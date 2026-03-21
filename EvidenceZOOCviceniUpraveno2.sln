@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37111.16 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EvidenceZOOCviceniUpraveno2", "EvidenceZOOCviceniUpraveno2\EvidenceZOOCviceniUpraveno2.csproj", "{C49DA3D8-A753-4109-B6C5-0B7B77EDC7CF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C49DA3D8-A753-4109-B6C5-0B7B77EDC7CF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C49DA3D8-A753-4109-B6C5-0B7B77EDC7CF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C49DA3D8-A753-4109-B6C5-0B7B77EDC7CF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C49DA3D8-A753-4109-B6C5-0B7B77EDC7CF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {59744900-7D48-444B-B6F7-BDBDFC1BE884}
+	EndGlobalSection
+EndGlobal
