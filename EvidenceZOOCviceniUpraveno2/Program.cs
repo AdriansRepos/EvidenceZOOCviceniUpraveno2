@@ -3,6 +3,9 @@
 
 // vytvoření instance ZOO
 ZOO zoo = new();
+SpravceZvirat spravceZvirat = new(zoo);
+SpravceZamestnancu spravceZamestnancu = new(zoo);
+
 
 char volbaMenu;
 do
@@ -20,11 +23,11 @@ do
     switch (volbaMenu)
     {
         case '1':
-            Zvire.MenuZvirata(zoo);
+            spravceZvirat.Menu();
             break;
 
         case '2':
-            Zamestnanec.MenuZamestnanci(zoo);
+            spravceZamestnancu.Menu();
             break;
 
         case '3':
