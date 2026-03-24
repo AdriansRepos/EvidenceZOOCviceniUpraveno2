@@ -15,27 +15,27 @@ namespace EvidenceZOOCviceniUpraveno2
         /// <summary>
         /// Jméno zaměstnance
         /// </summary>
-        public string Jmeno { get; private set; } = Vstupy.ToTitleCase(jmeno);
+        public string Jmeno { get; set; } = Vstupy.ToTitleCase(jmeno);
 
         /// <summary>
         /// Příjmení zaměstnance
         /// </summary>
-        public string Prijmeni { get; private set; } = Vstupy.ToTitleCase(prijmeni);
+        public string Prijmeni { get; set; } = Vstupy.ToTitleCase(prijmeni);
 
         /// <summary>
         /// Datum narození zamstnance
         /// </summary>
-        public DateOnly DatumNarozeni { get; private set; } = datumNarozeni;
+        public DateOnly DatumNarozeni { get; set; } = datumNarozeni;
 
         /// <summary>
         /// Mzda zaměstnance
         /// </summary>
-        public int Mzda { get; private set; } = mzda;
+        public int Mzda { get; set; } = mzda;
 
         /// <summary>
         /// Pracovní pozice zaměstnance
         /// </summary>
-        public string PracovniPozice { get; private set; } = Vstupy.ToTitleCase(pracovniPozice);
+        public string PracovniPozice { get; set; } = Vstupy.ToTitleCase(pracovniPozice);
 
         /// <summary>
         /// Metoda pro výpis zaměstnance
