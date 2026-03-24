@@ -12,17 +12,17 @@ namespace EvidenceZOOCviceniUpraveno2
         /// <summary>
         /// Název zvířete
         /// </summary>
-        public string Nazev { get; private set; } = Vstupy.ToTitleCase(nazev);
+        public string Nazev { get; set; } = Vstupy.ToTitleCase(nazev);
 
         /// <summary>
         /// Věk zvířete
         /// </summary>
-        public int Vek { get; private set; } = vek;
+        public int Vek { get; set; } = vek;
 
         /// <summary>
         /// Váha zvířete
         /// </summary>
-        public double Vaha { get; private set; } = vaha;
+        public double Vaha { get; set; } = vaha;
 
         /// <summary>
         /// Metoda pro výpis zvířat
