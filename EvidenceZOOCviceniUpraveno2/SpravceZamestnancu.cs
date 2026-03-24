@@ -6,14 +6,9 @@ using System.Threading.Tasks;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
-    class SpravceZamestnancu
+    class SpravceZamestnancu(ZOO zoo)
     {
-        private readonly ZOO zoo;
-
-        public SpravceZamestnancu(ZOO zoo)
-        {
-            this.zoo = zoo;
-        }
+        private readonly ZOO zoo = zoo;
 
         public void Menu()
         {
