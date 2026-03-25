@@ -7,7 +7,7 @@ namespace EvidenceZOOCviceniUpraveno2
         /// <summary>
         /// Název zvířete
         /// </summary>
-        public string Nazev { get; private set; }
+        public string Nazev { get; private set; } = "";
 
         /// <summary>
         /// Věk zvířete
