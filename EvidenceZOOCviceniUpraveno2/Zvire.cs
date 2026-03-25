@@ -1,28 +1,51 @@
 ﻿
 namespace EvidenceZOOCviceniUpraveno2
 {
-    /// <summary>
-    /// Vytvoření instance Zvíře
-    /// </summary>
-    /// <param name="nazev">Název zvířete</param>
-    /// <param name="vek">Věk zvířete</param>
-    /// <param name="vaha">Váha zvířete</param>
-    class Zvire(string nazev, int vek, double vaha)
+    
+    class Zvire
     {
         /// <summary>
         /// Název zvířete
         /// </summary>
-        public string Nazev { get; set; } = Vstupy.ToTitleCase(nazev);
+        public string Nazev { get; private set; }
 
         /// <summary>
         /// Věk zvířete
         /// </summary>
-        public int Vek { get; set; } = vek;
+        public int Vek { get; private set; }
 
         /// <summary>
         /// Váha zvířete
         /// </summary>
-        public double Vaha { get; set; } = vaha;
+        public double Vaha { get; private set; }
+
+        /// <summary>
+        /// Vytvoření instance Zvíře
+        /// </summary>
+        /// <param name="nazev">Název zvířete</param>
+        /// <param name="vek">Věk zvířete</param>
+        /// <param name="vaha">Váha zvířete</param>
+        public Zvire(string nazev, int vek, double vaha)
+        {
+            NastavNazev(nazev);
+            NastavVek(vek);
+            NastavVahu(vaha);
+        }
+
+        internal void NastavNazev(string novyNazev)
+        {
+            Nazev = Vstupy.ToTitleCase(novyNazev);
+        }
+
+        internal void NastavVek(int novyVek)
+        {
+            Vek = novyVek; 
+        }
+
+        internal void NastavVahu(double novaVaha)
+        {
+            Vaha = novaVaha; 
+        }
 
         /// <summary>
         /// Metoda pro výpis zvířat
