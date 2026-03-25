@@ -1,41 +1,77 @@
 ﻿
 namespace EvidenceZOOCviceniUpraveno2
 {
-    /// <summary>
-    /// Vytvoření instance zaměstnance
-    /// </summary>
-    /// <param name="jmeno">jméno zaměstnance</param>
-    /// <param name="prijmeni">příjmení zaměstnance</param>
-    /// <param name="datumNarozeni">datum narození zaměstnance</param>
-    /// <param name="mzda">mzda zaměstnance</param>
-    /// <param name="pracovniPozice">pracovní pozice zaměstnance</param>
-    class Zamestnanec(string jmeno, string prijmeni, DateOnly datumNarozeni,
-                       int mzda, string pracovniPozice)
+    
+    class Zamestnanec
     {
         /// <summary>
         /// Jméno zaměstnance
         /// </summary>
-        public string Jmeno { get; set; } = Vstupy.ToTitleCase(jmeno);
+        public string Jmeno { get; private set; } = "";
 
         /// <summary>
         /// Příjmení zaměstnance
         /// </summary>
-        public string Prijmeni { get; set; } = Vstupy.ToTitleCase(prijmeni);
+        public string Prijmeni { get; private set; } = "";
 
         /// <summary>
         /// Datum narození zamstnance
         /// </summary>
-        public DateOnly DatumNarozeni { get; set; } = datumNarozeni;
+        public DateOnly DatumNarozeni { get; private set; }
 
         /// <summary>
         /// Mzda zaměstnance
         /// </summary>
-        public int Mzda { get; set; } = mzda;
+        public int Mzda { get; private set; }
 
         /// <summary>
         /// Pracovní pozice zaměstnance
         /// </summary>
-        public string PracovniPozice { get; set; } = Vstupy.ToTitleCase(pracovniPozice);
+        public string PracovniPozice { get; private set; } = "";
+
+        /// <summary>
+        /// Vytvoření instance zaměstnance
+        /// </summary>
+        /// <param name="jmeno">jméno zaměstnance</param>
+        /// <param name="prijmeni">příjmení zaměstnance</param>
+        /// <param name="datumNarozeni">datum narození zaměstnance</param>
+        /// <param name="mzda">mzda zaměstnance</param>
+        /// <param name="pracovniPozice">pracovní pozice zaměstnance</param>
+        public Zamestnanec(string jmeno, string prijmeni, DateOnly datumNarozeni,
+                       int mzda, string pracovniPozice)
+        {
+            NastavJmeno(jmeno);
+            NastavPrijmeni(prijmeni);
+            NastavDatumNarozeni(datumNarozeni);
+            NastavMzdu(mzda);
+            NastavPracovniPozici(pracovniPozice);
+        }
+
+
+        internal void NastavJmeno(string noveJmeno)
+        {
+            Jmeno = Vstupy.ToTitleCase(noveJmeno);
+        }
+
+        internal void NastavPrijmeni(string novePrijmeni)
+        {
+            Prijmeni = Vstupy.ToTitleCase(novePrijmeni);
+        }
+
+        internal void NastavDatumNarozeni(DateOnly noveDatumNarozeni)
+        {
+            DatumNarozeni = noveDatumNarozeni;
+        }
+
+        internal void NastavMzdu(int novaMzda)
+        {
+            Mzda = novaMzda;
+        }
+
+        internal void NastavPracovniPozici(string novaPracovniPozice)
+        {
+            PracovniPozice = Vstupy.ToTitleCase(novaPracovniPozice);
+        }
 
         /// <summary>
         /// Metoda pro výpis zaměstnance
