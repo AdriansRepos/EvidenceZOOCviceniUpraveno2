@@ -79,9 +79,9 @@ namespace EvidenceZOOCviceniUpraveno2
             {
                 var zvire = zoo.Zvirata[index];
 
-                zvire.Nazev = Vstupy.ZeptejSeAUpravString(zvire.Nazev, "název", "Nový");
-                zvire.Vek = Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk");
-                zvire.Vaha = Vstupy.ZeptejSeAUpravDouble(zvire.Vaha, "váha");
+                zvire.NastavNazev(Vstupy.ZeptejSeAUpravString(zvire.Nazev, "název", "Nový"));
+                zvire.NastavVek(Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk"));
+                zvire.NastavVahu(Vstupy.ZeptejSeAUpravDouble(zvire.Vaha, "váha"));
 
                 Console.WriteLine("Úprava dokončena.");
             }
