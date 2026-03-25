@@ -85,9 +85,10 @@ namespace EvidenceZOOCviceniUpraveno2
             {
                 var zam = zoo.Zamestnanci[index];
 
-                zam.Jmeno = Vstupy.ZeptejSeAUpravString(zam.Jmeno, "jméno", "Nové");
-                zam.Prijmeni = Vstupy.ZeptejSeAUpravString(zam.Prijmeni, "příjmení", "Nové");
-                zam.PracovniPozice = Vstupy.ZeptejSeAUpravString(zam.PracovniPozice, "pracovní pozice", "Nová");
+                zam.NastavJmeno(Vstupy.ZeptejSeAUpravString(zam.Jmeno, "jméno", "Nové"));
+                zam.NastavPrijmeni(Vstupy.ZeptejSeAUpravString(zam.Prijmeni, "příjmení", "Nové"));
+                zam.NastavPracovniPozici(Vstupy.ZeptejSeAUpravString
+                    (zam.PracovniPozice, "pracovní pozice", "Nová"));
 
                 Console.WriteLine($"Aktuální datum narození: {zam.DatumNarozeni}\nChcete upravit tuto položku? A/N");
                 if (Console.ReadLine()!.Equals("A", StringComparison.CurrentCultureIgnoreCase))
@@ -101,10 +102,10 @@ namespace EvidenceZOOCviceniUpraveno2
                         Console.Write("Nové datum narození: ");
                     }
 
-                    zam.DatumNarozeni = noveDatum;
+                    zam.NastavDatumNarozeni(noveDatum);
                 }
 
-                zam.Mzda = Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda");
+                zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda"));
 
                 Console.WriteLine("Úprava dokončena.");
             }
