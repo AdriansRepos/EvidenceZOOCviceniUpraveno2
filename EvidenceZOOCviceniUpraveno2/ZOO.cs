@@ -3,28 +3,16 @@ namespace EvidenceZOOCviceniUpraveno2
 {
     class ZOO
     {
-        /// <summary>
-        /// Vytvoření kolekce pro evidenci zvířat 
-        /// </summary>
         public List<Zvire> Zvirata { get; private set; }
 
-        /// <summary>
-        /// Vytvoření kolekce pro evidenci zvířat 
-        /// </summary>
         public List<Zamestnanec> Zamestnanci { get; private set; }
 
-        /// <summary>
-        /// Vytvoření instance ZOO
-        /// </summary>
         public ZOO()
         {
             Zvirata = [];
             Zamestnanci = [];
         }
 
-        /// <summary>
-        /// Podmenu pro statistiky
-        /// </summary>
         public void MenuStatistiky()
         {
             char volba;
@@ -67,28 +55,16 @@ namespace EvidenceZOOCviceniUpraveno2
             while (volba != '4');
         }
 
-        /// <summary>
-        /// Statistika celkového počtu zvířat v ZOO
-        /// </summary>
-        /// <returns>celkový počet zvířat</returns>
         public int PocetZvirat()
         {
             return Zvirata.Count;
         }
 
-        /// <summary>
-        /// Statistika celkového počtu zaměstnanců v ZOO
-        /// </summary>
-        /// <returns></returns>
         public int PocetZamestnancu()
         {
             return Zamestnanci.Count;
         }
 
-        /// <summary>
-        /// Statistika celkového mzdového nákladu na všechny zaměstnance v ZOO
-        /// </summary>
-        /// <returns>součet všech mezd</returns>
         public int SoucetMezd()
         {
             return Zamestnanci.Sum(z => z.Mzda);

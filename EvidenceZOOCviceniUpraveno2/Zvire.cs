@@ -3,28 +3,13 @@ namespace EvidenceZOOCviceniUpraveno2
 {
     
     class Zvire
-    {
-        /// <summary>
-        /// Název zvířete
-        /// </summary>
+    {        
         public string Nazev { get; private set; } = "";
 
-        /// <summary>
-        /// Věk zvířete
-        /// </summary>
         public int Vek { get; private set; }
 
-        /// <summary>
-        /// Váha zvířete
-        /// </summary>
         public double Vaha { get; private set; }
 
-        /// <summary>
-        /// Vytvoření instance Zvíře
-        /// </summary>
-        /// <param name="nazev">Název zvířete</param>
-        /// <param name="vek">Věk zvířete</param>
-        /// <param name="vaha">Váha zvířete</param>
         public Zvire(string nazev, int vek, double vaha)
         {
             NastavNazev(nazev);
@@ -47,9 +32,6 @@ namespace EvidenceZOOCviceniUpraveno2
             Vaha = novaVaha; 
         }
 
-        /// <summary>
-        /// Metoda pro výpis zvířat
-        /// </summary>
         public void VypisZvire()
         {
             Console.WriteLine("Název zvířete: {0}", Nazev);

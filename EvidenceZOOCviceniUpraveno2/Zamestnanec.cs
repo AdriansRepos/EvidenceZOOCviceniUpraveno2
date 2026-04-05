@@ -3,40 +3,17 @@ namespace EvidenceZOOCviceniUpraveno2
 {
     
     class Zamestnanec
-    {
-        /// <summary>
-        /// Jméno zaměstnance
-        /// </summary>
+    {        
         public string Jmeno { get; private set; } = "";
-
-        /// <summary>
-        /// Příjmení zaměstnance
-        /// </summary>
+                
         public string Prijmeni { get; private set; } = "";
 
-        /// <summary>
-        /// Datum narození zamstnance
-        /// </summary>
         public DateOnly DatumNarozeni { get; private set; }
-
-        /// <summary>
-        /// Mzda zaměstnance
-        /// </summary>
+                
         public int Mzda { get; private set; }
 
-        /// <summary>
-        /// Pracovní pozice zaměstnance
-        /// </summary>
         public string PracovniPozice { get; private set; } = "";
 
-        /// <summary>
-        /// Vytvoření instance zaměstnance
-        /// </summary>
-        /// <param name="jmeno">jméno zaměstnance</param>
-        /// <param name="prijmeni">příjmení zaměstnance</param>
-        /// <param name="datumNarozeni">datum narození zaměstnance</param>
-        /// <param name="mzda">mzda zaměstnance</param>
-        /// <param name="pracovniPozice">pracovní pozice zaměstnance</param>
         public Zamestnanec(string jmeno, string prijmeni, DateOnly datumNarozeni,
                        int mzda, string pracovniPozice)
         {
@@ -73,9 +50,6 @@ namespace EvidenceZOOCviceniUpraveno2
             PracovniPozice = Vstupy.ToTitleCase(novaPracovniPozice);
         }
 
-        /// <summary>
-        /// Metoda pro výpis zaměstnance
-        /// </summary>
         public void VypisZamestnance()
         {
             Console.WriteLine("Jméno zaměstnance: {0}", Jmeno);
