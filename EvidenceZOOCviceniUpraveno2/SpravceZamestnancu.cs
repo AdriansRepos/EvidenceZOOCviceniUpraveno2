@@ -69,8 +69,18 @@ namespace EvidenceZOOCviceniUpraveno2
             string pracovniPozice = Vstupy.ZeptejSeAUpravString("", "pracovní pozice", "Nová", true);
             int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", true);
 
-            Console.Write("Datum narození (formát d.M.rrrr): ");
-            DateOnly datumNarozeni = DateOnly.Parse(Console.ReadLine()!);
+            DateOnly datumNarozeni;
+
+            while (true)
+            {
+                Console.Write("Datum narození (formát d.M.rrrr): ");
+                string vstup = Console.ReadLine()!;
+
+                if (DateOnly.TryParse(vstup, out datumNarozeni))
+                    break;
+
+                Console.WriteLine("Neplatný formát data. Zkus to znovu.");
+            }
 
             zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
 
@@ -118,7 +128,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
                     while (!DateOnly.TryParse(Console.ReadLine(), out noveDatum))
                     {
-                        Console.WriteLine("Neplatné zadání, zkuste znovu:");
+                        Console.WriteLine("Neplatné zadání, zkuste znovu!");
                         Console.Write("Nové datum narození: ");
                     }
 
