@@ -87,10 +87,7 @@ namespace EvidenceZOOCviceniUpraveno2
             return ti.ToTitleCase(text.ToLower());
         }
 
-        /// <summary>
-        /// Metoda k indexaci zaměstnanců
-        /// </summary>
-        /// <returns>index zaměstnance</returns>
+        
         public static int VybratIndexZamestnance(ZOO zoo)
         {
             for (int i = 0; i < zoo.Zamestnanci.Count; i++)
@@ -111,10 +108,7 @@ namespace EvidenceZOOCviceniUpraveno2
             return -1;
         }
 
-        /// <summary>
-        /// Metoda k indexaci zvířat
-        /// </summary>
-        /// <returns>index zvířete</returns>
+        
         public static int VybratIndexZvirete(ZOO zoo)
         {
             for (int i = 0; i < zoo.Zvirata.Count; i++)
