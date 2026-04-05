@@ -28,13 +28,33 @@ namespace EvidenceZOOCviceniUpraveno2
 
                 switch (volba)
                 {
-                    case '1': Pridat(); break;
-                    case '2': Vypis(); break;
-                    case '3': Smazat(); break;
-                    case '4': Upravit(); break;
-                    case '5': Vyhledat(); break;
-                    case '6': Console.WriteLine(); break;
-                    default: Console.WriteLine("Neplatná volba."); break;
+                    case '1': 
+                        Pridat(); 
+                        break;
+
+                    case '2': 
+                        Vypis(); 
+                        break;
+
+                    case '3': 
+                        Smazat(); 
+                        break;
+
+                    case '4': 
+                        Upravit(); 
+                        break;
+
+                    case '5': 
+                        Vyhledat(); 
+                        break;
+
+                    case '6': 
+                        Console.WriteLine(); 
+                        break;
+
+                    default: 
+                        Console.WriteLine("Neplatná volba."); 
+                        break;
                 }
 
             } while (volba != '6');
