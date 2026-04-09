@@ -18,7 +18,7 @@ namespace EvidenceZOOCviceniUpraveno2
             return ToTitleCase(Console.ReadLine()!.Trim());
         }
 
-        public static int ZeptejSeAUpravInt(int aktualni, string popis, bool jeNove = false)
+        public static int ZeptejSeAUpravInt(int aktualni,  string popis, string prefix, bool jeNove = false)
         {
             if (!jeNove)
             {
@@ -27,7 +27,7 @@ namespace EvidenceZOOCviceniUpraveno2
                     return aktualni;
             }
 
-            Console.Write($"Nový {popis}: ");
+            Console.Write($"{prefix} {popis}: ");
 
             while (true)
             {
