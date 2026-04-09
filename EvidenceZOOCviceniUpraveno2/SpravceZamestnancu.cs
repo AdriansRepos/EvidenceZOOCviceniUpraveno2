@@ -67,7 +67,7 @@ namespace EvidenceZOOCviceniUpraveno2
             string jmeno = Vstupy.ZeptejSeAUpravString("", "jméno", "Nové", true);
             string prijmeni = Vstupy.ZeptejSeAUpravString("", "příjmení", "Nové", true);
             string pracovniPozice = Vstupy.ZeptejSeAUpravString("", "pracovní pozice", "Nová", true);
-            int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", true);
+            int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", "Nová", true);
 
             DateOnly datumNarozeni;
 
@@ -135,7 +135,7 @@ namespace EvidenceZOOCviceniUpraveno2
                     zam.NastavDatumNarozeni(noveDatum);
                 }
 
-                zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda"));
+                zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda", "Nová"));
 
                 Console.WriteLine("Úprava dokončena.");
             }
