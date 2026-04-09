@@ -65,7 +65,7 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
 
             string nazev = Vstupy.ZeptejSeAUpravString("", "název", "Nový", true);
-            int vek = Vstupy.ZeptejSeAUpravInt(0, "věk", true);
+            int vek = Vstupy.ZeptejSeAUpravInt(0, "věk", "Nový" ,true);
             double vaha = Vstupy.ZeptejSeAUpravDouble(0, "váha", true);
 
             zoo.Zvirata.Add(new Zvire(nazev, vek, vaha));
@@ -100,7 +100,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 var zvire = zoo.Zvirata[index];
 
                 zvire.NastavNazev(Vstupy.ZeptejSeAUpravString(zvire.Nazev, "název", "Nový"));
-                zvire.NastavVek(Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk"));
+                zvire.NastavVek(Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk", "Nový"));
                 zvire.NastavVahu(Vstupy.ZeptejSeAUpravDouble(zvire.Vaha, "váha"));
 
                 Console.WriteLine("Úprava dokončena.");
