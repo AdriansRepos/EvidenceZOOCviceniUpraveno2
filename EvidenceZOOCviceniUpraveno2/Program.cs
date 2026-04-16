@@ -35,7 +35,6 @@ do
             break;
 
         case '4':
-            Console.WriteLine();
             break;
 
         default:
