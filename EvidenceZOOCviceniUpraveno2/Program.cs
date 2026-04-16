@@ -1,15 +1,17 @@
 ﻿using EvidenceZOOCviceniUpraveno2;
 
-
+// Cesty k datovým souborům (relativní vůči projektu)
 string souborZam = @"..\..\..\zamestnanci.txt";
 string souborZvir = @"..\..\..\zvirata.txt";
 
-// vytvořit soubory, pokud neexistují
+// Zajistí, že soubory existují – pokud ne, vytvoří je prázdné
 ZOO.KontrolaExistenceSouboru(souborZam);
 ZOO.KontrolaExistenceSouboru(souborZvir);
 
+// Vytvoření hlavního objektu ZOO – načte data ze souborů do paměti
 ZOO zoo = new(souborZam, souborZvir);
 
+// Vytvoření správců, kteří pracují s daty v ZOO
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
 

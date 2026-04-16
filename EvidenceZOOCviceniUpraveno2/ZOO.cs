@@ -3,22 +3,35 @@ namespace EvidenceZOOCviceniUpraveno2
 {
     class ZOO
     {
+        // Seznam všech zvířat načtených ze souboru
         public List<Zvire> Zvirata { get; private set; }
+
+        // Seznam všech zaměstnanců načtených ze souboru
         public List<Zamestnanec> Zamestnanci { get; private set; }
+
+        // Cesta k souboru se zaměstnanci
         public string SouborZamestnanci { get; private set; } = "";
+
+        // Cesta k souboru se zvířaty
         public string SouborZvirata { get; private set; } = "";
+
+        // Konstruktor – uloží cesty k souborům, zajistí jejich existenci
+        // a načte data do seznamů
         public ZOO(string souborZam, string souborZvir)
         {
             SouborZamestnanci = souborZam;
             SouborZvirata = souborZvir;
 
+            // Pokud soubory neexistují, vytvoří je
             KontrolaExistenceSouboru(SouborZamestnanci);
             KontrolaExistenceSouboru(SouborZvirata);
 
+            // Načtení dat ze souborů do paměti
             Zamestnanci = NactiZamestnanceZeSouboru();
             Zvirata = NactiZvirataZeSouboru();
         }
 
+        // Zkontroluje existenci souboru a pokud chybí, vytvoří ho
         public static void KontrolaExistenceSouboru(string cesta)
         {
             try
@@ -39,13 +52,14 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        // Načte zaměstnance ze souboru a převede je pomocí Parse
         private List<Zamestnanec> NactiZamestnanceZeSouboru()
         {
             try
             {
                 return [.. File.ReadAllLines(SouborZamestnanci)
-                       .Where(l => !string.IsNullOrWhiteSpace(l))
-                       .Select(Zamestnanec.Parse)];
+                   .Where(r => !string.IsNullOrWhiteSpace(r))   // ignoruje prázdné řádky
+                   .Select(Zamestnanec.Parse)];                 // převede řádek na objekt
             }
             catch (FileNotFoundException)
             {
@@ -59,13 +73,14 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        // Načte zvířata ze souboru a převede je pomocí Parse
         private List<Zvire> NactiZvirataZeSouboru()
         {
             try
             {
                 return [.. File.ReadAllLines(SouborZvirata)
-                       .Where(l => !string.IsNullOrWhiteSpace(l))
-                       .Select(Zvire.Parse)];
+                   .Where(l => !string.IsNullOrWhiteSpace(l))   // ignoruje prázdné řádky
+                   .Select(Zvire.Parse)];                       // převede řádek na objekt
             }
             catch (FileNotFoundException)
             {
@@ -79,12 +94,13 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        // Uloží všechny zaměstnance zpět do souboru
         public void UlozZamestnance()
         {
             try
             {
                 File.WriteAllLines(SouborZamestnanci,
-                    Zamestnanci.Select(z => z.ToFileString()));
+                    Zamestnanci.Select(z => z.ToFileString()));  // každý objekt převede na řádek
             }
             catch (Exception ex)
             {
@@ -92,18 +108,21 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        // Uloží všechna zvířata zpět do souboru
         public void UlozZvirata()
         {
             try
             {
                 File.WriteAllLines(SouborZvirata,
-                    Zvirata.Select(z => z.ToFileString()));
+                    Zvirata.Select(z => z.ToFileString()));       // každý objekt převede na řádek
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Chyba při ukládání zvířat: {ex.Message}");
             }
         }
+
+        // Hlavní menu statistik
         public void MenuStatistiky()
         {
             char volba;
@@ -145,19 +164,23 @@ namespace EvidenceZOOCviceniUpraveno2
             while (volba != '4');
         }
 
+        // Vrátí počet zvířat v seznamu
         public int PocetZvirat()
         {
             return Zvirata.Count;
         }
 
+        // Vrátí počet zaměstnanců v seznamu
         public int PocetZamestnancu()
         {
             return Zamestnanci.Count;
         }
 
+        // Vrátí součet mezd všech zaměstnanců
         public int SoucetMezd()
         {
             return Zamestnanci.Sum(z => z.Mzda);
         }
     }
+
 }
