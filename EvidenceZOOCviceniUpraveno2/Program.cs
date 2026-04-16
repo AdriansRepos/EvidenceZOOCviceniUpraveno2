@@ -1,10 +1,17 @@
 ﻿using EvidenceZOOCviceniUpraveno2;
 
 
-// vytvoření instance ZOO
-ZOO zoo = new();
-SpravceZvirat spravceZvirat = new(zoo);
+string souborZam = @"..\..\..\zamestnanci.txt";
+string souborZvir = @"..\..\..\zvirata.txt";
+
+// vytvořit soubory, pokud neexistují
+ZOO.KontrolaExistenceSouboru(souborZam);
+ZOO.KontrolaExistenceSouboru(souborZvir);
+
+ZOO zoo = new(souborZam, souborZvir);
+
 SpravceZamestnancu spravceZamestnancu = new(zoo);
+SpravceZvirat spravceZvirat = new(zoo);
 
 
 char volbaMenu;
@@ -42,5 +49,5 @@ do
             break;
     }
 
-} 
+}
 while (volbaMenu != '4');
