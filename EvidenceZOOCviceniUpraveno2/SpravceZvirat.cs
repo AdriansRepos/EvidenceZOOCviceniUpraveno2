@@ -49,7 +49,6 @@ namespace EvidenceZOOCviceniUpraveno2
                         break;
 
                     case '6': 
-                        Console.WriteLine(); 
                         break;
 
                     default: 
