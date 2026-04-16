@@ -82,6 +82,7 @@ namespace EvidenceZOOCviceniUpraveno2
             }
 
             zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
+            zoo.UlozZamestnance();
 
             Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
         }
@@ -102,6 +103,7 @@ namespace EvidenceZOOCviceniUpraveno2
             {
                 Console.WriteLine($"Zaměstnanec {zoo.Zamestnanci[index].Prijmeni} byl smazán.");
                 zoo.Zamestnanci.RemoveAt(index);
+                zoo.UlozZamestnance();
             }
         }
 
@@ -135,6 +137,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 }
 
                 zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda", "Nová"));
+                zoo.UlozZamestnance();
 
                 Console.WriteLine("Úprava dokončena.");
             }
