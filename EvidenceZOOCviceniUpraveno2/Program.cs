@@ -16,6 +16,8 @@ SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
 
 
+// Hlavní menu aplikace – umožňuje přepínat mezi správou zvířat,
+// správou zaměstnanců a statistikami.
 char volbaMenu;
 do
 {
@@ -26,25 +28,27 @@ do
     Console.WriteLine("\t4. Konec programu");
     Console.Write("Vyber možnost: ");
 
+    // Načtení volby uživatele
     volbaMenu = Console.ReadKey().KeyChar;
     Console.WriteLine();
 
+    // Zpracování volby
     switch (volbaMenu)
     {
         case '1':
-            spravceZvirat.Menu();
+            spravceZvirat.Menu();          // otevře menu pro práci se zvířaty
             break;
 
         case '2':
-            spravceZamestnancu.Menu();
+            spravceZamestnancu.Menu();     // otevře menu pro práci se zaměstnanci
             break;
 
         case '3':
-            zoo.MenuStatistiky();
+            zoo.MenuStatistiky();          // zobrazí statistiky
             break;
 
         case '4':
-            break;
+            break;                          // ukončí program
 
         default:
             Console.WriteLine("Neplatná volba, opakujte zadání.");
@@ -52,4 +56,4 @@ do
     }
 
 }
-while (volbaMenu != '4');
+while (volbaMenu != '4');                    // opakuje menu, dokud uživatel nezvolí konec
