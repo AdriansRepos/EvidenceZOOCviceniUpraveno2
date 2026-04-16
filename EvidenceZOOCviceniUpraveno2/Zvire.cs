@@ -50,6 +50,32 @@ namespace EvidenceZOOCviceniUpraveno2
             }
 
             Console.WriteLine("\tVáha: {0} kg", Vaha);
-        }   
+        }
+
+        public string ToFileString()
+        {
+            return $"{Nazev};{Vek};{Vaha}";
+        }
+
+        public static Zvire Parse(string line)
+        {
+            string[] parts = line.Split(';');
+
+            if (parts.Length != 3)
+                throw new FormatException("Řádek nemá správný formát pro Zvire.");
+
+            if (string.IsNullOrWhiteSpace(parts[0]))
+                throw new FormatException("Název nesmí být prázdný.");
+            string nazev = parts[0];
+
+            if (!int.TryParse(parts[1], out int vek))
+                throw new FormatException("Věk není platné číslo.");
+
+            if (!double.TryParse(parts[2], out double vaha))
+                throw new FormatException("Váha není platné číslo.");
+
+            return new Zvire(nazev, vek, vaha);
+        }
+
     }
 }
