@@ -68,6 +68,8 @@ namespace EvidenceZOOCviceniUpraveno2
             double vaha = Vstupy.ZeptejSeAUpravDouble(0, "váha", true);
 
             zoo.Zvirata.Add(new Zvire(nazev, vek, vaha));
+            zoo.UlozZvirata();
+
             Console.WriteLine("Zvíře bylo úspěšně přidáno.");
         }
 
@@ -86,6 +88,7 @@ namespace EvidenceZOOCviceniUpraveno2
             {
                 Console.WriteLine($"Zvíře {zoo.Zvirata[index].Nazev} bylo smazáno.");
                 zoo.Zvirata.RemoveAt(index);
+                zoo.UlozZvirata();
             }
         }
 
@@ -101,6 +104,8 @@ namespace EvidenceZOOCviceniUpraveno2
                 zvire.NastavNazev(Vstupy.ZeptejSeAUpravString(zvire.Nazev, "název", "Nový"));
                 zvire.NastavVek(Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk", "Nový"));
                 zvire.NastavVahu(Vstupy.ZeptejSeAUpravDouble(zvire.Vaha, "váha"));
+
+                zoo.UlozZvirata();
 
                 Console.WriteLine("Úprava dokončena.");
             }
