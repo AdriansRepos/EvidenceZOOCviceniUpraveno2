@@ -63,14 +63,14 @@ namespace EvidenceZOOCviceniUpraveno2
         // Převede objekt na řetězec pro uložení do souboru
         public string ToFileString()
         {
-            return $"{Nazev};{Vek};{Vaha}";
+            return $"{Nazev}|{Vek}|{Vaha}";
         }
 
         // Vytvoří objekt Zvire z jednoho řádku textu v souboru
         public static Zvire Parse(string line)
         {
-            // Rozdělení řádku podle středníků
-            string[] parts = line.Split(';');
+            // Rozdělení řádku podle svislé čáry
+            string[] parts = line.Split('|');
 
             // Kontrola správného počtu položek
             if (parts.Length != 3)
@@ -93,5 +93,4 @@ namespace EvidenceZOOCviceniUpraveno2
             return new Zvire(nazev, vek, vaha);
         }
     }
-
 }

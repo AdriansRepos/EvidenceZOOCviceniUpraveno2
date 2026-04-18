@@ -73,14 +73,14 @@ namespace EvidenceZOOCviceniUpraveno2
         // Převede objekt na řetězec pro uložení do souboru
         public string ToFileString()
         {
-            return $"{Jmeno};{Prijmeni};{Mzda}";
+            return $"{Jmeno}|{Prijmeni}|{DatumNarozeni}|{Mzda}|{PracovniPozice}";
         }
 
         // Vytvoří objekt Zamestnanec z jednoho řádku textu v souboru
         public static Zamestnanec Parse(string line)
         {
-            // Rozdělení řádku podle středníků
-            string[] parts = line.Split(';');
+            // Rozdělení řádku podle svislé čáry
+            string[] parts = line.Split('|');
 
             // Kontrola správného počtu položek
             if (parts.Length != 5)
@@ -113,5 +113,4 @@ namespace EvidenceZOOCviceniUpraveno2
             return new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice);
         }
     }
-
 }
