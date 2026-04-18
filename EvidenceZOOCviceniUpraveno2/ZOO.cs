@@ -15,92 +15,91 @@ namespace EvidenceZOOCviceniUpraveno2
         // Cesta k souboru se zvířaty
         public string SouborZvirata { get; private set; } = "";
 
-        // Konstruktor – uloží cesty k souborům, zajistí jejich existenci
-        // a načte data do seznamů
-        public ZOO(string souborZam, string souborZvir)
+        // Cesta k logovacímu souboru pro chybné řádky
+        private readonly string LogSoubor = "";
+
+        /* Konstruktor – uloží cesty k souborům, zajistí jejich existenci
+         * a načte data do seznamů */
+        public ZOO(string souborZam, string souborZvir, string logSoubor)
         {
             SouborZamestnanci = souborZam;
             SouborZvirata = souborZvir;
+            LogSoubor = logSoubor;
 
-            // Pokud soubory neexistují, vytvoří je
-            KontrolaExistenceSouboru(SouborZamestnanci);
-            KontrolaExistenceSouboru(SouborZvirata);
-
-            // Načtení dat ze souborů do paměti
             Zamestnanci = NactiZamestnanceZeSouboru();
             Zvirata = NactiZvirataZeSouboru();
         }
 
-        // Zkontroluje existenci souboru a pokud chybí, vytvoří ho
-        public static void KontrolaExistenceSouboru(string cesta)
-        {
-            try
-            {
-                if (!File.Exists(cesta))
-                {
-                    Console.WriteLine($"Vytvářím soubor: {cesta}");
-                    using FileStream fs = File.Create(cesta);
-                }
-                else
-                {
-                    Console.WriteLine($"Soubor už existuje: {cesta}");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při práci se souborem: {ex.Message}");
-            }
-        }
-
-        // Načte zaměstnance ze souboru a převede je pomocí Parse
+        // Načte zaměstnance ze souboru, nevalidní řádky zapíše do logu
         private List<Zamestnanec> NactiZamestnanceZeSouboru()
-        {
-            try
+        {   // Vytvoření prázdného seznamu pro načtené zaměstnance
+            var list = new List<Zamestnanec>();
+            // Otevření logovacího souboru pro zápis chyb (v režimu přidávání)
+            using StreamWriter log = new(LogSoubor, append: true);
+            // Kontrola existence souboru se zaměstnanci, pokud neexistuje, vrátí prázdný seznam
+            if (!File.Exists(SouborZamestnanci))
+                return list;
+            // Procházení každého řádku v souboru se zaměstnanci
+            foreach (var radek in File.ReadAllLines(SouborZamestnanci))
             {
-                return [.. File.ReadAllLines(SouborZamestnanci)
-                   .Where(r => !string.IsNullOrWhiteSpace(r))   // ignoruje prázdné řádky
-                   .Select(Zamestnanec.Parse)];                 // převede řádek na objekt
+                try
+                {   // Kontrola, zda řádek není prázdný nebo pouze bílý, pokud ano, přeskočí ho
+                    if (string.IsNullOrWhiteSpace(radek))
+                        continue;
+                    // Pokus o parsování řádku do objektu Zamestnanec, pokud se nepodaří, zachytí výjimku a zapíše chybu do logu
+                    list.Add(Zamestnanec.Parse(radek));
+                }  // Zachycení a logování případných chyb při parsování řádku
+                catch (Exception ex)
+                {
+                    log.WriteLine($"{DateTime.Now}: Chybný řádek v zaměstnancích: \"{radek}\" – {ex.Message}");
+                }
             }
-            catch (FileNotFoundException)
-            {
-                Console.WriteLine("Soubor se zaměstnanci nebyl nalezen. Pokračuji prázdným seznamem.");
-                return [];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání zaměstnanců: {ex.Message}");
-                return [];
-            }
+            // Vrácení seznamu načtených zaměstnanců
+            return list;
         }
 
-        // Načte zvířata ze souboru a převede je pomocí Parse
+        // Načte zvířata ze souboru, nevalidní řádky zapíše do logu
         private List<Zvire> NactiZvirataZeSouboru()
-        {
-            try
+        {   // Vytvoření prázdného seznamu pro načtená zvířata
+            var list = new List<Zvire>();
+            // Otevření logovacího souboru pro zápis chyb (v režimu přidávání)
+            using StreamWriter log = new(LogSoubor, append: true);
+            // Kontrola existence souboru se zvířaty, pokud neexistuje, vrátí prázdný seznam
+            if (!File.Exists(SouborZvirata))
+                return list;
+            // Procházení každého řádku v souboru se zvířaty
+            foreach (var radek in File.ReadAllLines(SouborZvirata))
             {
-                return [.. File.ReadAllLines(SouborZvirata)
-                   .Where(l => !string.IsNullOrWhiteSpace(l))   // ignoruje prázdné řádky
-                   .Select(Zvire.Parse)];                       // převede řádek na objekt
+                try
+                {   // Kontrola, zda řádek není prázdný nebo pouze bílý, pokud ano, přeskočí ho
+                    if (string.IsNullOrWhiteSpace(radek))
+                        continue;
+                    // Pokus o parsování řádku do objektu Zvire, pokud se nepodaří, zachytí výjimku a zapíše chybu do logu
+                    list.Add(Zvire.Parse(radek));
+                }
+                catch (Exception ex)
+                {
+                    log.WriteLine($"{DateTime.Now}: Chybný řádek ve zvířatech: \"{radek}\" – {ex.Message}");
+                }
             }
-            catch (FileNotFoundException)
-            {
-                Console.WriteLine("Soubor se zvířaty nebyl nalezen. Pokračuji prázdným seznamem.");
-                return [];
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při načítání zvířat: {ex.Message}");
-                return [];
-            }
+            // Vrácení seznamu načtených zvířat
+            return list;
         }
 
-        // Uloží všechny zaměstnance zpět do souboru
+        // Uloží všechny zaměstnance zpět do souboru (včetně automatické zálohy)
         public void UlozZamestnance()
         {
             try
             {
+                // Zálohuje jen pokud původní soubor existuje
+                if (File.Exists(SouborZamestnanci))
+                {
+                    File.Copy(SouborZamestnanci, SouborZamestnanci + ".bak", overwrite: true);
+                }
+
+                // na začátku vytvoří nový soubor, pokud neexistuje, a zapíše všechny zaměstnance do souboru
                 File.WriteAllLines(SouborZamestnanci,
-                    Zamestnanci.Select(z => z.ToFileString()));  // každý objekt převede na řádek
+                    Zamestnanci.Select(z => z.ToFileString()));
             }
             catch (Exception ex)
             {
@@ -108,13 +107,18 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Uloží všechna zvířata zpět do souboru
+        // Uloží všechna zvířata zpět do souboru (včetně automatické zálohy)
         public void UlozZvirata()
         {
             try
             {
+                if (File.Exists(SouborZvirata))
+                {   // Zálohuje jen pokud původní soubor existuje
+                    File.Copy(SouborZvirata, SouborZvirata + ".bak", overwrite: true);
+                }
+                // na začátku vytvoří nový soubor, pokud neexistuje, a zapíše všechny zvířata do souboru
                 File.WriteAllLines(SouborZvirata,
-                    Zvirata.Select(z => z.ToFileString()));       // každý objekt převede na řádek
+                    Zvirata.Select(z => z.ToFileString()));
             }
             catch (Exception ex)
             {
@@ -182,5 +186,4 @@ namespace EvidenceZOOCviceniUpraveno2
             return Zamestnanci.Sum(z => z.Mzda);
         }
     }
-
 }
