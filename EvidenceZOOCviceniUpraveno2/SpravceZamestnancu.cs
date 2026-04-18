@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
-    // Třída zodpovědná za práci se zaměstnanci – přidávání, mazání, úpravy, výpisy a hledání.
-    // Přijímá instanci ZOO, kde jsou uložena data.
+    /* Třída zodpovědná za práci se zaměstnanci – přidávání, mazání, úpravy, výpisy a hledání.
+     * Přijímá instanci ZOO, kde jsou uložena data. */
     class SpravceZamestnancu(ZOO zoo)
     {
         // Odkaz na hlavní datový objekt ZOO
@@ -46,28 +46,18 @@ namespace EvidenceZOOCviceniUpraveno2
         }
 
         // Přidání nového zaměstnance – dotazy na vstupy + validace
+        // Přidání nového zaměstnance – dotazy na vstupy + validace
         public void Pridat()
         {
-            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
-
-            // Získání vstupů od uživatele
-            string jmeno = Vstupy.ZeptejSeAUpravString("", "jméno", "Nové", true);
-            string prijmeni = Vstupy.ZeptejSeAUpravString("", "příjmení", "Nové", true);
-            string pracovniPozice = Vstupy.ZeptejSeAUpravString("", "pracovní pozice", "Nová", true);
-            int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", "Nová", true);
-
-            // Zadání data narození s validací
-            DateOnly datumNarozeni;
-            while (true)
-            {
-                Console.Write("Datum narození (formát d.M.rrrr): ");
-                string vstup = Console.ReadLine()!;
-
-                if (DateOnly.TryParse(vstup, out datumNarozeni))
-                    break;
-
-                Console.WriteLine("Neplatný formát data. Zkus to znovu.");
-            }
+            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");            
+             /* Používáme NactiBezZakazanychZnaku, aby se do systému nikdy nedostal
+             * zakázaný znak '|' (oddělovač v souboru). 
+             * Tím zabráníme rozbití formátu při ukládání a načítání. */
+            string jmeno = Vstupy.NactiBezZakazanychZnaku("Zadejte jméno: ", '|');
+            string prijmeni = Vstupy.NactiBezZakazanychZnaku("Zadejte příjmení: ", '|');
+            string pracovniPozice = Vstupy.NactiBezZakazanychZnaku("Zadejte pracovní pozici: ", '|');
+            DateOnly datumNarozeni = Vstupy.ZeptejSeAUpravDateOnly(DateOnly.MinValue, "Datum narození", "Zadejte", true);
+            int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", "Nová", true);            
 
             // Uložení do seznamu
             zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
@@ -75,6 +65,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
             Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
         }
+
 
         // Vypíše všechny zaměstnance
         public void Vypis()
@@ -97,7 +88,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 zoo.UlozZamestnance(); // uloží změny
             }
         }
-
+        
         // Úprava existujícího zaměstnance
         public void Upravit()
         {
@@ -107,28 +98,22 @@ namespace EvidenceZOOCviceniUpraveno2
             if (index >= 0)
             {
                 var zam = zoo.Zamestnanci[index];
+                
+                 /* Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
+                 * zakázaný znak '|' a nerozbil formát uložených dat.
+                 */
+                zam.NastavJmeno(
+                    Vstupy.NactiBezZakazanychZnaku($"Nové jméno ({zam.Jmeno}): ", '|')
+                );
 
-                // Úprava jednotlivých položek
-                zam.NastavJmeno(Vstupy.ZeptejSeAUpravString(zam.Jmeno, "jméno", "Nové"));
-                zam.NastavPrijmeni(Vstupy.ZeptejSeAUpravString(zam.Prijmeni, "příjmení", "Nové"));
-                zam.NastavPracovniPozici(Vstupy.ZeptejSeAUpravString(zam.PracovniPozice, "pracovní pozice", "Nová"));
+                zam.NastavPrijmeni(
+                    Vstupy.NactiBezZakazanychZnaku($"Nové příjmení ({zam.Prijmeni}): ", '|')
+                );
 
-                // Úprava data narození – volitelná
-                Console.WriteLine($"Aktuální datum narození: {zam.DatumNarozeni}\nChcete upravit tuto položku? A/N");
-                if (Console.ReadLine()!.Equals("A", StringComparison.CurrentCultureIgnoreCase))
-                {
-                    Console.Write("Nové datum narození (formát d.M.rrrr): ");
-                    DateOnly noveDatum;
-
-                    while (!DateOnly.TryParse(Console.ReadLine(), out noveDatum))
-                    {
-                        Console.WriteLine("Neplatné zadání, zkuste znovu!");
-                        Console.Write("Nové datum narození: ");
-                    }
-
-                    zam.NastavDatumNarozeni(noveDatum);
-                }
-
+                zam.NastavPracovniPozici(
+                    Vstupy.NactiBezZakazanychZnaku($"Nová pracovní pozice ({zam.PracovniPozice}): ", '|')
+                );
+                zam.NastavDatumNarozeni(Vstupy.ZeptejSeAUpravDateOnly(zam.DatumNarozeni, "datum narození", "Nové"));
                 // Úprava mzdy
                 zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda", "Nová"));
 
@@ -160,10 +145,8 @@ namespace EvidenceZOOCviceniUpraveno2
                     nalezeno = true;
                 }
             }
-
             if (!nalezeno)
                 Console.WriteLine("Zaměstnanec nenalezen.");
         }
     }
-
 }
