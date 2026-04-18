@@ -3,13 +3,10 @@
 // Cesty k datovým souborům (relativní vůči projektu)
 string souborZam = @"..\..\..\zamestnanci.txt";
 string souborZvir = @"..\..\..\zvirata.txt";
-
-// Zajistí, že soubory existují – pokud ne, vytvoří je prázdné
-ZOO.KontrolaExistenceSouboru(souborZam);
-ZOO.KontrolaExistenceSouboru(souborZvir);
+string logSoubor = @"..\..\..\chyby.log";
 
 // Vytvoření hlavního objektu ZOO – načte data ze souborů do paměti
-ZOO zoo = new(souborZam, souborZvir);
+ZOO zoo = new(souborZam, souborZvir, logSoubor);
 
 // Vytvoření správců, kteří pracují s daty v ZOO
 SpravceZamestnancu spravceZamestnancu = new(zoo);
@@ -54,6 +51,5 @@ do
             Console.WriteLine("Neplatná volba, opakujte zadání.");
             break;
     }
-
 }
 while (volbaMenu != '4');                    // opakuje menu, dokud uživatel nezvolí konec
