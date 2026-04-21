@@ -99,9 +99,8 @@ namespace EvidenceZOOCviceniUpraveno2
             {
                 var zam = zoo.Zamestnanci[index];
                 
-                 /* Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
-                 * zakázaný znak '|' a nerozbil formát uložených dat.
-                 */
+                /* Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
+                 * zakázaný znak '|' a nerozbil formát uložených dat. */                 
                 zam.NastavJmeno(
                     Vstupy.NactiBezZakazanychZnaku($"Nové jméno ({zam.Jmeno}): ", '|')
                 );

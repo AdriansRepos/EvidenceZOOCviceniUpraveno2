@@ -98,11 +98,9 @@ namespace EvidenceZOOCviceniUpraveno2
             if (index >= 0)
             {
                 var zvire = zoo.Zvirata[index];
-
-                /*
-                 * Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
-                 * zakázaný znak '|' a nerozbil formát uložených dat.
-                 */
+                                
+                 /* Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
+                 * zakázaný znak '|' a nerozbil formát uložených dat. */                
                 zvire.NastavNazev(
                     Vstupy.NactiBezZakazanychZnaku($"Nový název ({zvire.Nazev}): ", '|')
                 );

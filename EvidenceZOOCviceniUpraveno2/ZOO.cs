@@ -116,7 +116,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 {   // Zálohuje jen pokud původní soubor existuje
                     File.Copy(SouborZvirata, SouborZvirata + ".bak", overwrite: true);
                 }
-                // na začátku vytvoří nový soubor, pokud neexistuje, a zapíše všechny zvířata do souboru
+                // na začátku vytvoří nový soubor, pokud neexistuje, a zapíše všechny zaměstnance do souboru
                 File.WriteAllLines(SouborZvirata,
                     Zvirata.Select(z => z.ToFileString()));
             }
