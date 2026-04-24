@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace EvidenceZOOCviceniUpraveno2
 {
     /* Třída zodpovědná za práci se zvířaty – přidávání, mazání, úpravy, výpisy a hledání.

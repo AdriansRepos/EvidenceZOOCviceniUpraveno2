@@ -44,8 +44,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
             } while (volba != '6');
         }
-
-        // Přidání nového zaměstnance – dotazy na vstupy + validace
+        
         // Přidání nového zaměstnance – dotazy na vstupy + validace
         public void Pridat()
         {
