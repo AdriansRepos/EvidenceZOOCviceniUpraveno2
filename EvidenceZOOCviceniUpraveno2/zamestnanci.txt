@@ -1,0 +1,2 @@
+Jan|Novák|12.10.1988|32000|Oštřovatel
+Petr|Novák|12.05.1980|25600|Uklizeč
