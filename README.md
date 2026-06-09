@@ -48,14 +48,23 @@ Každý řádek obsahuje hodnoty oddělené znakem `|`.
 /ZOO
 
 ├── Program.cs
+
 ├── ZOO.cs
+
 ├── Zamestnanec.cs
+
 ├── Zvire.cs
+
 ├── SpravceZamestnancu.cs
+
 ├── SpravceZvirat.cs
+
 ├── Vstupy.cs
+
 ├── zamestnanci.txt
+
 ├── zvirata.txt
+
 └── README.md
 
 ---
@@ -100,11 +109,11 @@ public void PridatZamestnance()
 
 ## Plánované funkce:
 
-Ukládání do JSON
-Export statistik
-Lepší validace vstupů
-Automatické testy
-GUI verze (WPF nebo MAUI)Ukázka kódu
+- Ukládání do JSON
+- Export statistik
+- Lepší validace vstupů
+- Automatické testy
+- GUI verze (WPF nebo MAUI)Ukázka kódu
 
 ### Release
 - První vydaná spustitelná verze
