@@ -2,9 +2,23 @@
 
 namespace EvidenceZOOCviceniUpraveno2
 {
+    /// <summary>
+    /// Statická pomocná třída poskytující metody pro načítání a validaci
+    /// uživatelských vstupů z konzole. Obsahuje funkce pro práci s textem,
+    /// čísly, daty a výběrem položek.
+    /// </summary>
     static class Vstupy
     {
-        // Zeptá se na textový vstup a zkontroluje, že neobsahuje zakázaný znak (např. oddělovač) a není prázdný.
+        /// <summary>
+        /// Načte textový vstup od uživatele a ověří, že:
+        /// <list type="bullet">
+        /// <item>neobsahuje zakázaný znak (např. '|')</item>
+        /// <item>není prázdný ani tvořený pouze mezerami</item>
+        /// </list>
+        /// </summary>
+        /// <param name="prompt">Text zobrazený uživateli.</param>
+        /// <param name="zakazanyZnak">Znak, který nesmí být ve vstupu obsažen.</param>
+        /// <returns>Validovaný textový vstup.</returns>
         public static string NactiBezZakazanychZnaku(string prompt, char zakazanyZnak)
         {
             while (true)
@@ -35,7 +49,19 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Zeptá se na textový vstup, případně umožní úpravu existující hodnoty.
+        /// <summary>
+        /// Zeptá se uživatele na textový vstup a umožní:
+        /// <list type="bullet">
+        /// <item>ponechat původní hodnotu</item>
+        /// <item>upravit ji</item>
+        /// </list>
+        /// Text je automaticky převeden do TitleCase.
+        /// </summary>
+        /// <param name="aktualni">Původní hodnota.</param>
+        /// <param name="popis">Popis položky (např. "jméno").</param>
+        /// <param name="prefix">Text před dotazem (např. "Nové").</param>
+        /// <param name="jeNove">Určuje, zda jde o nový záznam.</param>
+        /// <returns>Nová nebo původní hodnota.</returns>
         public static string ZeptejSeAUpravString(string aktualni, string popis, string prefix, bool jeNove = false)
         {
             try
@@ -57,7 +83,14 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Zeptá se na celé číslo, s validací a možností úpravy existující hodnoty
+        /// <summary>
+        /// Načte celé číslo s validací a možností úpravy existující hodnoty.
+        /// </summary>
+        /// <param name="aktualni">Původní hodnota.</param>
+        /// <param name="popis">Popis položky.</param>
+        /// <param name="prefix">Text před dotazem.</param>
+        /// <param name="jeNove">Určuje, zda jde o nový záznam.</param>
+        /// <returns>Nová nebo původní hodnota.</returns>
         public static int ZeptejSeAUpravInt(int aktualni, string popis, string prefix, bool jeNove = false)
         {
             try
@@ -102,7 +135,13 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Zeptá se na desetinné číslo (např. váhu), s validací
+        /// <summary>
+        /// Načte desetinné číslo (např. váhu) s validací a možností úpravy existující hodnoty.
+        /// </summary>
+        /// <param name="aktualni">Původní hodnota.</param>
+        /// <param name="popis">Popis položky.</param>
+        /// <param name="jeNove">Určuje, zda jde o nový záznam.</param>
+        /// <returns>Nová nebo původní hodnota.</returns>
         public static double ZeptejSeAUpravDouble(double aktualni, string popis, bool jeNove = false)
         {
             try
@@ -147,6 +186,14 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        /// <summary>
+        /// Načte datum typu <see cref="DateOnly"/> s validací a možností úpravy existující hodnoty.
+        /// </summary>
+        /// <param name="aktualni">Původní datum.</param>
+        /// <param name="popis">Popis položky.</param>
+        /// <param name="prefix">Text před dotazem.</param>
+        /// <param name="jeNove">Určuje, zda jde o nový záznam.</param>
+        /// <returns>Nové nebo původní datum.</returns>
         public static DateOnly ZeptejSeAUpravDateOnly(DateOnly aktualni, string popis, string prefix, bool jeNove = false)
         {
             try
@@ -195,7 +242,11 @@ namespace EvidenceZOOCviceniUpraveno2
         }
 
 
-        // Převede text do českého TitleCase
+        /// <summary>
+        /// Převede text do českého formátu TitleCase.
+        /// </summary>
+        /// <param name="text">Vstupní text.</param>
+        /// <returns>Text převedený do TitleCase.</returns>
         public static string ToTitleCase(string text)
         {
             try
@@ -215,64 +266,55 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Výběr zaměstnance podle indexu
-        public static int VybratIndexZamestnance(ZOO zoo)
+        /// <summary>
+        /// Zobrazí očíslovaný seznam položek a umožní uživateli vybrat jednu z nich
+        /// podle pořadového čísla. Výběr je validován a metoda vrací odpovídající
+        /// objekt ze seznamu.
+        /// </summary>
+        /// <typeparam name="T">Typ položek v seznamu.</typeparam>
+        /// <param name="seznam">Seznam položek, ze kterého se vybírá.</param>
+        /// <param name="nazev">Funkce určující, jak se má položka zobrazit v seznamu.</param>
+        /// <param name="chybaZprava">Text použitý v chybových hláškách.</param>
+        /// <returns>Vybraná položka typu T nebo default hodnota při chybě.</returns>
+        public static T VybratPolozku<T>(IList<T> seznam, Func<T, string> nazev, string chybaZprava)
         {
             try
             {
-                for (int i = 0; i < zoo.Zamestnanci.Count; i++)
-                    Console.WriteLine($"{i + 1}. {zoo.Zamestnanci[i].Jmeno}");
+                // Vytvoří očíslovaný seznam položek:
+                // Select((polozka, p) => ...) vrací text jako "1. Název", "2. Název", ...
+                // p = index položky v seznamu
+                var radky = seznam.Select((polozka, p) => $"{p + 1}. {nazev(polozka)}");
+                foreach (var radek in radky)
+                    // Vypíše všechny řádky na obrazovku
+                    Console.WriteLine(radek);
 
+                // Požádá uživatele o zadání pořadového čísla
                 Console.Write("Pořadové číslo pro úpravu: ");
-
                 int cislo;
                 while (!int.TryParse(Console.ReadLine(), out cislo))
                     Console.WriteLine("Neplatné zadání, zadejte prosím číslo:");
 
-                int index = cislo - 1;
-
-                if (index >= 0 && index < zoo.Zamestnanci.Count)
-                    return index;
-
-                Console.WriteLine("Nesprávné pořadové číslo!");
-                return -1;
+                // Pokusí se získat položku na indexu (cislo - 1),
+                // protože uživatel zadává 1 = první položka, ale seznam má indexy od 0.
+                var vybrany = seznam.ElementAtOrDefault(cislo - 1);
+                // Pokud je výsledek null, znamená to, že číslo bylo mimo rozsah seznamu
+                if (vybrany == null)
+                {
+                    Console.WriteLine("Nesprávné pořadové číslo!");
+                    throw new InvalidOperationException("Nesprávné pořadové číslo!");
+                }
+                // Vrací nalezenou položku
+                return vybrany;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Chyba při výběru zaměstnance: {ex.Message}");
-                return -1;
+                // Pokud nastane jakákoliv chyba, vypíše se zpráva
+                Console.WriteLine($"Chyba při výběru {chybaZprava}: {ex.Message}");
+                // Vrací default hodnotu typu T (např. null pro reference)
+                return default!;
             }
         }
 
-        // Výběr zvířete podle indexu
-        public static int VybratIndexZvirete(ZOO zoo)
-        {
-            try
-            {
-                for (int i = 0; i < zoo.Zvirata.Count; i++)
-                    Console.WriteLine($"{i + 1}. {zoo.Zvirata[i].Nazev}");
-
-                Console.Write("Pořadové číslo pro úpravu: ");
-
-                int cislo;
-                while (!int.TryParse(Console.ReadLine(), out cislo))
-                    Console.WriteLine("Neplatné zadání, zadejte prosím číslo:");
-
-                int index = cislo - 1;
-
-                if (index >= 0 && index < zoo.Zvirata.Count)
-                    return index;
-
-                Console.WriteLine("Nesprávné pořadové číslo!");
-                return -1;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Chyba při výběru zvířete: {ex.Message}");
-                return -1;
-            }
-        }
     }
-
 }
 
