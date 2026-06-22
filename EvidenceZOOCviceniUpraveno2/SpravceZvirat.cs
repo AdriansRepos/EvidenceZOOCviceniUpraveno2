@@ -1,14 +1,20 @@
-﻿
-namespace EvidenceZOOCviceniUpraveno2
+﻿namespace EvidenceZOOCviceniUpraveno2
 {
-    /* Třída zodpovědná za práci se zvířaty – přidávání, mazání, úpravy, výpisy a hledání.
-     * Přijímá instanci ZOO, kde jsou uložena data. */
+    /// <summary>
+    /// Třída zodpovědná za správu zvířat – přidávání, mazání, úpravy,
+    /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="ZOO"/>.
+    /// </summary>
+    /// <param name="zoo">Instance třídy ZOO obsahující seznam zvířat.</param>
     class SpravceZvirat(ZOO zoo)
     {
-        // Odkaz na hlavní datový objekt ZOO
+        /// <summary>
+        /// Odkaz na hlavní datový objekt ZOO, který obsahuje seznam zvířat.
+        /// </summary>
         private readonly ZOO zoo = zoo;
 
-        // Hlavní menu pro práci se zvířaty
+        /// <summary>
+        /// Zobrazí hlavní menu pro práci se zvířaty a zpracovává volby uživatele.
+        /// </summary>
         public void Menu()
         {
             char volba;
@@ -28,19 +34,35 @@ namespace EvidenceZOOCviceniUpraveno2
                 // Zpracování volby uživatele
                 switch (volba)
                 {
-                    case '1': Pridat(); break;
-                    case '2': Vypis(); break;
-                    case '3': Smazat(); break;
-                    case '4': Upravit(); break;
-                    case '5': Vyhledat(); break;
-                    case '6': break;
-                    default: Console.WriteLine("Neplatná volba."); break;
+                    case '1': Pridat(); 
+                        break;
+
+                    case '2': Vypis(); 
+                        break;
+
+                    case '3': Smazat(); 
+                        break;
+
+                    case '4': Upravit(); 
+                        break;
+
+                    case '5': Vyhledat(); 
+                        break;
+
+                    case '6': 
+                        break;
+
+                    default: Console.WriteLine("Neplatná volba."); 
+                        break;
                 }
 
             } while (volba != '6');
         }
-        
-        // Přidání nového zvířete – dotazy na vstupy + validace
+
+        /// <summary>
+        /// Přidá nové zvíře na základě vstupů od uživatele.
+        /// Vstupy jsou validovány a zakázané znaky nejsou povoleny.
+        /// </summary>
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
@@ -62,7 +84,9 @@ namespace EvidenceZOOCviceniUpraveno2
         }
 
 
-        // Vypíše všechna zvířata
+        /// <summary>
+        /// Vypíše všechna zvířata uložená v systému.
+        /// </summary>
         public void Vypis()
         {
             Console.WriteLine("VÝPIS ZVÍŘAT");
@@ -70,46 +94,45 @@ namespace EvidenceZOOCviceniUpraveno2
                 zvire.VypisZvire();
         }
 
-        // Smazání zvířete podle výběru uživatele
+        /// <summary>
+        /// Smaže zvíře vybrané uživatelem.
+        /// </summary>
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZVÍŘETE");
-            int index = Vstupy.VybratIndexZvirete(zoo);
 
-            if (index >= 0)
+            var zvire = Vstupy.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
+            if (zvire != null)
             {
-                Console.WriteLine($"Zvíře {zoo.Zvirata[index].Nazev} bylo smazáno.");
-                zoo.Zvirata.RemoveAt(index);
-                zoo.UlozZvirata(); // uloží změny
+                Console.WriteLine($"Zvíře {zvire.Nazev} bylo smazáno.");
+                zoo.Zvirata.Remove(zvire); 
+                zoo.UlozZvirata();
             }
         }
 
-        // Úprava existujícího zvířete
+        /// <summary>
+        /// Upraví údaje vybraného zvířete.
+        /// </summary>
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZVÍŘETE");
-            int index = Vstupy.VybratIndexZvirete(zoo);
 
-            if (index >= 0)
+            var zvire = Vstupy.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
+            if (zvire != null)
             {
-                var zvire = zoo.Zvirata[index];
-                                
-                 /* Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
-                 * zakázaný znak '|' a nerozbil formát uložených dat. */                
                 zvire.NastavNazev(
                     Vstupy.NactiBezZakazanychZnaku($"Nový název ({zvire.Nazev}): ", '|')
                 );
-
                 zvire.NastavVek(Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk", "Nový"));
                 zvire.NastavVahu(Vstupy.ZeptejSeAUpravDouble(zvire.Vaha, "váha"));
-
-                zoo.UlozZvirata(); // uloží změny
-
+                zoo.UlozZvirata();
                 Console.WriteLine("Úprava dokončena.");
             }
         }
 
-        // Vyhledání zvířete podle názvu (částečná shoda)
+        /// <summary>
+        /// Vyhledá zvíře podle názvu. Podporuje částečnou shodu.
+        /// </summary>
         public void Vyhledat()
         {
             Console.Write("Zadejte hledaný výraz: ");
