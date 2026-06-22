@@ -1,19 +1,34 @@
 ﻿
 namespace EvidenceZOOCviceniUpraveno2
 {
-
+    /// <summary>
+    /// Reprezentuje jedno zvíře v zoologické zahradě.
+    /// Uchovává jeho název, věk a váhu.
+    /// </summary>
     class Zvire
     {
-        // Název zvířete – text, nikdy nesmí být null, proto výchozí hodnota ""
+        /// <summary>
+        /// Název zvířete. Nikdy nesmí být null.
+        /// Je automaticky převáděn do formátu TitleCase.
+        /// </summary>
         public string Nazev { get; private set; } = "";
 
-        // Věk zvířete v letech
+        /// <summary>
+        /// Věk zvířete v letech.
+        /// </summary>
         public int Vek { get; private set; }
 
-        // Váha zvířete v kilogramech
+        /// <summary>
+        /// Váha zvířete v kilogramech.
+        /// </summary>
         public double Vaha { get; private set; }
 
-        // Konstruktor – při vytvoření objektu nastaví všechny vlastnosti
+        /// <summary>
+        /// Vytvoří nové zvíře a nastaví jeho název, věk a váhu.
+        /// </summary>
+        /// <param name="nazev">Název zvířete.</param>
+        /// <param name="vek">Věk v letech.</param>
+        /// <param name="vaha">Váha v kilogramech.</param>
         public Zvire(string nazev, int vek, double vaha)
         {
             NastavNazev(nazev);
@@ -21,25 +36,37 @@ namespace EvidenceZOOCviceniUpraveno2
             NastavVahu(vaha);
         }
 
-        // Nastaví název a převede ho do hezkého formátu (TitleCase)
+        /// <summary>
+        /// Nastaví název zvířete a převede jej do formátu TitleCase.
+        /// </summary>
+        /// <param name="novyNazev">Nový název zvířete.</param>
         internal void NastavNazev(string novyNazev)
         {
             Nazev = Vstupy.ToTitleCase(novyNazev);
         }
 
-        // Nastaví věk zvířete
+        /// <summary>
+        /// Nastaví věk zvířete.
+        /// </summary>
+        /// <param name="novyVek">Nový věk v letech.</param>
         internal void NastavVek(int novyVek)
         {
             Vek = novyVek;
         }
 
-        // Nastaví váhu zvířete
+        /// <summary>
+        /// Nastaví váhu zvířete.
+        /// </summary>
+        /// <param name="novaVaha">Nová váha v gramech (kilogramech).</param>
         internal void NastavVahu(double novaVaha)
         {
             Vaha = novaVaha;
         }
 
-        // Vypíše informace o zvířeti včetně správného skloňování věku
+        /// <summary>
+        /// Vypíše informace o zvířeti do konzole,
+        /// včetně správného skloňování slova „rok“.
+        /// </summary>
         public void VypisZvire()
         {
             Console.WriteLine("Název zvířete: {0}", Nazev);
@@ -60,13 +87,23 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.WriteLine("\tVáha: {0} kg", Vaha);
         }
 
-        // Převede objekt na řetězec pro uložení do souboru
+        /// <summary>
+        /// Převede objekt zvířete na řetězec vhodný pro uložení do souboru.
+        /// </summary>
+        /// <returns>Řetězec ve formátu "Nazev|Vek|Vaha".</returns>
         public string ToFileString()
         {
             return $"{Nazev}|{Vek}|{Vaha}";
         }
 
-        // Vytvoří objekt Zvire z jednoho řádku textu v souboru
+        /// <summary>
+        /// Vytvoří objekt <see cref="Zvire"/> z jednoho řádku textu v souboru.
+        /// </summary>
+        /// <param name="line">Řádek textu obsahující údaje o zvířeti.</param>
+        /// <returns>Nově vytvořený objekt zvířete.</returns>
+        /// <exception cref="FormatException">
+        /// Vyvolána, pokud řádek nemá správný formát nebo obsahuje neplatná data.
+        /// </exception>
         public static Zvire Parse(string line)
         {
             // Rozdělení řádku podle svislé čáry

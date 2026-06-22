@@ -1,25 +1,46 @@
 ﻿
 namespace EvidenceZOOCviceniUpraveno2
 {
-
+    /// <summary>
+    /// Reprezentuje jednoho zaměstnance zoologické zahrady.
+    /// Uchovává jeho jméno, příjmení, datum narození, mzdu a pracovní pozici.
+    /// </summary>
     class Zamestnanec
     {
-        // Křestní jméno zaměstnance – nikdy nesmí být null
+        /// <summary>
+        /// Křestní jméno zaměstnance. Nikdy nesmí být null.
+        /// Automaticky převáděno do formátu TitleCase.
+        /// </summary>
         public string Jmeno { get; private set; } = "";
 
-        // Příjmení zaměstnance
+        /// <summary>
+        /// Příjmení zaměstnance. Automaticky převáděno do TitleCase.
+        /// </summary>
         public string Prijmeni { get; private set; } = "";
 
-        // Datum narození zaměstnance
+        /// <summary>
+        /// Datum narození zaměstnance.
+        /// </summary>
         public DateOnly DatumNarozeni { get; private set; }
 
-        // Mzda zaměstnance v Kč
+        /// <summary>
+        /// Mzda zaměstnance v českých korunách.
+        /// </summary>
         public int Mzda { get; private set; }
 
-        // Pracovní pozice zaměstnance
+        /// <summary>
+        /// Pracovní pozice zaměstnance. Automaticky převáděna do TitleCase.
+        /// </summary>
         public string PracovniPozice { get; private set; } = "";
 
-        // Konstruktor – nastaví všechny vlastnosti pomocí interních metod
+        /// <summary>
+        /// Vytvoří nového zaměstnance a nastaví všechny jeho vlastnosti.
+        /// </summary>
+        /// <param name="jmeno">Křestní jméno zaměstnance.</param>
+        /// <param name="prijmeni">Příjmení zaměstnance.</param>
+        /// <param name="datumNarozeni">Datum narození.</param>
+        /// <param name="mzda">Mzda v Kč.</param>
+        /// <param name="pracovniPozice">Pracovní pozice.</param>
         public Zamestnanec(string jmeno, string prijmeni, DateOnly datumNarozeni,
                            int mzda, string pracovniPozice)
         {
@@ -30,37 +51,54 @@ namespace EvidenceZOOCviceniUpraveno2
             NastavPracovniPozici(pracovniPozice);
         }
 
-        // Nastaví jméno a převede ho do TitleCase
+        /// <summary>
+        /// Nastaví jméno zaměstnance a převede jej do TitleCase.
+        /// </summary>
+        /// <param name="noveJmeno">Nové jméno.</param>
         internal void NastavJmeno(string noveJmeno)
         {
             Jmeno = Vstupy.ToTitleCase(noveJmeno);
         }
 
-        // Nastaví příjmení a převede ho do TitleCase
+        /// <summary>
+        /// Nastaví příjmení zaměstnance a převede jej do TitleCase.
+        /// </summary>
+        /// <param name="novePrijmeni">Nové příjmení.</param>
         internal void NastavPrijmeni(string novePrijmeni)
         {
             Prijmeni = Vstupy.ToTitleCase(novePrijmeni);
         }
 
-        // Nastaví datum narození
+        /// <summary>
+        /// Nastaví datum narození zaměstnance.
+        /// </summary>
+        /// <param name="noveDatumNarozeni">Nové datum narození.</param>
         internal void NastavDatumNarozeni(DateOnly noveDatumNarozeni)
         {
             DatumNarozeni = noveDatumNarozeni;
         }
 
-        // Nastaví mzdu
+        /// <summary>
+        /// Nastaví mzdu zaměstnance.
+        /// </summary>
+        /// <param name="novaMzda">Nová mzda v Kč.</param>
         internal void NastavMzdu(int novaMzda)
         {
             Mzda = novaMzda;
         }
 
-        // Nastaví pracovní pozici a převede ji do TitleCase
+        /// <summary>
+        /// Nastaví pracovní pozici zaměstnance a převede ji do TitleCase.
+        /// </summary>
+        /// <param name="novaPracovniPozice">Nová pracovní pozice.</param>
         internal void NastavPracovniPozici(string novaPracovniPozice)
         {
             PracovniPozice = Vstupy.ToTitleCase(novaPracovniPozice);
         }
 
-        // Vypíše všechny informace o zaměstnanci
+        /// <summary>
+        /// Vypíše všechny informace o zaměstnanci do konzole.
+        /// </summary>
         public void VypisZamestnance()
         {
             Console.WriteLine("Jméno zaměstnance: {0}", Jmeno);
@@ -70,13 +108,23 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.WriteLine("\tPracovní pozice zaměstnance: {0}", PracovniPozice);
         }
 
-        // Převede objekt na řetězec pro uložení do souboru
+        /// <summary>
+        /// Převede zaměstnance na řetězec vhodný pro uložení do souboru.
+        /// </summary>
+        /// <returns>Řetězec ve formátu "Jmeno|Prijmeni|DatumNarozeni|Mzda|PracovniPozice".</returns>
         public string ToFileString()
         {
             return $"{Jmeno}|{Prijmeni}|{DatumNarozeni}|{Mzda}|{PracovniPozice}";
         }
 
-        // Vytvoří objekt Zamestnanec z jednoho řádku textu v souboru
+        /// <summary>
+        /// Vytvoří objekt <see cref="Zamestnanec"/> z jednoho řádku textu v souboru.
+        /// </summary>
+        /// <param name="line">Řádek textu obsahující údaje o zaměstnanci.</param>
+        /// <returns>Nově vytvořený objekt zaměstnance.</returns>
+        /// <exception cref="FormatException">
+        /// Vyvolána, pokud řádek nemá správný formát nebo obsahuje neplatná data.
+        /// </exception>
         public static Zamestnanec Parse(string line)
         {
             // Rozdělení řádku podle svislé čáry

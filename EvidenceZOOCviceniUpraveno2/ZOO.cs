@@ -1,25 +1,44 @@
 ﻿
 namespace EvidenceZOOCviceniUpraveno2
 {
+    /// <summary>
+    /// Reprezentuje správu zoologické zahrady – načítání dat, ukládání,
+    /// poskytování statistik a práce se soubory.
+    /// </summary>
     class ZOO
     {
-        // Seznam všech zvířat načtených ze souboru
+        /// <summary>
+        /// Seznam všech zvířat načtených ze souboru.
+        /// </summary>
         public List<Zvire> Zvirata { get; private set; }
 
-        // Seznam všech zaměstnanců načtených ze souboru
+        /// <summary>
+        /// Seznam všech zaměstnanců načtených ze souboru.
+        /// </summary>
         public List<Zamestnanec> Zamestnanci { get; private set; }
 
-        // Cesta k souboru se zaměstnanci
+        /// <summary>
+        /// Cesta k souboru se zaměstnanci.
+        /// </summary>
         public string SouborZamestnanci { get; private set; } = "";
 
-        // Cesta k souboru se zvířaty
+        /// <summary>
+        /// Cesta k souboru se zvířaty.
+        /// </summary>
         public string SouborZvirata { get; private set; } = "";
 
-        // Cesta k logovacímu souboru pro chybné řádky
+        /// <summary>
+        /// Cesta k logovacímu souboru, kam se zapisují chybné řádky.
+        /// </summary>
         private readonly string LogSoubor = "";
 
-        /* Konstruktor – uloží cesty k souborům, zajistí jejich existenci
-         * a načte data do seznamů */
+        /// <summary>
+        /// Inicializuje instanci třídy ZOO, uloží cesty k souborům
+        /// a načte zaměstnance i zvířata.
+        /// </summary>
+        /// <param name="souborZam">Cesta k souboru se zaměstnanci.</param>
+        /// <param name="souborZvir">Cesta k souboru se zvířaty.</param>
+        /// <param name="logSoubor">Cesta k logovacímu souboru.</param>
         public ZOO(string souborZam, string souborZvir, string logSoubor)
         {
             SouborZamestnanci = souborZam;
@@ -30,7 +49,10 @@ namespace EvidenceZOOCviceniUpraveno2
             Zvirata = NactiZvirataZeSouboru();
         }
 
-        // Načte zaměstnance ze souboru, nevalidní řádky zapíše do logu
+        /// <summary>
+        /// Načte zaměstnance ze souboru. Nevalidní řádky zapisuje do logu.
+        /// </summary>
+        /// <returns>Seznam načtených zaměstnanců.</returns>
         private List<Zamestnanec> NactiZamestnanceZeSouboru()
         {   // Vytvoření prázdného seznamu pro načtené zaměstnance
             var list = new List<Zamestnanec>();
@@ -58,7 +80,10 @@ namespace EvidenceZOOCviceniUpraveno2
             return list;
         }
 
-        // Načte zvířata ze souboru, nevalidní řádky zapíše do logu
+        /// <summary>
+        /// Načte zvířata ze souboru. Nevalidní řádky zapisuje do logu.
+        /// </summary>
+        /// <returns>Seznam načtených zvířat.</returns>
         private List<Zvire> NactiZvirataZeSouboru()
         {   // Vytvoření prázdného seznamu pro načtená zvířata
             var list = new List<Zvire>();
@@ -86,7 +111,9 @@ namespace EvidenceZOOCviceniUpraveno2
             return list;
         }
 
-        // Uloží všechny zaměstnance zpět do souboru (včetně automatické zálohy)
+        /// <summary>
+        /// Uloží všechny zaměstnance zpět do souboru a vytvoří zálohu.
+        /// </summary>
         public void UlozZamestnance()
         {
             try
@@ -107,7 +134,9 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Uloží všechna zvířata zpět do souboru (včetně automatické zálohy)
+        /// <summary>
+        /// Uloží všechna zvířata zpět do souboru a vytvoří zálohu.
+        /// </summary>
         public void UlozZvirata()
         {
             try
@@ -126,7 +155,9 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Hlavní menu statistik
+        /// <summary>
+        /// Zobrazí hlavní menu statistik a umožní uživateli vybrat požadovanou akci.
+        /// </summary>
         public void MenuStatistiky()
         {
             char volba;
@@ -168,19 +199,25 @@ namespace EvidenceZOOCviceniUpraveno2
             while (volba != '4');
         }
 
-        // Vrátí počet zvířat v seznamu
+        /// <summary>
+        /// Vrátí počet zvířat v seznamu.
+        /// </summary>
         public int PocetZvirat()
         {
             return Zvirata.Count;
         }
 
-        // Vrátí počet zaměstnanců v seznamu
+        /// <summary>
+        /// Vrátí počet zaměstnanců v seznamu.
+        /// </summary>
         public int PocetZamestnancu()
         {
             return Zamestnanci.Count;
         }
 
-        // Vrátí součet mezd všech zaměstnanců
+        /// <summary>
+        /// Vrátí součet mezd všech zaměstnanců.
+        /// </summary>
         public int SoucetMezd()
         {
             return Zamestnanci.Sum(z => z.Mzda);
