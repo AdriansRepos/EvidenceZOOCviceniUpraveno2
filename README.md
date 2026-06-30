@@ -138,3 +138,8 @@ Aplikace ukládá data do souborů JSON:
 - Aktuální verze: v1.0.0
 - Stáhnout zde: Releases
 https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases
+
+- Spustitelná verze se zapracovanými novými features
+- Verze: v1.1.0
+- Ke stažení zde: Releases
+https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.1.0
