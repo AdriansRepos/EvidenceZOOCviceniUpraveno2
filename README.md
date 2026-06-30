@@ -32,14 +32,13 @@ Umožňuje evidovat \*\*zvířata\*\*, \*\*zaměstnance\*\*, provádět \*\*stat
 
 ## Ukládání dat
 
-Aplikace ukládá data do textových souborů:
+Aplikace ukládá data do souborů JSON:
 
-- `zamestnanci.txt` 
+- `zamestnanci.json` 
 - `zamestnanci.bak` (automatická záloha) 
-- `zvirata.txt`
+- `zvirata.json`
 - `zvirata.bak` (automatická záloha)
 
-Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 ---
 
@@ -128,6 +127,8 @@ Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 ## Plánované funkce:
 
+- Přidání transakčního ukládání
+- Přidání logování změn
 - Export statistik
 - Automatické testy
 - GUI verze (WPF nebo MAUI)Ukázka kódu
