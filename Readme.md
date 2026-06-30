@@ -1,4 +1,4 @@
-\# ZOO – Konzolová aplikace v C#
+# ZOO – Konzolová aplikace v C#
 
 
 
@@ -8,51 +8,51 @@ Umožňuje evidovat \*\*zvířata\*\*, \*\*zaměstnance\*\*, provádět \*\*stat
 
 
 
-\---
+---
 
 
 
-\## Funkce aplikace
+## Funkce aplikace
 
 
 
-\### Zvířata
+### Zvířata
 
-\- Přidání nového zvířete  
+- Přidání nového zvířete  
 
-\- Výpis všech zvířat  
+- Výpis všech zvířat  
 
-\- Úprava existujícího zvířete  
+- Úprava existujícího zvířete  
 
-\- Smazání zvířete  
+- Smazání zvířete  
 
-\- Vyhledávání podle názvu  
+- Vyhledávání podle názvu  
 
-\- Statistiky (průměrná váha, počet druhů…)
-
-
-
-\### Zaměstnanci
-
-\- Přidání zaměstnance  
-
-\- Úprava zaměstnance  
-
-\- Smazání zaměstnance  
-
-\- Výpis všech zaměstnanců  
-
-\- Vyhledávání podle jména  
-
-\- Ukládání do souboru + záloha `.bak`
+- Statistiky (průměrná váha, počet druhů…)
 
 
 
-\---
+### Zaměstnanci
+
+- Přidání zaměstnance  
+
+- Úprava zaměstnance  
+
+- Smazání zaměstnance  
+
+- Výpis všech zaměstnanců  
+
+- Vyhledávání podle jména  
+
+- Ukládání do souboru + záloha `.bak`
 
 
 
-\## Ukládání dat
+---
+
+
+
+## Ukládání dat
 
 
 
@@ -60,11 +60,11 @@ Aplikace ukládá data do textových souborů:
 
 
 
-\- `zamestnanci.txt`  
+- `zamestnanci.txt`  
 
-\- `zamestnanci.bak` (automatická záloha)  
+- `zamestnanci.bak` (automatická záloha)  
 
-\- `zvirata.txt`
+- `zvirata.txt`
 
 
 
@@ -72,11 +72,11 @@ Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 
 
-\---
+---
 
 
 
-\## Struktura projektu
+## Struktura projektu
 
 /ZOO
 
@@ -104,33 +104,33 @@ Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 
 
-\---
+---
 
 
 
-\## Použité techniky
+## Použité techniky
 
 
 
-\- OOP (třídy, vlastnosti, zapouzdření)
+- OOP (třídy, vlastnosti, zapouzdření)
 
-\- Výčtové typy (enum)
+- Výčtové typy (enum)
 
-\- Delegáty a události
+- Delegáty a události
 
-\- Práce se soubory (`File.ReadAllText`, `File.WriteAllLines`)
+- Práce se soubory (`File.ReadAllText`, `File.WriteAllLines`)
 
-\- Validace vstupů
+- Validace vstupů
 
-\- Try-catch bloky
+- Try-catch bloky
 
-\- DateOnly
+- DateOnly
 
-\- Kolekce (`List<T>`)
+- Kolekce (`List<T>`)
 
 
 
-\---
+---
 
 
 
@@ -162,24 +162,12 @@ public void PridatZamestnance()
 
 
 
-\## Plánované funkce
+## Plánované funkce
 
 Ukládání do JSON
-
-
-
 Export statistik
-
-
-
 Lepší validace vstupů
-
-
-
 Automatické testy
-
-
-
 GUI verze (WPF nebo MAUI)Ukázka kódu
 
 

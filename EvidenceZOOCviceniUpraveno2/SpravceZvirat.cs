@@ -17,6 +17,7 @@
         /// </summary>
         public void Menu()
         {
+            zoo.ZajistiData("Zvířata");
             char volba;
             do
             {
@@ -66,20 +67,26 @@
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
+            string nazev = Vstupy.ZeptejSeAUprav(
+                "", "název",
+                v => v,
+                s => s,
+                jeNove: true);
 
-            /*
-             * Používáme NactiBezZakazanychZnaku, aby se do systému nikdy nedostal
-             * zakázaný znak '|' (oddělovač v souboru).
-             * Tím zabráníme rozbití formátu při ukládání a načítání. */
-            string nazev = Vstupy.NactiBezZakazanychZnaku("Zadejte název zvířete: ", '|');
+            int vek = Vstupy.ZeptejSeAUprav(
+                0, "věk",
+                v => v.ToString(),
+                s => int.Parse(s),
+                jeNove: true);
 
-            int vek = Vstupy.ZeptejSeAUpravInt(0, "věk", "Nový", true);
-            double vaha = Vstupy.ZeptejSeAUpravDouble(0, "váha", true);
+            double vaha = Vstupy.ZeptejSeAUprav(
+                0.0, "váha",
+                v => v.ToString(),
+                s => double.Parse(s),
+                jeNove: true);
 
-            // Uložení do seznamu
             zoo.Zvirata.Add(new Zvire(nazev, vek, vaha));
-            zoo.UlozZvirata(); // okamžité uložení změn
-
+            zoo.UlozZvirata();
             Console.WriteLine("Zvíře bylo úspěšně přidáno.");
         }
 
@@ -90,6 +97,13 @@
         public void Vypis()
         {
             Console.WriteLine("VÝPIS ZVÍŘAT");
+            Console.WriteLine();
+
+            Console.WriteLine(
+                $"{"Název",-20} {"Věk",-12} {"Váha",-10}"
+            );
+
+            Console.WriteLine(new string('-', 45));
             foreach (var zvire in zoo.Zvirata)
                 zvire.VypisZvire();
         }
@@ -116,15 +130,24 @@
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZVÍŘETE");
-
             var zvire = Vstupy.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
-                zvire.NastavNazev(
-                    Vstupy.NactiBezZakazanychZnaku($"Nový název ({zvire.Nazev}): ", '|')
-                );
-                zvire.NastavVek(Vstupy.ZeptejSeAUpravInt(zvire.Vek, "věk", "Nový"));
-                zvire.NastavVahu(Vstupy.ZeptejSeAUpravDouble(zvire.Vaha, "váha"));
+                zvire.Nazev = Vstupy.ZeptejSeAUprav(
+                    zvire.Nazev, "název",
+                    v => v,
+                    s => s);
+
+                zvire.Vek = Vstupy.ZeptejSeAUprav(
+                    zvire.Vek, "věk",
+                    v => v.ToString(),
+                    s => int.Parse(s));
+
+                zvire.Vaha = Vstupy.ZeptejSeAUprav(
+                    zvire.Vaha, "váha",
+                    v => v.ToString(),
+                    s => double.Parse(s));
+
                 zoo.UlozZvirata();
                 Console.WriteLine("Úprava dokončena.");
             }
@@ -145,7 +168,7 @@
                 if (zvire.Nazev.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {
                     Console.WriteLine(
-                        $"Nalezeno:\t{Vstupy.ToTitleCase(zvire.Nazev)}" +
+                        $"Nalezeno:\t{zvire.Nazev}" +
                         $"\tVěk: {zvire.Vek}" +
                         $"\tVáha: {zvire.Vaha}"
                     );

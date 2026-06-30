@@ -1,5 +1,4 @@
-﻿
-namespace EvidenceZOOCviceniUpraveno2
+﻿namespace EvidenceZOOCviceniUpraveno2
 {
     /// <summary>
     /// Třída zodpovědná za správu zaměstnanců – přidávání, mazání, úpravy,
@@ -18,6 +17,7 @@ namespace EvidenceZOOCviceniUpraveno2
         /// </summary>
         public void Menu()
         {
+            zoo.ZajistiData("Zaměstnanci");
             char volba;
             do
             {
@@ -66,23 +66,41 @@ namespace EvidenceZOOCviceniUpraveno2
         /// </summary>
         public void Pridat()
         {
-            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");            
-             /* Používáme NactiBezZakazanychZnaku, aby se do systému nikdy nedostal
-             * zakázaný znak '|' (oddělovač v souboru). 
-             * Tím zabráníme rozbití formátu při ukládání a načítání. */
-            string jmeno = Vstupy.NactiBezZakazanychZnaku("Zadejte jméno: ", '|');
-            string prijmeni = Vstupy.NactiBezZakazanychZnaku("Zadejte příjmení: ", '|');
-            string pracovniPozice = Vstupy.NactiBezZakazanychZnaku("Zadejte pracovní pozici: ", '|');
-            DateOnly datumNarozeni = Vstupy.ZeptejSeAUpravDateOnly(DateOnly.MinValue, "Datum narození", "Zadejte", true);
-            int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", "Nová", true);            
+            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
+            string jmeno = Vstupy.ZeptejSeAUprav(
+                "", "jméno",
+                v => v,
+                s => s,
+                jeNove: true);
 
-            // Uložení do seznamu
+            string prijmeni = Vstupy.ZeptejSeAUprav(
+                "", "příjmení",
+                v => v,
+                s => s,
+                jeNove: true);
+
+            string pracovniPozice = Vstupy.ZeptejSeAUprav(
+                "", "pracovní pozice",
+                v => v,
+                s => s,
+                jeNove: true);
+
+            DateOnly datumNarozeni = Vstupy.ZeptejSeAUprav(
+                DateOnly.MinValue, "datum narození",
+                v => v.ToString(),
+                s => DateOnly.Parse(s),
+                jeNove: true);
+
+            int mzda = Vstupy.ZeptejSeAUprav(
+                0, "mzda",
+                v => v.ToString(),
+                s => int.Parse(s),
+                jeNove: true);
+
             zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
-            zoo.UlozZamestnance(); // okamžité uložení změn
-
+            zoo.UlozZamestnance();
             Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
         }
-
 
         /// <summary>
         /// Vypíše všechny zaměstnance uložené v systému.
@@ -90,6 +108,14 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Vypis()
         {
             Console.WriteLine("VÝPIS ZAMĚSTNANCŮ");
+            Console.WriteLine();
+
+            Console.WriteLine(
+                $"{"Jméno",-15} {"Příjmení",-15} {"Datum narození",-15} {"Mzda",-10} {"Pozice",-20}"
+            );
+
+            Console.WriteLine(new string('-', 80));
+
             foreach (var zam in zoo.Zamestnanci)
                 zam.VypisZamestnance();
         }
@@ -100,12 +126,11 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
-            var vybranyZamestnanec = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
-            int index = vybranyZamestnanec != null ? zoo.Zamestnanci.IndexOf(vybranyZamestnanec) : -1;
-            if (index >= 0)
+            var zam = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            if (zam != null)
             {
-                Console.WriteLine($"Zaměstnanec {zoo.Zamestnanci[index].Prijmeni} byl smazán.");
-                zoo.Zamestnanci.RemoveAt(index);
+                Console.WriteLine($"Zaměstnanec {zam.Prijmeni} byl smazán.");
+                zoo.Zamestnanci.Remove(zam);
                 zoo.UlozZamestnance();
             }
         }
@@ -116,16 +141,34 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
-            var vybranyZamestnanec = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
-            int index = vybranyZamestnanec != null ? zoo.Zamestnanci.IndexOf(vybranyZamestnanec) : -1;
-            if (index >= 0)
+            var zam = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            if (zam != null)
             {
-                var zam = zoo.Zamestnanci[index];
-                zam.NastavJmeno(Vstupy.NactiBezZakazanychZnaku($"Nové jméno ({zam.Jmeno}): ", '|'));
-                zam.NastavPrijmeni(Vstupy.NactiBezZakazanychZnaku($"Nové příjmení ({zam.Prijmeni}): ", '|'));
-                zam.NastavPracovniPozici(Vstupy.NactiBezZakazanychZnaku($"Nová pracovní pozice ({zam.PracovniPozice}): ", '|'));
-                zam.NastavDatumNarozeni(Vstupy.ZeptejSeAUpravDateOnly(zam.DatumNarozeni, "datum narození", "Nové"));
-                zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda", "Nová"));
+                zam.Jmeno = Vstupy.ZeptejSeAUprav(
+                    zam.Jmeno, "jméno",
+                    v => v,
+                    s => s);
+
+                zam.Prijmeni = Vstupy.ZeptejSeAUprav(
+                    zam.Prijmeni, "příjmení",
+                    v => v,
+                    s => s);
+
+                zam.PracovniPozice = Vstupy.ZeptejSeAUprav(
+                    zam.PracovniPozice, "pracovní pozice",
+                    v => v,
+                    s => s);
+
+                zam.DatumNarozeni = Vstupy.ZeptejSeAUprav(
+                    zam.DatumNarozeni, "datum narození",
+                    v => v.ToString(),
+                    s => DateOnly.Parse(s));
+
+                zam.Mzda = Vstupy.ZeptejSeAUprav(
+                    zam.Mzda, "mzda",
+                    v => v.ToString(),
+                    s => int.Parse(s));
+
                 zoo.UlozZamestnance();
                 Console.WriteLine("Úprava dokončena.");
             }
@@ -146,11 +189,11 @@ namespace EvidenceZOOCviceniUpraveno2
                 if (zam.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {
                     Console.WriteLine(
-                        $"Nalezeno:\t{Vstupy.ToTitleCase(zam.Prijmeni)}" +
-                        $"\t{Vstupy.ToTitleCase(zam.Jmeno)}" +
+                        $"Nalezeno:\t{zam.Prijmeni}" +
+                        $"\t{zam.Jmeno}" +
                         $"\t{zam.DatumNarozeni}" +
                         $"\t{zam.Mzda}" +
-                        $"\t{Vstupy.ToTitleCase(zam.PracovniPozice)}"
+                        $"\t{zam.PracovniPozice}"
                     );
                     nalezeno = true;
                 }

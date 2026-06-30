@@ -1,17 +1,16 @@
 ﻿using EvidenceZOOCviceniUpraveno2;
 
-// Cesty k datovým souborům (relativní vůči projektu)
-string souborZam = @"..\..\..\zamestnanci.txt";
-string souborZvir = @"..\..\..\zvirata.txt";
-string logSoubor = @"..\..\..\chyby.log";
+var (souborZam, souborZvir) = ZOO.NactiNeboSeZeptejNaCesty();
 
 // Vytvoření hlavního objektu ZOO – načte data ze souborů do paměti
-ZOO zoo = new(souborZam, souborZvir, logSoubor);
+ZOO zoo = new(souborZam, souborZvir);
+
+zoo.RegistrujNacitani("Zaměstnanci", () => zoo.NactiZamestnance(souborZam));
+zoo.RegistrujNacitani("Zvířata", () => zoo.NactiZvirata(souborZvir));
 
 // Vytvoření správců, kteří pracují s daty v ZOO
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
-
 
 // Hlavní menu aplikace – umožňuje přepínat mezi správou zvířat,
 // správou zaměstnanců a statistikami.
