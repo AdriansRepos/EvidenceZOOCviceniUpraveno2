@@ -10,6 +10,6 @@ namespace EvidenceZOOCviceniUpraveno2
         => DateOnly.Parse(reader.GetString()!);
 
         public override void Write(Utf8JsonWriter writer, DateOnly value, JsonSerializerOptions o)
-            => writer.WriteStringValue(value.ToString("dd-MM-yyyy"));
+            => writer.WriteStringValue(value.ToString("dd.MM.yyyy"));
     }
 }
