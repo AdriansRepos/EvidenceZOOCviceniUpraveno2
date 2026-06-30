@@ -1,21 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace EvidenceZOOCviceniUpraveno2
+﻿namespace EvidenceZOOCviceniUpraveno2
 {
-    /* Třída zodpovědná za práci se zaměstnanci – přidávání, mazání, úpravy, výpisy a hledání.
-     * Přijímá instanci ZOO, kde jsou uložena data. */
+    /// <summary>
+    /// Třída zodpovědná za správu zaměstnanců – přidávání, mazání, úpravy,
+    /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="ZOO"/>.
+    /// </summary>
+    /// <param name="zoo">Instance třídy ZOO obsahující seznam zaměstnanců.</param>
     class SpravceZamestnancu(ZOO zoo)
     {
-        // Odkaz na hlavní datový objekt ZOO
+        /// <summary>
+        /// Odkaz na hlavní datový objekt ZOO, který obsahuje seznam zaměstnanců.
+        /// </summary>
         private readonly ZOO zoo = zoo;
 
-        // Hlavní menu pro práci se zaměstnanci
+        /// <summary>
+        /// Zobrazí hlavní menu pro práci se zaměstnanci a zpracovává volby uživatele.
+        /// </summary>
         public void Menu()
         {
+            zoo.ZajistiData("Zaměstnanci");
             char volba;
             do
             {
@@ -33,95 +35,148 @@ namespace EvidenceZOOCviceniUpraveno2
                 // Zpracování volby uživatele
                 switch (volba)
                 {
-                    case '1': Pridat(); break;
-                    case '2': Vypis(); break;
-                    case '3': Smazat(); break;
-                    case '4': Upravit(); break;
-                    case '5': Vyhledat(); break;
-                    case '6': break;
-                    default: Console.WriteLine("Neplatná volba."); break;
+                    case '1': Pridat(); 
+                        break;
+
+                    case '2': Vypis(); 
+                        break;
+
+                    case '3': Smazat(); 
+                        break;
+
+                    case '4': Upravit(); 
+                        break;
+
+                    case '5': Vyhledat(); 
+                        break;
+
+                    case '6': 
+                        break;
+
+                    default: Console.WriteLine("Neplatná volba."); 
+                        break;
                 }
 
             } while (volba != '6');
         }
-        
-        // Přidání nového zaměstnance – dotazy na vstupy + validace
+
+        /// <summary>
+        /// Přidá nového zaměstnance na základě vstupů od uživatele.
+        /// Vstupy jsou validovány a zakázané znaky nejsou povoleny.
+        /// </summary>
         public void Pridat()
         {
-            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");            
-             /* Používáme NactiBezZakazanychZnaku, aby se do systému nikdy nedostal
-             * zakázaný znak '|' (oddělovač v souboru). 
-             * Tím zabráníme rozbití formátu při ukládání a načítání. */
-            string jmeno = Vstupy.NactiBezZakazanychZnaku("Zadejte jméno: ", '|');
-            string prijmeni = Vstupy.NactiBezZakazanychZnaku("Zadejte příjmení: ", '|');
-            string pracovniPozice = Vstupy.NactiBezZakazanychZnaku("Zadejte pracovní pozici: ", '|');
-            DateOnly datumNarozeni = Vstupy.ZeptejSeAUpravDateOnly(DateOnly.MinValue, "Datum narození", "Zadejte", true);
-            int mzda = Vstupy.ZeptejSeAUpravInt(0, "mzda", "Nová", true);            
+            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
+            string jmeno = Vstupy.ZeptejSeAUprav(
+                "", "jméno",
+                v => v,
+                s => s,
+                jeNove: true);
 
-            // Uložení do seznamu
+            string prijmeni = Vstupy.ZeptejSeAUprav(
+                "", "příjmení",
+                v => v,
+                s => s,
+                jeNove: true);
+
+            string pracovniPozice = Vstupy.ZeptejSeAUprav(
+                "", "pracovní pozice",
+                v => v,
+                s => s,
+                jeNove: true);
+
+            DateOnly datumNarozeni = Vstupy.ZeptejSeAUprav(
+                DateOnly.MinValue, "datum narození",
+                v => v.ToString(),
+                s => DateOnly.Parse(s),
+                jeNove: true);
+
+            int mzda = Vstupy.ZeptejSeAUprav(
+                0, "mzda",
+                v => v.ToString(),
+                s => int.Parse(s),
+                jeNove: true);
+
             zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
-            zoo.UlozZamestnance(); // okamžité uložení změn
-
+            zoo.UlozZamestnance();
             Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
         }
 
-
-        // Vypíše všechny zaměstnance
+        /// <summary>
+        /// Vypíše všechny zaměstnance uložené v systému.
+        /// </summary>
         public void Vypis()
         {
             Console.WriteLine("VÝPIS ZAMĚSTNANCŮ");
+            Console.WriteLine();
+
+            Console.WriteLine(
+                $"{"Jméno",-15} {"Příjmení",-15} {"Datum narození",-15} {"Mzda",-10} {"Pozice",-20}"
+            );
+
+            Console.WriteLine(new string('-', 80));
+
             foreach (var zam in zoo.Zamestnanci)
                 zam.VypisZamestnance();
         }
 
-        // Smazání zaměstnance podle výběru uživatele
+        /// <summary>
+        /// Smaže zaměstnance vybraného uživatelem.
+        /// </summary>      
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
-            int index = Vstupy.VybratIndexZamestnance(zoo);
-
-            if (index >= 0)
+            var zam = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            if (zam != null)
             {
-                Console.WriteLine($"Zaměstnanec {zoo.Zamestnanci[index].Prijmeni} byl smazán.");
-                zoo.Zamestnanci.RemoveAt(index);
-                zoo.UlozZamestnance(); // uloží změny
+                Console.WriteLine($"Zaměstnanec {zam.Prijmeni} byl smazán.");
+                zoo.Zamestnanci.Remove(zam);
+                zoo.UlozZamestnance();
             }
         }
-        
-        // Úprava existujícího zaměstnance
+
+        /// <summary>
+        /// Upraví údaje vybraného zaměstnance.
+        /// </summary>
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
-            int index = Vstupy.VybratIndexZamestnance(zoo);
-
-            if (index >= 0)
+            var zam = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            if (zam != null)
             {
-                var zam = zoo.Zamestnanci[index];
-                
-                /* Opět používáme NactiBezZakazanychZnaku, aby uživatel nemohl zadat
-                 * zakázaný znak '|' a nerozbil formát uložených dat. */                 
-                zam.NastavJmeno(
-                    Vstupy.NactiBezZakazanychZnaku($"Nové jméno ({zam.Jmeno}): ", '|')
-                );
+                zam.Jmeno = Vstupy.ZeptejSeAUprav(
+                    zam.Jmeno, "jméno",
+                    v => v,
+                    s => s);
 
-                zam.NastavPrijmeni(
-                    Vstupy.NactiBezZakazanychZnaku($"Nové příjmení ({zam.Prijmeni}): ", '|')
-                );
+                zam.Prijmeni = Vstupy.ZeptejSeAUprav(
+                    zam.Prijmeni, "příjmení",
+                    v => v,
+                    s => s);
 
-                zam.NastavPracovniPozici(
-                    Vstupy.NactiBezZakazanychZnaku($"Nová pracovní pozice ({zam.PracovniPozice}): ", '|')
-                );
-                zam.NastavDatumNarozeni(Vstupy.ZeptejSeAUpravDateOnly(zam.DatumNarozeni, "datum narození", "Nové"));
-                // Úprava mzdy
-                zam.NastavMzdu(Vstupy.ZeptejSeAUpravInt(zam.Mzda, "mzda", "Nová"));
+                zam.PracovniPozice = Vstupy.ZeptejSeAUprav(
+                    zam.PracovniPozice, "pracovní pozice",
+                    v => v,
+                    s => s);
 
-                zoo.UlozZamestnance(); // uloží změny
+                zam.DatumNarozeni = Vstupy.ZeptejSeAUprav(
+                    zam.DatumNarozeni, "datum narození",
+                    v => v.ToString(),
+                    s => DateOnly.Parse(s));
 
+                zam.Mzda = Vstupy.ZeptejSeAUprav(
+                    zam.Mzda, "mzda",
+                    v => v.ToString(),
+                    s => int.Parse(s));
+
+                zoo.UlozZamestnance();
                 Console.WriteLine("Úprava dokončena.");
             }
         }
 
-        // Vyhledání zaměstnance podle příjmení (částečná shoda)
+        /// <summary>
+        /// Vyhledá zaměstnance podle příjmení. Podporuje částečnou shodu.
+        /// </summary>
         public void Vyhledat()
         {
             Console.Write("Zadejte hledané příjmení: ");
@@ -134,11 +189,11 @@ namespace EvidenceZOOCviceniUpraveno2
                 if (zam.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {
                     Console.WriteLine(
-                        $"Nalezeno:\t{Vstupy.ToTitleCase(zam.Prijmeni)}" +
-                        $"\t{Vstupy.ToTitleCase(zam.Jmeno)}" +
+                        $"Nalezeno:\t{zam.Prijmeni}" +
+                        $"\t{zam.Jmeno}" +
                         $"\t{zam.DatumNarozeni}" +
                         $"\t{zam.Mzda}" +
-                        $"\t{Vstupy.ToTitleCase(zam.PracovniPozice)}"
+                        $"\t{zam.PracovniPozice}"
                     );
                     nalezeno = true;
                 }

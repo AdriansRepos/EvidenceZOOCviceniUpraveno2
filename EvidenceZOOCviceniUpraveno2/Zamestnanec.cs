@@ -1,116 +1,86 @@
-﻿
+﻿using System.Text.Json.Serialization;
+
 namespace EvidenceZOOCviceniUpraveno2
 {
-
+    /// <summary>
+    /// Reprezentuje jednoho zaměstnance zoologické zahrady.
+    /// Uchovává jeho jméno, příjmení, datum narození, mzdu a pracovní pozici.
+    /// </summary>
     class Zamestnanec
     {
-        // Křestní jméno zaměstnance – nikdy nesmí být null
-        public string Jmeno { get; private set; } = "";
+        /// <summary>
+        /// Křestní jméno zaměstnance. Nikdy nesmí být null.
+        /// Automaticky převáděno do formátu TitleCase.
+        /// </summary>
+        private string _jmeno = string.Empty;
+        [JsonPropertyName("jmeno")]
+        public string Jmeno
+        {
+            get => _jmeno;
+            internal set => _jmeno = Vstupy.ToTitleCase(value);
+        }
 
-        // Příjmení zaměstnance
-        public string Prijmeni { get; private set; } = "";
+        /// <summary>
+        /// Příjmení zaměstnance. Automaticky převáděno do TitleCase.
+        /// </summary>
+        private string _prijmeni = string.Empty;
+        [JsonPropertyName("prijmeni")]
+        public string Prijmeni
+        {
+            get => _prijmeni;
+            internal set => _prijmeni = Vstupy.ToTitleCase(value);
+        }
 
-        // Datum narození zaměstnance
-        public DateOnly DatumNarozeni { get; private set; }
+        /// <summary>
+        /// Datum narození zaměstnance.
+        /// </summary>
+        [JsonPropertyName("datumNarozeni")]
+        public DateOnly DatumNarozeni { get; internal set; }
 
-        // Mzda zaměstnance v Kč
-        public int Mzda { get; private set; }
+        /// <summary>
+        /// Mzda zaměstnance v českých korunách.
+        /// </summary>
+        [JsonPropertyName("mzda")]
+        public int Mzda { get; internal set; }
 
-        // Pracovní pozice zaměstnance
-        public string PracovniPozice { get; private set; } = "";
+        /// <summary>
+        /// Pracovní pozice zaměstnance. Automaticky převáděna do TitleCase.
+        /// </summary>
+        private string _pracovniPozice = string.Empty;
+        [JsonPropertyName("pracovniPozice")]
+        public string PracovniPozice
+        {
+            get => _pracovniPozice;
+            internal set => _pracovniPozice = Vstupy.ToTitleCase(value);
+        }
 
-        // Konstruktor – nastaví všechny vlastnosti pomocí interních metod
+        /// <summary>
+        /// Vytvoří nového zaměstnance a nastaví všechny jeho vlastnosti.
+        /// </summary>
+        /// <param name="jmeno">Křestní jméno zaměstnance.</param>
+        /// <param name="prijmeni">Příjmení zaměstnance.</param>
+        /// <param name="datumNarozeni">Datum narození.</param>
+        /// <param name="mzda">Mzda v Kč.</param>
+        /// <param name="pracovniPozice">Pracovní pozice.</param>
+        [JsonConstructor]
         public Zamestnanec(string jmeno, string prijmeni, DateOnly datumNarozeni,
-                           int mzda, string pracovniPozice)
+                       int mzda, string pracovniPozice)
         {
-            NastavJmeno(jmeno);
-            NastavPrijmeni(prijmeni);
-            NastavDatumNarozeni(datumNarozeni);
-            NastavMzdu(mzda);
-            NastavPracovniPozici(pracovniPozice);
+            Jmeno = jmeno;
+            Prijmeni = prijmeni;
+            DatumNarozeni = datumNarozeni;
+            Mzda = mzda;
+            PracovniPozice = pracovniPozice;
         }
 
-        // Nastaví jméno a převede ho do TitleCase
-        internal void NastavJmeno(string noveJmeno)
-        {
-            Jmeno = Vstupy.ToTitleCase(noveJmeno);
-        }
-
-        // Nastaví příjmení a převede ho do TitleCase
-        internal void NastavPrijmeni(string novePrijmeni)
-        {
-            Prijmeni = Vstupy.ToTitleCase(novePrijmeni);
-        }
-
-        // Nastaví datum narození
-        internal void NastavDatumNarozeni(DateOnly noveDatumNarozeni)
-        {
-            DatumNarozeni = noveDatumNarozeni;
-        }
-
-        // Nastaví mzdu
-        internal void NastavMzdu(int novaMzda)
-        {
-            Mzda = novaMzda;
-        }
-
-        // Nastaví pracovní pozici a převede ji do TitleCase
-        internal void NastavPracovniPozici(string novaPracovniPozice)
-        {
-            PracovniPozice = Vstupy.ToTitleCase(novaPracovniPozice);
-        }
-
-        // Vypíše všechny informace o zaměstnanci
+        /// <summary>
+        /// Vypíše všechny informace o zaměstnanci do konzole.
+        /// </summary>
         public void VypisZamestnance()
         {
-            Console.WriteLine("Jméno zaměstnance: {0}", Jmeno);
-            Console.WriteLine("\tPříjmení zaměstnance: {0}", Prijmeni);
-            Console.WriteLine("\tDatum narození zaměstnance: {0}", DatumNarozeni);
-            Console.WriteLine("\tMzda zaměstnance: {0}", Mzda);
-            Console.WriteLine("\tPracovní pozice zaměstnance: {0}", PracovniPozice);
-        }
-
-        // Převede objekt na řetězec pro uložení do souboru
-        public string ToFileString()
-        {
-            return $"{Jmeno}|{Prijmeni}|{DatumNarozeni}|{Mzda}|{PracovniPozice}";
-        }
-
-        // Vytvoří objekt Zamestnanec z jednoho řádku textu v souboru
-        public static Zamestnanec Parse(string line)
-        {
-            // Rozdělení řádku podle svislé čáry
-            string[] parts = line.Split('|');
-
-            // Kontrola správného počtu položek
-            if (parts.Length != 5)
-                throw new FormatException("Řádek nemá správný formát pro Zamestnance.");
-
-            // Kontrola jména
-            if (string.IsNullOrWhiteSpace(parts[0]))
-                throw new FormatException("Jméno nesmí být prázdné.");
-            string jmeno = parts[0];
-
-            // Kontrola příjmení
-            if (string.IsNullOrWhiteSpace(parts[1]))
-                throw new FormatException("Příjmení nesmí být prázdné.");
-            string prijmeni = parts[1];
-
-            // Kontrola a převod data narození
-            if (!DateOnly.TryParse(parts[2], out DateOnly datumNarozeni))
-                throw new FormatException("Datum narození není platné.");
-
-            // Kontrola a převod mzdy
-            if (!int.TryParse(parts[3], out int mzda))
-                throw new FormatException("Mzda není platné číslo.");
-
-            // Kontrola pracovní pozice
-            if (string.IsNullOrWhiteSpace(parts[4]))
-                throw new FormatException("Pracovní pozice nesmí být prázdná.");
-            string pracovniPozice = parts[4];
-
-            // Vytvoření nového objektu
-            return new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice);
-        }
+            Console.WriteLine(
+                $"{Jmeno,-15} {Prijmeni,-15} {DatumNarozeni,-15} {Mzda,-10} {PracovniPozice,-20}"
+            );
+        }        
     }
 }

@@ -1,105 +1,245 @@
-﻿
+﻿using System.Text.Json;
+
 namespace EvidenceZOOCviceniUpraveno2
 {
-    class ZOO
+    /// <summary>
+    /// Reprezentuje správu zoologické zahrady – načítání dat, ukládání,
+    /// poskytování statistik a práce se soubory.
+    /// </summary>
+    /// <remarks>
+    /// Inicializuje instanci třídy ZOO, uloží cesty k souborům
+    /// a načte zaměstnance i zvířata.
+    /// </remarks>
+    /// <param name="souborZam">Cesta k souboru se zaměstnanci.</param>
+    /// <param name="souborZvir">Cesta k souboru se zvířaty.</param>        
+    class ZOO(string souborZam, string souborZvir)
     {
-        // Seznam všech zvířat načtených ze souboru
-        public List<Zvire> Zvirata { get; private set; }
+        /// <summary>
+        /// Seznam všech zvířat načtených ze souboru.
+        /// </summary>
+        public List<Zvire> Zvirata { get; internal set; } = [];
 
-        // Seznam všech zaměstnanců načtených ze souboru
-        public List<Zamestnanec> Zamestnanci { get; private set; }
+        /// <summary>
+        /// Seznam všech zaměstnanců načtených ze souboru.
+        /// </summary>
+        public List<Zamestnanec> Zamestnanci { get; internal set; } = [];
 
-        // Cesta k souboru se zaměstnanci
-        public string SouborZamestnanci { get; private set; } = "";
+        /// <summary>
+        /// Cesta k souboru se zaměstnanci.
+        /// </summary>
+        public string SouborZamestnanci { get; private set; } = souborZam;
 
-        // Cesta k souboru se zvířaty
-        public string SouborZvirata { get; private set; } = "";
+        /// <summary>
+        /// Cesta k souboru se zvířaty.
+        /// </summary>
+        public string SouborZvirata { get; private set; } = souborZvir;
 
-        // Cesta k logovacímu souboru pro chybné řádky
-        private readonly string LogSoubor = "";
+        /// <summary>
+        /// Registr načítacích akcí pro jednotlivé datové moduly.
+        /// Klíč = název modulu (např. "Zaměstnanci", "Zvířata").
+        /// Hodnota = delegát, který provede načtení dat pro daný modul.
+        /// </summary>
+        private readonly Dictionary<string, Action> akceNacitani = [];
 
-        /* Konstruktor – uloží cesty k souborům, zajistí jejich existenci
-         * a načte data do seznamů */
-        public ZOO(string souborZam, string souborZvir, string logSoubor)
+        /// <summary>
+        /// Sada modulů, které již byly načteny.
+        /// Slouží k zajištění, že se každý modul načte pouze jednou
+        /// bez ohledu na to, kolikrát je požadován.
+        /// </summary>
+        private readonly HashSet<string> nacteno = [];
+
+        /// <summary>
+        /// Cesta ke konfiguračnímu souboru, který ukládá umístění JSON souborů
+        /// se zaměstnanci a zvířaty. Používá se při startu aplikace.
+        /// </summary>
+        private static readonly string KonfigSoubor = @"..\..\..\konfig.txt";
+
+        /// <summary>
+        /// Nastavení JSON serializace pro zaměstnance.
+        /// Obsahuje konvertor pro DateOnly.
+        /// </summary>
+        private static readonly JsonSerializerOptions ZamestnanecJsonOptions = new()
         {
-            SouborZamestnanci = souborZam;
-            SouborZvirata = souborZvir;
-            LogSoubor = logSoubor;
+            Converters = { new DateOnlyConverter() }
+        };
 
+        /// <summary>
+        /// Nastavení JSON serializace pro zaměstnance s odsazením,
+        /// používané při ukládání do souboru.
+        /// </summary>
+        private static readonly JsonSerializerOptions ZamestnanecJsonOptionsIndented = new()
+        {
+            WriteIndented = true,
+            Converters = { new DateOnlyConverter() }
+        };
+
+        /// <summary>
+        /// Nastavení JSON serializace pro zvířata s odsazením.
+        /// </summary>
+        private static readonly JsonSerializerOptions ZvireJsonOptionsIndented = new()
+        {
+            WriteIndented = true
+        };
+
+        /// <summary>
+        /// Při prvním spuštění se zeptá na složku a uloží cesty do konfig.txt.
+        /// Při každém dalším spuštění načte cesty z konfig.txt automaticky.
+        /// </summary>
+        public static (string souborZam, string souborZvir) NactiNeboSeZeptejNaCesty()
+        {
+            // Pokud konfig existuje, načti cesty z něj
+            if (File.Exists(KonfigSoubor))
+            {
+                string[] radky = File.ReadAllLines(KonfigSoubor);
+                if (radky.Length == 2
+                    && !string.IsNullOrWhiteSpace(radky[0])
+                    && !string.IsNullOrWhiteSpace(radky[1]))
+                {
+                    Console.WriteLine($"Načteny uložené cesty z: {KonfigSoubor}");
+                    return (radky[0], radky[1]);
+                }
+            }
+
+            // První spuštění — zeptej se na složku
+            Console.WriteLine("=== PRVNÍ SPUŠTĚNÍ — NASTAVENÍ CEST ===");
+            Console.Write("Zadej cestu ke složce pro ukládání dat: ");
+            string slozka = Console.ReadLine()!.Trim();
+
+            // Vytvoří složku, pokud neexistuje
+            Directory.CreateDirectory(slozka);
+
+            string zam = Path.Combine(slozka, "zamestnanci.json");
+            string zvir = Path.Combine(slozka, "zvirata.json");
+
+            // Uloží cesty trvale do konfig.txt
+            File.WriteAllLines(KonfigSoubor, [zam, zvir]);
+
+            Console.WriteLine($"Cesty uloženy. Data budou ukládána do: {slozka}");
+            return (zam, zvir);
+        }
+
+        /// <summary>
+        /// Zaregistruje načítací akci pro daný datový modul.
+        /// Klíč určuje název modulu (např. "Zaměstnanci", "Zvířata").
+        /// Akce je delegát, který provede načtení dat.
+        /// </summary>
+        /// <param name="klic">Identifikátor modulu, pro který se registruje načítání.</param>
+        /// <param name="akce">Delegát obsahující logiku načtení dat.</param>
+        public void RegistrujNacitani(string klic, Action akce)
+        {
+            akceNacitani[klic] = akce;   // uloží nebo přepíše načítací akci pro daný klíč
+        }
+
+        /// <summary>
+        /// Zajistí, že data pro daný modul budou načtena.
+        /// Pokud již byla načtena dříve, znovu se nenačítají.
+        /// </summary>
+        /// <param name="klic">Identifikátor modulu, jehož data mají být zajištěna.</param>
+        public void ZajistiData(string klic)
+        {
+            if (!nacteno.Contains(klic))                 // pokud modul ještě nebyl načten
+            {
+                if (akceNacitani.TryGetValue(klic, out var akce))   // najde registrovanou akci
+                {
+                    akce.Invoke();                      // provede načtení dat
+                    nacteno.Add(klic);                   // označí modul jako načtený
+                }
+                else
+                {
+                    // pokud není registrována žádná akce, jde o chybu návrhu
+                    throw new InvalidOperationException(
+                        $"Pro klíč '{klic}' není registrováno načítání dat."
+                    );
+                }
+            }
+        }
+
+        // -----------------------------
+        // VEŘEJNÉ METODY PRO NAČTENÍ DAT
+        // -----------------------------
+
+        public void NactiZamestnance(string cesta)
+        {
+            SouborZamestnanci = cesta;
             Zamestnanci = NactiZamestnanceZeSouboru();
+        }
+
+        public void NactiZvirata(string cesta)
+        {
+            SouborZvirata = cesta;
             Zvirata = NactiZvirataZeSouboru();
         }
 
-        // Načte zaměstnance ze souboru, nevalidní řádky zapíše do logu
+        /// <summary>
+        /// Načte zaměstnance ze souboru.
+        /// </summary>
+        /// <returns>Seznam načtených zaměstnanců.</returns>
         private List<Zamestnanec> NactiZamestnanceZeSouboru()
-        {   // Vytvoření prázdného seznamu pro načtené zaměstnance
-            var list = new List<Zamestnanec>();
-            // Otevření logovacího souboru pro zápis chyb (v režimu přidávání)
-            using StreamWriter log = new(LogSoubor, append: true);
-            // Kontrola existence souboru se zaměstnanci, pokud neexistuje, vrátí prázdný seznam
+        {
+            // Pokud .json chybí, ale .bak existuje, obnov ze zálohy
+            if (!File.Exists(SouborZamestnanci) && File.Exists(SouborZamestnanci + ".bak"))
+            {
+                File.Copy(SouborZamestnanci + ".bak", SouborZamestnanci);
+                Console.WriteLine("Soubor zaměstnanců obnoven ze zálohy.");
+            }
+
+            // Pokud soubor neexistuje, vrátí prázdný seznam
             if (!File.Exists(SouborZamestnanci))
-                return list;
-            // Procházení každého řádku v souboru se zaměstnanci
-            foreach (var radek in File.ReadAllLines(SouborZamestnanci))
+                return [];
+
+            try
             {
-                try
-                {   // Kontrola, zda řádek není prázdný nebo pouze bílý, pokud ano, přeskočí ho
-                    if (string.IsNullOrWhiteSpace(radek))
-                        continue;
-                    // Pokus o parsování řádku do objektu Zamestnanec, pokud se nepodaří, zachytí výjimku a zapíše chybu do logu
-                    list.Add(Zamestnanec.Parse(radek));
-                }  // Zachycení a logování případných chyb při parsování řádku
-                catch (Exception ex)
-                {
-                    log.WriteLine($"{DateTime.Now}: Chybný řádek v zaměstnancích: \"{radek}\" – {ex.Message}");
-                }
+                string json = File.ReadAllText(SouborZamestnanci);
+                return JsonSerializer.Deserialize<List<Zamestnanec>>(json, ZamestnanecJsonOptions) ?? [];
             }
-            // Vrácení seznamu načtených zaměstnanců
-            return list;
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při načítání zaměstnanců: {ex.Message}");
+                return [];
+            }
         }
 
-        // Načte zvířata ze souboru, nevalidní řádky zapíše do logu
+        /// <summary>
+        /// Načte zvířata ze souboru.
+        /// </summary>
+        /// <returns>Seznam načtených zvířat.</returns>
         private List<Zvire> NactiZvirataZeSouboru()
-        {   // Vytvoření prázdného seznamu pro načtená zvířata
-            var list = new List<Zvire>();
-            // Otevření logovacího souboru pro zápis chyb (v režimu přidávání)
-            using StreamWriter log = new(LogSoubor, append: true);
-            // Kontrola existence souboru se zvířaty, pokud neexistuje, vrátí prázdný seznam
-            if (!File.Exists(SouborZvirata))
-                return list;
-            // Procházení každého řádku v souboru se zvířaty
-            foreach (var radek in File.ReadAllLines(SouborZvirata))
+        {
+            // Pokud .json chybí, ale .bak existuje, obnov ze zálohy
+            if (!File.Exists(SouborZvirata) && File.Exists(SouborZvirata + ".bak"))
             {
-                try
-                {   // Kontrola, zda řádek není prázdný nebo pouze bílý, pokud ano, přeskočí ho
-                    if (string.IsNullOrWhiteSpace(radek))
-                        continue;
-                    // Pokus o parsování řádku do objektu Zvire, pokud se nepodaří, zachytí výjimku a zapíše chybu do logu
-                    list.Add(Zvire.Parse(radek));
-                }
-                catch (Exception ex)
-                {
-                    log.WriteLine($"{DateTime.Now}: Chybný řádek ve zvířatech: \"{radek}\" – {ex.Message}");
-                }
+                File.Copy(SouborZvirata + ".bak", SouborZvirata);
+                Console.WriteLine("Soubor zvířat obnoven ze zálohy.");
             }
-            // Vrácení seznamu načtených zvířat
-            return list;
+
+            // Pokud soubor neexistuje, vrátí prázdný seznam
+            if (!File.Exists(SouborZvirata))
+                return [];
+
+            try
+            {
+                string json = File.ReadAllText(SouborZvirata);
+                return JsonSerializer.Deserialize<List<Zvire>>(json) ?? [];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Chyba při načítání zvířat: {ex.Message}");
+                return [];
+            }
         }
 
-        // Uloží všechny zaměstnance zpět do souboru (včetně automatické zálohy)
+        /// <summary>
+        /// Uloží všechny zaměstnance zpět do souboru a vytvoří zálohu.
+        /// </summary>
         public void UlozZamestnance()
         {
             try
             {
-                // Zálohuje jen pokud původní soubor existuje
                 if (File.Exists(SouborZamestnanci))
-                {
                     File.Copy(SouborZamestnanci, SouborZamestnanci + ".bak", overwrite: true);
-                }
 
-                // na začátku vytvoří nový soubor, pokud neexistuje, a zapíše všechny zaměstnance do souboru
-                File.WriteAllLines(SouborZamestnanci,
-                    Zamestnanci.Select(z => z.ToFileString()));
+                string json = JsonSerializer.Serialize(Zamestnanci, ZamestnanecJsonOptionsIndented);
+                File.WriteAllText(SouborZamestnanci, json);
             }
             catch (Exception ex)
             {
@@ -107,18 +247,18 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Uloží všechna zvířata zpět do souboru (včetně automatické zálohy)
+        /// <summary>
+        /// Uloží všechna zvířata zpět do souboru a vytvoří zálohu.
+        /// </summary>
         public void UlozZvirata()
         {
             try
             {
                 if (File.Exists(SouborZvirata))
-                {   // Zálohuje jen pokud původní soubor existuje
                     File.Copy(SouborZvirata, SouborZvirata + ".bak", overwrite: true);
-                }
-                // na začátku vytvoří nový soubor, pokud neexistuje, a zapíše všechny zaměstnance do souboru
-                File.WriteAllLines(SouborZvirata,
-                    Zvirata.Select(z => z.ToFileString()));
+
+                string json = JsonSerializer.Serialize(Zvirata, ZvireJsonOptionsIndented);
+                File.WriteAllText(SouborZvirata, json);
             }
             catch (Exception ex)
             {
@@ -126,9 +266,13 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // Hlavní menu statistik
+        /// <summary>
+        /// Zobrazí hlavní menu statistik a umožní uživateli vybrat požadovanou akci.
+        /// </summary>
         public void MenuStatistiky()
         {
+            ZajistiData("Zaměstnanci");
+            ZajistiData("Zvířata");
             char volba;
             do
             {
@@ -168,19 +312,25 @@ namespace EvidenceZOOCviceniUpraveno2
             while (volba != '4');
         }
 
-        // Vrátí počet zvířat v seznamu
+        /// <summary>
+        /// Vrátí počet zvířat v seznamu.
+        /// </summary>
         public int PocetZvirat()
         {
             return Zvirata.Count;
         }
 
-        // Vrátí počet zaměstnanců v seznamu
+        /// <summary>
+        /// Vrátí počet zaměstnanců v seznamu.
+        /// </summary>
         public int PocetZamestnancu()
         {
             return Zamestnanci.Count;
         }
 
-        // Vrátí součet mezd všech zaměstnanců
+        /// <summary>
+        /// Vrátí součet mezd všech zaměstnanců.
+        /// </summary>
         public int SoucetMezd()
         {
             return Zamestnanci.Sum(z => z.Mzda);

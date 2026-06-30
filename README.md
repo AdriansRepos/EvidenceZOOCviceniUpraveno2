@@ -32,14 +32,13 @@ Umožňuje evidovat \*\*zvířata\*\*, \*\*zaměstnance\*\*, provádět \*\*stat
 
 ## Ukládání dat
 
-Aplikace ukládá data do textových souborů:
+Aplikace ukládá data do souborů JSON:
 
-- `zamestnanci.txt` 
+- `zamestnanci.json` 
 - `zamestnanci.bak` (automatická záloha) 
-- `zvirata.txt`
+- `zvirata.json`
 - `zvirata.bak` (automatická záloha)
 
-Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 ---
 
@@ -61,9 +60,7 @@ Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 ├── Vstupy.cs
 
-├── zamestnanci.txt
-
-├── zvirata.txt
+├── DateOnlyConverter.cs
 
 └── README.md
 
@@ -73,45 +70,66 @@ Každý řádek obsahuje hodnoty oddělené znakem `|`.
 
 - OOP (třídy, vlastnosti, zapouzdření)
 - Výčtové typy (enum)
-- Delegáty a události
+- Delegáty a události pro přístup k souborům
 - Práce se soubory (`File.ReadAllText`, `File.WriteAllLines`)
 - Validace vstupů
 - Try-catch bloky
 - DateOnly
 - Kolekce (`List<T>`)
+- Parsování data pro JSON soubor
+- Ukládání do JSON souborů
+- Zadání cest k adresáři a souborům jenom při prvním spuštění aplikace - nastavení a jejich uložení do konfiguračního souboru
+- Lazy loading pro načtení souborů až když je potřeba
+- Úprava formátování výpisů do tabulek
 
 ---
 
 ```csharp
 
-public void PridatZamestnance()
+ public void Pridat()
+ {
+     Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
+     string jmeno = Vstupy.ZeptejSeAUprav(
+         "", "jméno",
+         v => v,
+         s => s,
+         jeNove: true);
 
-{
+     string prijmeni = Vstupy.ZeptejSeAUprav(
+         "", "příjmení",
+         v => v,
+         s => s,
+         jeNove: true);
 
-&#x20;   string jmeno = Vstupy.NactiBezZakazanychZnaku("Zadejte jméno: ", '|');
+     string pracovniPozice = Vstupy.ZeptejSeAUprav(
+         "", "pracovní pozice",
+         v => v,
+         s => s,
+         jeNove: true);
 
-&#x20;   string prijmeni = Vstupy.NactiBezZakazanychZnaku("Zadejte příjmení: ", '|');
+     DateOnly datumNarozeni = Vstupy.ZeptejSeAUprav(
+         DateOnly.MinValue, "datum narození",
+         v => v.ToString(),
+         s => DateOnly.Parse(s),
+         jeNove: true);
 
-&#x20;   Pozice pozice = Vstupy.ZeptejSeAUpravEnum<Pozice>("Pracovní pozice");
+     int mzda = Vstupy.ZeptejSeAUprav(
+         0, "mzda",
+         v => v.ToString(),
+         s => int.Parse(s),
+         jeNove: true);
 
-&#x20;   DateOnly narozeni = Vstupy.ZeptejSeAUpravDateOnly(DateOnly.MinValue, "Datum narození", "Zadejte", true);
-
-
-
-&#x20;   Zamestnanec z = new(jmeno, prijmeni, pozice, narozeni);
-
-&#x20;   Zamestnanci.Add(z);
-
-&#x20;   UlozZamestnance();
-
-}
+     zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
+     zoo.UlozZamestnance();
+     Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
+ }
 ```
 
 ## Plánované funkce:
 
-- Ukládání do JSON
+- Přidání transakčního ukládání
+- Přidání logování změn
 - Export statistik
-- Lepší validace vstupů
 - Automatické testy
 - GUI verze (WPF nebo MAUI)Ukázka kódu
 

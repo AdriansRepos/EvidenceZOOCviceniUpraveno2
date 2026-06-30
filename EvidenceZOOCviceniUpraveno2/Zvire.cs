@@ -1,96 +1,73 @@
-﻿
+﻿using System.Text.Json.Serialization;
+
 namespace EvidenceZOOCviceniUpraveno2
 {
-
+    /// <summary>
+    /// Reprezentuje jedno zvíře v zoologické zahradě.
+    /// Uchovává jeho název, věk a váhu.
+    /// </summary>
     class Zvire
     {
-        // Název zvířete – text, nikdy nesmí být null, proto výchozí hodnota ""
-        public string Nazev { get; private set; } = "";
+        /// <summary>
+        /// Název zvířete. Nikdy nesmí být null.
+        /// Je automaticky převáděn do formátu TitleCase.
+        /// </summary>
+        private string _nazev = string.Empty;
+        [JsonPropertyName("nazev")]
+        public string Nazev
+        {
+            get => _nazev;
+            internal set => _nazev = Vstupy.ToTitleCase(value);
+        }
 
-        // Věk zvířete v letech
-        public int Vek { get; private set; }
+        /// <summary>
+        /// Věk zvířete v letech.
+        /// </summary>
+        [JsonPropertyName("vek")]
+        public int Vek { get; internal set; }
 
-        // Váha zvířete v kilogramech
-        public double Vaha { get; private set; }
+        /// <summary>
+        /// Váha zvířete v kilogramech.
+        /// </summary>
+        [JsonPropertyName("vaha")]
+        public double Vaha { get; internal set; }
 
-        // Konstruktor – při vytvoření objektu nastaví všechny vlastnosti
+        /// <summary>
+        /// Vytvoří nové zvíře a nastaví jeho název, věk a váhu.
+        /// </summary>
+        /// <param name="nazev">Název zvířete.</param>
+        /// <param name="vek">Věk v letech.</param>
+        /// <param name="vaha">Váha v kilogramech.</param>
+        [JsonConstructor]
         public Zvire(string nazev, int vek, double vaha)
         {
-            NastavNazev(nazev);
-            NastavVek(vek);
-            NastavVahu(vaha);
+            Nazev = nazev;
+            Vek = vek;
+            Vaha = vaha;
         }
 
-        // Nastaví název a převede ho do hezkého formátu (TitleCase)
-        internal void NastavNazev(string novyNazev)
+        /// <summary>
+        /// Metoda pro správné tvarování slova rok
+        /// </summary>
+        /// <returns>Vrátí správný tvar slova rok podle věku zvířete</returns>
+        private string VekSklonovany()
         {
-            Nazev = Vstupy.ToTitleCase(novyNazev);
+            if (Vek == 1)
+                return $"{Vek} rok";
+            else if (Vek >= 2 && Vek <= 4)
+                return $"{Vek} roky";
+            else
+                return $"{Vek} let";
         }
 
-        // Nastaví věk zvířete
-        internal void NastavVek(int novyVek)
-        {
-            Vek = novyVek;
-        }
-
-        // Nastaví váhu zvířete
-        internal void NastavVahu(double novaVaha)
-        {
-            Vaha = novaVaha;
-        }
-
-        // Vypíše informace o zvířeti včetně správného skloňování věku
+        /// <summary>
+        /// Vypíše informace o zvířeti do konzole,        
+        /// </summary>
         public void VypisZvire()
         {
-            Console.WriteLine("Název zvířete: {0}", Nazev);
-
-            if (Vek == 1)
-            {
-                Console.WriteLine("\tVěk zvířete: {0} rok", Vek);
-            }
-            else if (Vek >= 2 && Vek <= 4)
-            {
-                Console.WriteLine("\tVěk zvířete: {0} roky", Vek);
-            }
-            else
-            {
-                Console.WriteLine("\tVěk zvířete: {0} let", Vek);
-            }
-
-            Console.WriteLine("\tVáha: {0} kg", Vaha);
-        }
-
-        // Převede objekt na řetězec pro uložení do souboru
-        public string ToFileString()
-        {
-            return $"{Nazev}|{Vek}|{Vaha}";
-        }
-
-        // Vytvoří objekt Zvire z jednoho řádku textu v souboru
-        public static Zvire Parse(string line)
-        {
-            // Rozdělení řádku podle svislé čáry
-            string[] parts = line.Split('|');
-
-            // Kontrola správného počtu položek
-            if (parts.Length != 3)
-                throw new FormatException("Řádek nemá správný formát pro Zvire.");
-
-            // Kontrola názvu
-            if (string.IsNullOrWhiteSpace(parts[0]))
-                throw new FormatException("Název nesmí být prázdný.");
-            string nazev = parts[0];
-
-            // Kontrola a převod věku
-            if (!int.TryParse(parts[1], out int vek))
-                throw new FormatException("Věk není platné číslo.");
-
-            // Kontrola a převod váhy
-            if (!double.TryParse(parts[2], out double vaha))
-                throw new FormatException("Váha není platné číslo.");
-
-            // Vytvoření nového objektu
-            return new Zvire(nazev, vek, vaha);
-        }
+            Console.WriteLine(
+                $"{Nazev,-20} {VekSklonovany(),-12} {Vaha + " kg",-10}"
+            );
+        }       
     }
 }
