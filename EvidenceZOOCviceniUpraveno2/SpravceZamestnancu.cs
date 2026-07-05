@@ -1,4 +1,7 @@
-﻿namespace EvidenceZOOCviceniUpraveno2
+﻿using TextHelper;
+using SelectHelper;
+
+namespace EvidenceZOOCviceniUpraveno2
 {
     /// <summary>
     /// Třída zodpovědná za správu zaměstnanců – přidávání, mazání, úpravy,
@@ -67,31 +70,31 @@
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
-            string jmeno = Vstupy.ZeptejSeAUprav(
+            string jmeno = UpravaVstupu.ZeptejSeAUprav(
                 "", "jméno",
                 v => v,
                 s => s,
                 jeNove: true);
 
-            string prijmeni = Vstupy.ZeptejSeAUprav(
+            string prijmeni = UpravaVstupu.ZeptejSeAUprav(
                 "", "příjmení",
                 v => v,
                 s => s,
                 jeNove: true);
 
-            string pracovniPozice = Vstupy.ZeptejSeAUprav(
+            string pracovniPozice = UpravaVstupu.ZeptejSeAUprav(
                 "", "pracovní pozice",
                 v => v,
                 s => s,
                 jeNove: true);
 
-            DateOnly datumNarozeni = Vstupy.ZeptejSeAUprav(
+            DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                 DateOnly.MinValue, "datum narození",
                 v => v.ToString(),
                 s => DateOnly.Parse(s),
                 jeNove: true);
 
-            int mzda = Vstupy.ZeptejSeAUprav(
+            int mzda = UpravaVstupu.ZeptejSeAUprav(
                 0, "mzda",
                 v => v.ToString(),
                 s => int.Parse(s),
@@ -126,7 +129,7 @@
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
-            var zam = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
             if (zam != null)
             {
                 Console.WriteLine($"Zaměstnanec {zam.Prijmeni} byl smazán.");
@@ -141,30 +144,30 @@
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
-            var zam = Vstupy.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
             if (zam != null)
             {
-                zam.Jmeno = Vstupy.ZeptejSeAUprav(
+                zam.Jmeno = UpravaVstupu.ZeptejSeAUprav(
                     zam.Jmeno, "jméno",
                     v => v,
                     s => s);
 
-                zam.Prijmeni = Vstupy.ZeptejSeAUprav(
+                zam.Prijmeni = UpravaVstupu.ZeptejSeAUprav(
                     zam.Prijmeni, "příjmení",
                     v => v,
                     s => s);
 
-                zam.PracovniPozice = Vstupy.ZeptejSeAUprav(
+                zam.PracovniPozice = UpravaVstupu.ZeptejSeAUprav(
                     zam.PracovniPozice, "pracovní pozice",
                     v => v,
                     s => s);
 
-                zam.DatumNarozeni = Vstupy.ZeptejSeAUprav(
+                zam.DatumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                     zam.DatumNarozeni, "datum narození",
                     v => v.ToString(),
                     s => DateOnly.Parse(s));
 
-                zam.Mzda = Vstupy.ZeptejSeAUprav(
+                zam.Mzda = UpravaVstupu.ZeptejSeAUprav(
                     zam.Mzda, "mzda",
                     v => v.ToString(),
                     s => int.Parse(s));

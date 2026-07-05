@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using InputHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
@@ -17,7 +18,7 @@ namespace EvidenceZOOCviceniUpraveno2
         public string Nazev
         {
             get => _nazev;
-            internal set => _nazev = Vstupy.ToTitleCase(value);
+            internal set => _nazev = TitleCase.ToTitleCase(value);
         }
 
         /// <summary>

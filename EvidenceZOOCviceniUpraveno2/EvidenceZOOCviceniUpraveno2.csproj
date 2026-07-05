@@ -7,4 +7,19 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Reference Include="DateConverterForJson">
+      <HintPath>..\..\DateConverterForJson\DateConverterForJson\bin\Release\net8.0\DateConverterForJson.dll</HintPath>
+    </Reference>
+    <Reference Include="InputHelper">
+      <HintPath>..\..\InputHelper\InputHelper\bin\Release\net8.0\InputHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="SelectHelper">
+      <HintPath>..\..\SelectHelper\SelectHelper\bin\Release\net8.0\SelectHelper.dll</HintPath>
+    </Reference>
+    <Reference Include="TextHelper">
+      <HintPath>..\..\TextHelper\TextHelper\bin\Release\net8.0\TextHelper.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using DateConverterForJson;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
@@ -52,7 +53,10 @@ namespace EvidenceZOOCviceniUpraveno2
         /// Cesta ke konfiguračnímu souboru, který ukládá umístění JSON souborů
         /// se zaměstnanci a zvířaty. Používá se při startu aplikace.
         /// </summary>
-        private static readonly string KonfigSoubor = @"..\..\..\konfig.txt";
+        private static readonly string KonfigSoubor =
+                 Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
+                 "EvidenceZOOCviceniUpraveno2",
+                 "config.ini");
 
         /// <summary>
         /// Nastavení JSON serializace pro zaměstnance.
@@ -82,21 +86,37 @@ namespace EvidenceZOOCviceniUpraveno2
         };
 
         /// <summary>
-        /// Při prvním spuštění se zeptá na složku a uloží cesty do konfig.txt.
-        /// Při každém dalším spuštění načte cesty z konfig.txt automaticky.
+        /// Při prvním spuštění se zeptá na složku a uloží cesty do config.ini.
+        /// Při každém dalším spuštění načte cesty z config.ini automaticky.
         /// </summary>
         public static (string souborZam, string souborZvir) NactiNeboSeZeptejNaCesty()
         {
+            Directory.CreateDirectory(Path.GetDirectoryName(KonfigSoubor)!);
             // Pokud konfig existuje, načti cesty z něj
             if (File.Exists(KonfigSoubor))
             {
-                string[] radky = File.ReadAllLines(KonfigSoubor);
-                if (radky.Length == 2
-                    && !string.IsNullOrWhiteSpace(radky[0])
-                    && !string.IsNullOrWhiteSpace(radky[1]))
+                var hodnoty = new Dictionary<string, string>();
+                foreach (string radek in File.ReadAllLines(KonfigSoubor))
+                {
+                    string upraven = radek.Trim();
+                    if (upraven.Length == 0 || upraven.StartsWith("#") || upraven.StartsWith(";"))
+                        continue; // přeskoč prázdné řádky a komentáře
+
+                    int idx = upraven.IndexOf('=');
+                    if (idx <= 0) continue;
+
+                    string klic = upraven[..idx].Trim();
+                    string hodnota = upraven[(idx + 1)..].Trim();
+                    hodnoty[klic] = hodnota;
+                }
+
+                if (hodnoty.TryGetValue("souborZam", out var zamUlozeny)
+                    && hodnoty.TryGetValue("souborZvir", out var zvirUlozeny)
+                    && !string.IsNullOrWhiteSpace(zamUlozeny)
+                    && !string.IsNullOrWhiteSpace(zvirUlozeny))
                 {
                     Console.WriteLine($"Načteny uložené cesty z: {KonfigSoubor}");
-                    return (radky[0], radky[1]);
+                    return (zamUlozeny, zvirUlozeny);
                 }
             }
 
@@ -107,12 +127,14 @@ namespace EvidenceZOOCviceniUpraveno2
 
             // Vytvoří složku, pokud neexistuje
             Directory.CreateDirectory(slozka);
-
             string zam = Path.Combine(slozka, "zamestnanci.json");
             string zvir = Path.Combine(slozka, "zvirata.json");
 
-            // Uloží cesty trvale do konfig.txt
-            File.WriteAllLines(KonfigSoubor, [zam, zvir]);
+            // Uloží cesty trvale do config.ini
+            File.WriteAllLines(KonfigSoubor, [
+                $"souborZam={zam}",
+                $"souborZvir={zvir}"
+            ]);
 
             Console.WriteLine($"Cesty uloženy. Data budou ukládána do: {slozka}");
             return (zam, zvir);

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using InputHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
@@ -17,7 +18,7 @@ namespace EvidenceZOOCviceniUpraveno2
         public string Jmeno
         {
             get => _jmeno;
-            internal set => _jmeno = Vstupy.ToTitleCase(value);
+            internal set => _jmeno = TitleCase.ToTitleCase(value);
         }
 
         /// <summary>
@@ -28,7 +29,7 @@ namespace EvidenceZOOCviceniUpraveno2
         public string Prijmeni
         {
             get => _prijmeni;
-            internal set => _prijmeni = Vstupy.ToTitleCase(value);
+            internal set => _prijmeni = TitleCase.ToTitleCase(value);
         }
 
         /// <summary>
@@ -51,7 +52,7 @@ namespace EvidenceZOOCviceniUpraveno2
         public string PracovniPozice
         {
             get => _pracovniPozice;
-            internal set => _pracovniPozice = Vstupy.ToTitleCase(value);
+            internal set => _pracovniPozice = TitleCase.ToTitleCase(value);
         }
 
         /// <summary>

@@ -84,6 +84,8 @@ Aplikace ukládá data do souborů JSON:
 
 ---
 
+## Ukázka kódu
+
 ```csharp
 
  public void Pridat()
@@ -131,7 +133,7 @@ Aplikace ukládá data do souborů JSON:
 - Přidání logování změn
 - Export statistik
 - Automatické testy
-- GUI verze (WPF nebo MAUI)Ukázka kódu
+- GUI verze (WPF nebo MAUI)
 
 ### Release
 - První vydaná spustitelná verze
@@ -143,3 +145,9 @@ https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases
 - Verze: v1.1.0
 - Ke stažení zde: Releases
 https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.1.0
+
+- Úprava kódu, odebrání třídy vstupy a DataConverterJson
+- Funkce z těchto dvou tříd jsou přesunuté do samostatných knihoven
+- Zapracování knihoven do aplikace
+- Verze: v1.2.0
+- Ke stažení zde: Releases

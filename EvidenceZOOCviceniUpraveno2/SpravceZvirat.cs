@@ -1,4 +1,7 @@
-﻿namespace EvidenceZOOCviceniUpraveno2
+﻿using TextHelper;
+using SelectHelper;
+
+namespace EvidenceZOOCviceniUpraveno2
 {
     /// <summary>
     /// Třída zodpovědná za správu zvířat – přidávání, mazání, úpravy,
@@ -67,19 +70,19 @@
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
-            string nazev = Vstupy.ZeptejSeAUprav(
+            string nazev = UpravaVstupu.ZeptejSeAUprav(
                 "", "název",
                 v => v,
                 s => s,
                 jeNove: true);
 
-            int vek = Vstupy.ZeptejSeAUprav(
+            int vek = UpravaVstupu.ZeptejSeAUprav(
                 0, "věk",
                 v => v.ToString(),
                 s => int.Parse(s),
                 jeNove: true);
 
-            double vaha = Vstupy.ZeptejSeAUprav(
+            double vaha = UpravaVstupu.ZeptejSeAUprav(
                 0.0, "váha",
                 v => v.ToString(),
                 s => double.Parse(s),
@@ -115,7 +118,7 @@
         {
             Console.WriteLine("SMAZÁNÍ ZVÍŘETE");
 
-            var zvire = Vstupy.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
+            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
                 Console.WriteLine($"Zvíře {zvire.Nazev} bylo smazáno.");
@@ -130,20 +133,20 @@
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZVÍŘETE");
-            var zvire = Vstupy.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
+            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
-                zvire.Nazev = Vstupy.ZeptejSeAUprav(
+                zvire.Nazev = UpravaVstupu.ZeptejSeAUprav(
                     zvire.Nazev, "název",
                     v => v,
                     s => s);
 
-                zvire.Vek = Vstupy.ZeptejSeAUprav(
+                zvire.Vek = UpravaVstupu.ZeptejSeAUprav(
                     zvire.Vek, "věk",
                     v => v.ToString(),
                     s => int.Parse(s));
 
-                zvire.Vaha = Vstupy.ZeptejSeAUprav(
+                zvire.Vaha = UpravaVstupu.ZeptejSeAUprav(
                     zvire.Vaha, "váha",
                     v => v.ToString(),
                     s => double.Parse(s));
