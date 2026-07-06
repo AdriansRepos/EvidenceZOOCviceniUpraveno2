@@ -151,3 +151,4 @@ https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.1.0
 - Zapracování knihoven do aplikace
 - Verze: v1.2.0
 - Ke stažení zde: Releases
+https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.2.0
