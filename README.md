@@ -47,11 +47,17 @@ Pokud je při načítání hlavní soubor (`zamestnanci.json`, `zvirata.json` ne
 
 /ZOO
 ├── Program.cs
+
 ├── ZOO.cs
+
 ├── Zamestnanec.cs
+
 ├── Zvire.cs
+
 ├── SpravceZamestnancu.cs
+
 ├── SpravceZvirat.cs
+
 └── README.md
 ---
 
