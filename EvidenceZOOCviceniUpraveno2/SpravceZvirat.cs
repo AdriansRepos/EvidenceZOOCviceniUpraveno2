@@ -24,6 +24,7 @@ namespace EvidenceZOOCviceniUpraveno2
             char volba;
             do
             {
+                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("\n=== MENU ZVÍŘATA ===");
                 Console.WriteLine("\t1. Přidat zvíře");
                 Console.WriteLine("\t2. Vypsat zvířata");
@@ -31,6 +32,8 @@ namespace EvidenceZOOCviceniUpraveno2
                 Console.WriteLine("\t4. Upravit zvíře");
                 Console.WriteLine("\t5. Vyhledat zvíře");
                 Console.WriteLine("\t6. Návrat do hlavního menu");
+                Console.ResetColor();
+                Console.Write("Vyber možnost: ");
 
                 volba = Console.ReadKey().KeyChar;
                 Console.WriteLine();
@@ -56,7 +59,10 @@ namespace EvidenceZOOCviceniUpraveno2
                     case '6': 
                         break;
 
-                    default: Console.WriteLine("Neplatná volba."); 
+                    default: 
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Neplatná volba, opakujte zadání:"); 
+                        Console.ResetColor();
                         break;
                 }
 
@@ -90,7 +96,9 @@ namespace EvidenceZOOCviceniUpraveno2
 
             zoo.Zvirata.Add(new Zvire(nazev, vek, vaha));
             zoo.UlozZvirata();
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Zvíře bylo úspěšně přidáno.");
+            Console.ResetColor();
         }
 
 
@@ -121,7 +129,9 @@ namespace EvidenceZOOCviceniUpraveno2
             var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"Zvíře {zvire.Nazev} bylo smazáno.");
+                Console.ResetColor();
                 zoo.Zvirata.Remove(zvire); 
                 zoo.UlozZvirata();
             }
@@ -152,7 +162,9 @@ namespace EvidenceZOOCviceniUpraveno2
                     s => double.Parse(s));
 
                 zoo.UlozZvirata();
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Úprava dokončena.");
+                Console.ResetColor();
             }
         }
 
@@ -180,7 +192,11 @@ namespace EvidenceZOOCviceniUpraveno2
             }
 
             if (!nalezeno)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Zvíře nenalezeno.");
+                Console.ResetColor();
+            }
         }
     }
 }

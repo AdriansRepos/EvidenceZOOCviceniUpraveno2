@@ -85,60 +85,9 @@ namespace EvidenceZOOCviceniUpraveno2
             WriteIndented = true
         };
 
-        /// <summary>
-        /// Při prvním spuštění se zeptá na složku a uloží cesty do config.ini.
-        /// Při každém dalším spuštění načte cesty z config.ini automaticky.
-        /// </summary>
-        public static (string souborZam, string souborZvir) NactiNeboSeZeptejNaCesty()
-        {
-            Directory.CreateDirectory(Path.GetDirectoryName(KonfigSoubor)!);
-            // Pokud konfig existuje, načti cesty z něj
-            if (File.Exists(KonfigSoubor))
-            {
-                var hodnoty = new Dictionary<string, string>();
-                foreach (string radek in File.ReadAllLines(KonfigSoubor))
-                {
-                    string upraven = radek.Trim();
-                    if (upraven.Length == 0 || upraven.StartsWith("#") || upraven.StartsWith(";"))
-                        continue; // přeskoč prázdné řádky a komentáře
-
-                    int idx = upraven.IndexOf('=');
-                    if (idx <= 0) continue;
-
-                    string klic = upraven[..idx].Trim();
-                    string hodnota = upraven[(idx + 1)..].Trim();
-                    hodnoty[klic] = hodnota;
-                }
-
-                if (hodnoty.TryGetValue("souborZam", out var zamUlozeny)
-                    && hodnoty.TryGetValue("souborZvir", out var zvirUlozeny)
-                    && !string.IsNullOrWhiteSpace(zamUlozeny)
-                    && !string.IsNullOrWhiteSpace(zvirUlozeny))
-                {
-                    Console.WriteLine($"Načteny uložené cesty z: {KonfigSoubor}");
-                    return (zamUlozeny, zvirUlozeny);
-                }
-            }
-
-            // První spuštění — zeptej se na složku
-            Console.WriteLine("=== PRVNÍ SPUŠTĚNÍ — NASTAVENÍ CEST ===");
-            Console.Write("Zadej cestu ke složce pro ukládání dat: ");
-            string slozka = Console.ReadLine()!.Trim();
-
-            // Vytvoří složku, pokud neexistuje
-            Directory.CreateDirectory(slozka);
-            string zam = Path.Combine(slozka, "zamestnanci.json");
-            string zvir = Path.Combine(slozka, "zvirata.json");
-
-            // Uloží cesty trvale do config.ini
-            File.WriteAllLines(KonfigSoubor, [
-                $"souborZam={zam}",
-                $"souborZvir={zvir}"
-            ]);
-
-            Console.WriteLine($"Cesty uloženy. Data budou ukládána do: {slozka}");
-            return (zam, zvir);
-        }
+        // ----------------------------------------------------------------
+        // METODY PRO PRÁCI S KLÍČI (registrace a zajištění načtení modulů)
+        // ----------------------------------------------------------------
 
         /// <summary>
         /// Zaregistruje načítací akci pro daný datový modul.
@@ -176,9 +125,103 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        // -----------------------------
+        // ------------------------
+        // KONFIGURACE (config.ini)
+        // ------------------------
+
+        /// <summary>
+        /// Při prvním spuštění se zeptá na složku a uloží cesty do config.ini.
+        /// Při každém dalším spuštění načte cesty z config.ini automaticky.
+        /// </summary>
+        public static (string souborZam, string souborZvir) NactiNeboSeZeptejNaCesty()
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(KonfigSoubor)!);
+
+            // Pokud config.ini chybí, ale záloha existuje, obnov ji
+            if (!File.Exists(KonfigSoubor) && File.Exists(KonfigSoubor + ".bak"))
+            {
+                File.Copy(KonfigSoubor + ".bak", KonfigSoubor);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Config.ini obnoven ze zálohy.");
+                Console.ResetColor();
+            }
+
+            if (File.Exists(KonfigSoubor))
+            {
+                var hodnoty = new Dictionary<string, string>();
+                foreach (string radek in File.ReadAllLines(KonfigSoubor))
+                {
+                    string upraven = radek.Trim();
+                    if (upraven.Length == 0 || upraven.StartsWith("#") || upraven.StartsWith(";"))
+                        continue;
+
+                    int idx = upraven.IndexOf('=');
+                    if (idx <= 0) continue;
+
+                    string klic = upraven[..idx].Trim();
+                    string hodnota = upraven[(idx + 1)..].Trim();
+                    hodnoty[klic] = hodnota;
+                }
+
+                if (hodnoty.TryGetValue("souborZam", out var zamUlozeny)
+                    && hodnoty.TryGetValue("souborZvir", out var zvirUlozeny)
+                    && !string.IsNullOrWhiteSpace(zamUlozeny)
+                    && !string.IsNullOrWhiteSpace(zvirUlozeny))
+                {
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.WriteLine($"Načteny uložené cesty z: {KonfigSoubor}");
+                    Console.ResetColor();
+                    return (zamUlozeny, zvirUlozeny);
+                }
+            }
+
+            Console.ForegroundColor = ConsoleColor.Blue;
+            Console.WriteLine("=== PRVNÍ SPUŠTĚNÍ — NASTAVENÍ CEST ===");
+            Console.ResetColor();
+            Console.Write("Zadej cestu ke složce pro ukládání dat: ");
+            string slozka = Console.ReadLine()!.Trim();
+
+            Directory.CreateDirectory(slozka);
+            string zam = Path.Combine(slozka, "zamestnanci.json");
+            string zvir = Path.Combine(slozka, "zvirata.json");
+
+            ZapisKonfigSeZalohou(zam, zvir);
+
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine($"Cesty uloženy. Data budou ukládána do: {slozka}");
+            Console.ResetColor();
+            return (zam, zvir);
+        }
+
+        /// <summary>
+        /// Zapíše config.ini bezpečně – nejprve zálohuje starý, pak zapíše nový
+        /// přes dočasný soubor, aby při pádu aplikace uprostřed zápisu
+        /// nezůstal config.ini poškozený nebo prázdný.
+        /// </summary>
+        private static void ZapisKonfigSeZalohou(string souborZam, string souborZvir)
+        {
+            // 1) Zálohuj aktuální config.ini, pokud existuje
+            if (File.Exists(KonfigSoubor))
+                File.Copy(KonfigSoubor, KonfigSoubor + ".bak", overwrite: true);
+        
+            // 2) Zapiš nejdřív do dočasného souboru
+            string docasny = KonfigSoubor + ".tmp";
+            File.WriteAllLines(docasny, [
+                $"souborZam={souborZam}",
+                $"souborZvir={souborZvir}"
+            ]);
+        
+            // 3) Atomicky nahraď – File.Replace zajistí, že buď proběhne celé,
+            // nebo se nic nezmění (na rozdíl od přímého přepsání File.WriteAllLines)
+            if (File.Exists(KonfigSoubor))
+                File.Replace(docasny, KonfigSoubor, null);
+            else
+                File.Move(docasny, KonfigSoubor);
+        }
+
+        // ------------------------------
         // VEŘEJNÉ METODY PRO NAČTENÍ DAT
-        // -----------------------------
+        // ------------------------------
 
         public void NactiZamestnance(string cesta)
         {
@@ -193,7 +236,9 @@ namespace EvidenceZOOCviceniUpraveno2
         }
 
         /// <summary>
-        /// Načte zaměstnance ze souboru.
+        /// Načte zaměstnance ze souboru. Pokud je soubor poškozený (nevalidní JSON),
+        /// automaticky zkusí obnovit data ze zálohy (.bak). Pokud soubor chybí úplně,
+        /// ale záloha existuje, obnoví ji jako hlavní soubor.
         /// </summary>
         /// <returns>Seznam načtených zaměstnanců.</returns>
         private List<Zamestnanec> NactiZamestnanceZeSouboru()
@@ -202,13 +247,15 @@ namespace EvidenceZOOCviceniUpraveno2
             if (!File.Exists(SouborZamestnanci) && File.Exists(SouborZamestnanci + ".bak"))
             {
                 File.Copy(SouborZamestnanci + ".bak", SouborZamestnanci);
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Soubor zaměstnanců obnoven ze zálohy.");
+                Console.ResetColor();
             }
-
-            // Pokud soubor neexistuje, vrátí prázdný seznam
+        
+            // Pokud soubor neexistuje ani po pokusu o obnovu, vrátí prázdný seznam
             if (!File.Exists(SouborZamestnanci))
                 return [];
-
+        
             try
             {
                 string json = File.ReadAllText(SouborZamestnanci);
@@ -216,13 +263,53 @@ namespace EvidenceZOOCviceniUpraveno2
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Chyba při načítání zaměstnanců: {ex.Message}");
+                Console.ResetColor();
+                return NactiZeZalohyZamestnanci();
+            }
+        }
+        
+        /// <summary>
+        /// Pokusí se obnovit zaměstnance ze záložního souboru (.bak) poté,
+        /// co se nepodařilo načíst hlavní soubor (např. kvůli poškození).
+        /// </summary>
+        /// <returns>Seznam zaměstnanců ze zálohy, nebo prázdný seznam, pokud záloha
+        /// neexistuje nebo je také poškozená.</returns>
+        private List<Zamestnanec> NactiZeZalohyZamestnanci()
+        {
+            string zaloha = SouborZamestnanci + ".bak";
+        
+            if (!File.Exists(zaloha))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("!!! POZOR: Data zaměstnanců se nepodařilo načíst ani ze zálohy !!!");
+                Console.ResetColor();
+                return [];
+            }
+        
+            try
+            {
+                string json = File.ReadAllText(zaloha);
+                var data = JsonSerializer.Deserialize<List<Zamestnanec>>(json, ZamestnanecJsonOptions) ?? [];
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Zaměstnanci úspěšně obnoveni ze zálohy (.bak).");
+                Console.ResetColor();
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Záloha zaměstnanců je také poškozená: {ex.Message}");
+                Console.ResetColor();
                 return [];
             }
         }
-
+        
         /// <summary>
-        /// Načte zvířata ze souboru.
+        /// Načte zvířata ze souboru. Pokud je soubor poškozený (nevalidní JSON),
+        /// automaticky zkusí obnovit data ze zálohy (.bak). Pokud soubor chybí úplně,
+        /// ale záloha existuje, obnoví ji jako hlavní soubor.
         /// </summary>
         /// <returns>Seznam načtených zvířat.</returns>
         private List<Zvire> NactiZvirataZeSouboru()
@@ -231,13 +318,15 @@ namespace EvidenceZOOCviceniUpraveno2
             if (!File.Exists(SouborZvirata) && File.Exists(SouborZvirata + ".bak"))
             {
                 File.Copy(SouborZvirata + ".bak", SouborZvirata);
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Soubor zvířat obnoven ze zálohy.");
+                Console.ResetColor();
             }
-
-            // Pokud soubor neexistuje, vrátí prázdný seznam
+        
+            // Pokud soubor neexistuje ani po pokusu o obnovu, vrátí prázdný seznam
             if (!File.Exists(SouborZvirata))
                 return [];
-
+        
             try
             {
                 string json = File.ReadAllText(SouborZvirata);
@@ -245,46 +334,115 @@ namespace EvidenceZOOCviceniUpraveno2
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Chyba při načítání zvířat: {ex.Message}");
+                Console.ResetColor();
+                return NactiZeZalohyZvirata();
+            }
+        }
+
+        /// <summary>
+        /// Pokusí se obnovit zvířata ze záložního souboru (.bak) poté,
+        /// co se nepodařilo načíst hlavní soubor (např. kvůli poškození).
+        /// </summary>
+        /// <returns>Seznam zvířat ze zálohy, nebo prázdný seznam, pokud záloha
+        /// neexistuje nebo je také poškozená.</returns>
+        private List<Zvire> NactiZeZalohyZvirata()
+        {
+            string zaloha = SouborZvirata + ".bak";
+        
+            if (!File.Exists(zaloha))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine("!!! POZOR: Data zvířat se nepodařilo načíst ani ze zálohy !!!");
+                Console.ResetColor();
+                return [];
+            }
+        
+            try
+            {
+                string json = File.ReadAllText(zaloha);
+                var data = JsonSerializer.Deserialize<List<Zvire>>(json) ?? [];
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Zvířata úspěšně obnovena ze zálohy (.bak).");
+                Console.ResetColor();
+                return data;
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Záloha zvířat je také poškozená: {ex.Message}");
+                Console.ResetColor();
                 return [];
             }
         }
 
         /// <summary>
-        /// Uloží všechny zaměstnance zpět do souboru a vytvoří zálohu.
+        /// Uloží všechny zaměstnance zpět do souboru bezpečně (přes dočasný soubor)
+        /// a vytvoří zálohu předchozí verze.
         /// </summary>
         public void UlozZamestnance()
         {
             try
             {
-                if (File.Exists(SouborZamestnanci))
-                    File.Copy(SouborZamestnanci, SouborZamestnanci + ".bak", overwrite: true);
-
                 string json = JsonSerializer.Serialize(Zamestnanci, ZamestnanecJsonOptionsIndented);
-                File.WriteAllText(SouborZamestnanci, json);
+                ZapisSouborSeZalohou(SouborZamestnanci, json);
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Chyba při ukládání zaměstnanců: {ex.Message}");
+                Console.ResetColor();
             }
         }
-
+        
         /// <summary>
-        /// Uloží všechna zvířata zpět do souboru a vytvoří zálohu.
+        /// Uloží všechna zvířata zpět do souboru bezpečně (přes dočasný soubor)
+        /// a vytvoří zálohu předchozí verze.
         /// </summary>
         public void UlozZvirata()
         {
             try
             {
-                if (File.Exists(SouborZvirata))
-                    File.Copy(SouborZvirata, SouborZvirata + ".bak", overwrite: true);
-
                 string json = JsonSerializer.Serialize(Zvirata, ZvireJsonOptionsIndented);
-                File.WriteAllText(SouborZvirata, json);
+                ZapisSouborSeZalohou(SouborZvirata, json);
             }
             catch (Exception ex)
             {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Chyba při ukládání zvířat: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+        
+        /// <summary>
+        /// Bezpečně zapíše text do cílového souboru: nejprve zálohuje starou verzi
+        /// (.bak), poté zapíše nový obsah do dočasného souboru (.tmp) a teprve
+        /// po úspěšném zápisu ho atomicky nahradí na místo cílového souboru.
+        /// Zajišťuje, že při pádu aplikace uprostřed zápisu nedojde k poškození
+        /// ani ztrátě posledního platného souboru.
+        /// </summary>
+        /// <param name="cilovySoubor">Cesta k cílovému souboru (např. zamestnanci.json).</param>
+        /// <param name="obsah">Textový obsah k zapsání (např. JSON).</param>
+        private static void ZapisSouborSeZalohou(string cilovySoubor, string obsah)
+        {
+            string docasny = cilovySoubor + ".tmp";
+            string zaloha = cilovySoubor + ".bak";
+        
+            // 1) Zapiš nejdřív do dočasného souboru – pokud zápis selže
+            // (např. dojde místo na disku), originál ani záloha nejsou ohroženy
+            File.WriteAllText(docasny, obsah);
+        
+            // 2) Atomicky nahraď cílový soubor dočasným, přičemž File.Replace
+            // rovnou vytvoří i zálohu (třetí parametr) v jediném atomickém kroku
+            if (File.Exists(cilovySoubor))
+            {
+                File.Replace(docasny, cilovySoubor, zaloha);
+            }
+            else
+            {
+                // Cílový soubor ještě neexistuje (první uložení) – není co nahrazovat
+                File.Move(docasny, cilovySoubor);
             }
         }
 
@@ -298,11 +456,13 @@ namespace EvidenceZOOCviceniUpraveno2
             char volba;
             do
             {
+                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("\n=== STATISTIKY ===");
                 Console.WriteLine("\t1. Počet zvířat");
                 Console.WriteLine("\t2. Počet zaměstnanců");
                 Console.WriteLine("\t3. Součet mezd zaměstnanců");
                 Console.WriteLine("\t4. Návrat do hlavního menu");
+                Console.ResetColor();
                 Console.Write("Vyber možnost: ");
 
                 volba = Console.ReadKey().KeyChar;
@@ -326,7 +486,9 @@ namespace EvidenceZOOCviceniUpraveno2
                         break;
 
                     default:
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Neplatná volba, opakujte zadání:");
+                        Console.ResetColor();
                         break;
                 }
 

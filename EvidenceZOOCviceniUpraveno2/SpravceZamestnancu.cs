@@ -24,6 +24,7 @@ namespace EvidenceZOOCviceniUpraveno2
             char volba;
             do
             {
+                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("\n=== MENU ZAMĚSTNANCI ===");
                 Console.WriteLine("\t1. Přidat zaměstnance");
                 Console.WriteLine("\t2. Vypsat zaměstnance");
@@ -31,6 +32,8 @@ namespace EvidenceZOOCviceniUpraveno2
                 Console.WriteLine("\t4. Upravit zaměstnance");
                 Console.WriteLine("\t5. Vyhledat zaměstnance");
                 Console.WriteLine("\t6. Návrat do hlavního menu");
+                Console.ResetColor();
+                Console.Write("Vyber možnost: ");
 
                 volba = Console.ReadKey().KeyChar;
                 Console.WriteLine();
@@ -56,7 +59,10 @@ namespace EvidenceZOOCviceniUpraveno2
                     case '6': 
                         break;
 
-                    default: Console.WriteLine("Neplatná volba."); 
+                    default: 
+                        Console.ForegroundColor = ConsoleColor.Yellow;
+                        Console.WriteLine("Neplatná volba, opakujte zadání:"); 
+                        Console.ResetColor();
                         break;
                 }
 
@@ -102,7 +108,9 @@ namespace EvidenceZOOCviceniUpraveno2
 
             zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
             zoo.UlozZamestnance();
+            Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
+            Console.ResetColor();
         }
 
         /// <summary>
@@ -132,7 +140,9 @@ namespace EvidenceZOOCviceniUpraveno2
             var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
             if (zam != null)
             {
+                Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"Zaměstnanec {zam.Prijmeni} byl smazán.");
+                Console.ResetColor();
                 zoo.Zamestnanci.Remove(zam);
                 zoo.UlozZamestnance();
             }
@@ -173,7 +183,9 @@ namespace EvidenceZOOCviceniUpraveno2
                     s => int.Parse(s));
 
                 zoo.UlozZamestnance();
+                Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Úprava dokončena.");
+                Console.ResetColor();
             }
         }
 
@@ -202,7 +214,11 @@ namespace EvidenceZOOCviceniUpraveno2
                 }
             }
             if (!nalezeno)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine("Zaměstnanec nenalezen.");
+                Console.ResetColor();
+            }
         }
     }
 }

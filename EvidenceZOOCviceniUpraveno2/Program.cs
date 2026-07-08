@@ -17,11 +17,13 @@ SpravceZvirat spravceZvirat = new(zoo);
 char volbaMenu;
 do
 {
+    Console.ForegroundColor = ConsoleColor.Blue;
     Console.WriteLine("=== HLAVNÍ MENU ===");
     Console.WriteLine("\t1. Zvířata");
     Console.WriteLine("\t2. Zaměstnanci");
     Console.WriteLine("\t3. Statistiky");
     Console.WriteLine("\t4. Konec programu");
+    Console.ResetColor();
     Console.Write("Vyber možnost: ");
 
     // Načtení volby uživatele
@@ -47,7 +49,9 @@ do
             break;                          // ukončí program
 
         default:
-            Console.WriteLine("Neplatná volba, opakujte zadání.");
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("Neplatná volba, opakujte zadání:");
+            Console.ResetColor();
             break;
     }
 }
