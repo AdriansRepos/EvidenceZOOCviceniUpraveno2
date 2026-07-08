@@ -46,6 +46,7 @@ Pokud je při načítání hlavní soubor (`zamestnanci.json`, `zvirata.json` ne
 ## Struktura projektu
 
 /ZOO
+
 ├── Program.cs
 
 ├── ZOO.cs
@@ -59,6 +60,7 @@ Pokud je při načítání hlavní soubor (`zamestnanci.json`, `zvirata.json` ne
 ├── SpravceZvirat.cs
 
 └── README.md
+
 ---
 
 ### Externí knihovny (samostatné projekty)
