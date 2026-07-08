@@ -164,4 +164,4 @@ public void Pridat()
   a varování, modrá pro menu, žlutá pro neplatné volby.
 -  Oprava chyby ve vyhledávání (chybějící složené závorky u podmínky) 
   způsobující nesprávné zobrazení hlášky "nenalezeno".
-  [Stáhnout zde]
+  [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.3.0)
