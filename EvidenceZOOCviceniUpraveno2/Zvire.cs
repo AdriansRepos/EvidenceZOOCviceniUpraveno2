@@ -1,11 +1,14 @@
 ﻿using System.Text.Json.Serialization;
 using InputHelper;
+using DateConverterForJson;
+using VekZviratHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
     /// <summary>
     /// Reprezentuje jedno zvíře v zoologické zahradě.
-    /// Uchovává jeho název, věk a váhu.
+    /// Uchovává jeho název, datum narození a váhu. Věk se počítá
+    /// dynamicky z data narození, není ukládán jako pevná hodnota.
     /// </summary>
     class Zvire
     {
@@ -22,10 +25,11 @@ namespace EvidenceZOOCviceniUpraveno2
         }
 
         /// <summary>
-        /// Věk zvířete v letech.
+        /// Datum narození zvířete. Slouží jako zdroj pro dynamický
+        /// výpočet aktuálního věku.
         /// </summary>
-        [JsonPropertyName("vek")]
-        public int Vek { get; internal set; }
+        [JsonPropertyName("datumNarozeni")]
+        public DateOnly DatumNarozeni { get; internal set; }
 
         /// <summary>
         /// Váha zvířete v kilogramech.
@@ -34,41 +38,34 @@ namespace EvidenceZOOCviceniUpraveno2
         public double Vaha { get; internal set; }
 
         /// <summary>
-        /// Vytvoří nové zvíře a nastaví jeho název, věk a váhu.
+        /// Aktuální věk zvířete, vypočtený dynamicky z data narození
+        /// při každém přístupu. Nikdy tedy není zastaralý.
+        /// </summary>
+        [JsonIgnore]
+        public string Vek => VypocetVeku.VypocitejVekTextove(DatumNarozeni);
+
+        /// <summary>
+        /// Vytvoří nové zvíře a nastaví jeho název, datum narození a váhu.
         /// </summary>
         /// <param name="nazev">Název zvířete.</param>
-        /// <param name="vek">Věk v letech.</param>
+        /// <param name="datumNarozeni">Datum narození.</param>
         /// <param name="vaha">Váha v kilogramech.</param>
         [JsonConstructor]
-        public Zvire(string nazev, int vek, double vaha)
+        public Zvire(string nazev, DateOnly datumNarozeni, double vaha)
         {
             Nazev = nazev;
-            Vek = vek;
+            DatumNarozeni = datumNarozeni;
             Vaha = vaha;
         }
 
         /// <summary>
-        /// Metoda pro správné tvarování slova rok
-        /// </summary>
-        /// <returns>Vrátí správný tvar slova rok podle věku zvířete</returns>
-        private string VekSklonovany()
-        {
-            if (Vek == 1)
-                return $"{Vek} rok";
-            else if (Vek >= 2 && Vek <= 4)
-                return $"{Vek} roky";
-            else
-                return $"{Vek} let";
-        }
-
-        /// <summary>
-        /// Vypíše informace o zvířeti do konzole,        
+        /// Vypíše informace o zvířeti do konzole.
         /// </summary>
         public void VypisZvire()
         {
             Console.WriteLine(
-                $"{Nazev,-20} {VekSklonovany(),-12} {Vaha + " kg",-10}"
+                $"{Nazev,-20} {Vek,-15} {Vaha + " kg",-10}"
             );
-        }       
+        }
     }
 }
