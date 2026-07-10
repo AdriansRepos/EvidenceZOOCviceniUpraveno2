@@ -66,7 +66,6 @@ Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné v
 ## Struktura projektu
 
 /ZOO
-
 ├── Program.cs
 
 ├── ZOO.cs
@@ -75,9 +74,15 @@ Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné v
 
 ├── Zvire.cs
 
+├── SkladovaPolozka.cs
+
+├── SkladovyPohyb.cs
+
 ├── SpravceZamestnancu.cs
 
 ├── SpravceZvirat.cs
+
+├── SpravceSkladu.cs
 
 └── README.md
 
