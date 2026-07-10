@@ -1,19 +1,21 @@
 ﻿using EvidenceZOOCviceniUpraveno2;
 
-var (souborZam, souborZvir) = ZOO.NactiNeboSeZeptejNaCesty();
+var (souborZam, souborZvir, souborSklad) = ZOO.NactiNeboSeZeptejNaCesty();
 
-// Vytvoření hlavního objektu ZOO – načte data ze souborů do paměti
-ZOO zoo = new(souborZam, souborZvir);
+ZOO zoo = new(souborZam, souborZvir, souborSklad);
+
+// Zkontroluje a případně provede roční archivaci – musí proběhnout
+// hned po vytvoření zoo, ještě před prvním použitím dat.
+zoo.ZkontrolujRocniArchivaci();
 
 zoo.RegistrujNacitani("Zaměstnanci", () => zoo.NactiZamestnance(souborZam));
 zoo.RegistrujNacitani("Zvířata", () => zoo.NactiZvirata(souborZvir));
+zoo.RegistrujNacitani("Sklad", () => zoo.NactiSklad(souborSklad));
 
-// Vytvoření správců, kteří pracují s daty v ZOO
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
+SpravceSkladu spravceSkladu = new(zoo);
 
-// Hlavní menu aplikace – umožňuje přepínat mezi správou zvířat,
-// správou zaměstnanců a statistikami.
 char volbaMenu;
 do
 {
@@ -21,33 +23,22 @@ do
     Console.WriteLine("=== HLAVNÍ MENU ===");
     Console.WriteLine("\t1. Zvířata");
     Console.WriteLine("\t2. Zaměstnanci");
-    Console.WriteLine("\t3. Statistiky");
-    Console.WriteLine("\t4. Konec programu");
+    Console.WriteLine("\t3. Sklad");
+    Console.WriteLine("\t4. Statistiky");
+    Console.WriteLine("\t5. Konec programu");
     Console.ResetColor();
     Console.Write("Vyber možnost: ");
 
-    // Načtení volby uživatele
     volbaMenu = Console.ReadKey().KeyChar;
     Console.WriteLine();
 
-    // Zpracování volby
     switch (volbaMenu)
     {
-        case '1':
-            spravceZvirat.Menu();          // otevře menu pro práci se zvířaty
-            break;
-
-        case '2':
-            spravceZamestnancu.Menu();     // otevře menu pro práci se zaměstnanci
-            break;
-
-        case '3':
-            zoo.MenuStatistiky();          // zobrazí statistiky
-            break;
-
-        case '4':
-            break;                          // ukončí program
-
+        case '1': spravceZvirat.Menu(); break;
+        case '2': spravceZamestnancu.Menu(); break;
+        case '3': spravceSkladu.Menu(); break;
+        case '4': zoo.MenuStatistiky(); break;
+        case '5': break;
         default:
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Neplatná volba, opakujte zadání:");
@@ -55,4 +46,4 @@ do
             break;
     }
 }
-while (volbaMenu != '4');                    // opakuje menu, dokud uživatel nezvolí konec
+while (volbaMenu != '5');
