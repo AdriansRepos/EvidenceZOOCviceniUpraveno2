@@ -71,7 +71,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
         /// <summary>
         /// Přidá nové zvíře na základě vstupů od uživatele.
-        /// Vstupy jsou validovány a zakázané znaky nejsou povoleny.
+        /// Vstupy jsou validovány.
         /// </summary>
         public void Pridat()
         {
