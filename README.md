@@ -14,6 +14,7 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, provádět **statistiky**, 
 - Úprava existujícího zvířete
 - Smazání zvířete
 - Vyhledávání podle názvu
+- Automatický výpočet aktuálního věku z data narození (roky, měsíce)
 - Statistiky (průměrná váha, počet druhů…)
 
 ### Zaměstnanci
@@ -71,6 +72,7 @@ Pokud je při načítání hlavní soubor (`zamestnanci.json`, `zvirata.json` ne
 - **SelectHelper** – výběr položky ze seznamu (`SelectHelp.VybratPolozku`)
 - **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`)
 - **DateConverterForJson** – JSON konvertor pro typ `DateOnly` (`DateOnlyConverter`)
+- **VekZviratHelper** – výpočet aktuálního věku zvířete z data narození (`VypocetVeku.VypocitejVek`, `VypocetVeku.VypocitejVekTextove`), včetně skloňování slov "rok"/"měsíc"
 
 ---
 
@@ -85,6 +87,7 @@ Pokud je při načítání hlavní soubor (`zamestnanci.json`, `zvirata.json` ne
 - Validace vstupů
 - Try-catch bloky
 - DateOnly
+- Dynamicky počítané vlastnosti (výpočet věku za běhu z data narození, bez ukládání zastaralé hodnoty)
 - Kolekce (`List<T>`)
 - Serializace/deserializace do JSON souborů (`System.Text.Json`)
 - Zadání cest k adresáři a souborům jenom při prvním spuštění aplikace – nastavení a jejich uložení do konfiguračního souboru
@@ -148,7 +151,6 @@ public void Pridat()
 - Základ účetnictví
 - Mzdové účetnictví
 - Rozšíření evidence zaměstnanců o další údaje
-- Knihovna pro automatický výpočet věku zvířat podle druhu (na základě data narození nebo dopočtu z uvedeného věku při příchodu zvířete)
 - Přidání transakčního ukládání
 - Přidání logování změn
 - Export statistik
@@ -168,8 +170,8 @@ public void Pridat()
 **v1.2.0** – Úprava kódu, odebrání tříd `Vstupy` a `DataConverterJson`; funkce přesunuty do samostatných knihoven a zapracovány zpět do aplikace  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.2.0)
 
-**v1.3.0** - Barevné odlišení výstupů v konzoli – zelená pro úspěšné akce, červená pro chyby 
-  a varování, modrá pro menu, žlutá pro neplatné volby.
--  Oprava chyby ve vyhledávání (chybějící složené závorky u podmínky) 
-  způsobující nesprávné zobrazení hlášky "nenalezeno".
-  [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.3.0)
+**v1.3.0** – Barevné odlišení výstupů v konzoli – zelená pro úspěšné akce, červená pro chyby a varování, modrá pro menu, žlutá pro neplatné volby. Oprava chyby ve vyhledávání (chybějící složené závorky u podmínky) způsobující nesprávné zobrazení hlášky "nenalezeno".  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.3.0)
+
+**v1.4.0** – Přidána nová knihovna `VekZviratHelper` pro automatický výpočet věku zvířat. Třída `Zvire` nahrazuje ruční zadávání věku (`int Vek`) datem narození (`DateOnly DatumNarozeni`) – věk se nyní počítá dynamicky při každém zobrazení a je vždy aktuální bez nutnosti ruční aktualizace.  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.4.0)
