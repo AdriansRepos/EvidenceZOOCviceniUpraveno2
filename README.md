@@ -197,3 +197,4 @@ public void Pridat()
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.4.0)
 
 **v1.5.0** – Přidán modul Sklad (krmivo, pomůcky, léky/veterinární materiál) včetně naskladnění, vyskladnění, upozornění na docházející položky a historie pohybů. Přidána automatizovaná roční archivace všech datových souborů do složky `Archiv` s retenční politikou 5 let.
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.5.0)
