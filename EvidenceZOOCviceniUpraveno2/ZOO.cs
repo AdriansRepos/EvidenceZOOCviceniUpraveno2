@@ -80,7 +80,7 @@ namespace EvidenceZOOCviceniUpraveno2
         /// <summary>
         /// Nastavení JSON serializace pro zvířata s odsazením.
         /// </summary>
-        private static readonly JsonSerializerOptions ZvireJsonOptionsIndented = new()
+        private static readonly JsonSerializerOptions JsonSerializerOptions = new()
         {
             WriteIndented = true
         };
@@ -89,12 +89,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             WriteIndented = true,
             Converters = { new DateOnlyConverter() }
-        };
-        
-        private static readonly JsonSerializerOptions ZvireJsonOptions = new()
-        {
-            Converters = { new DateOnlyConverter() }
-        };
+        };                
 
         // ----------------------------------------------------------------
         // METODY PRO PRÁCI S KLÍČI (registrace a zajištění načtení modulů)

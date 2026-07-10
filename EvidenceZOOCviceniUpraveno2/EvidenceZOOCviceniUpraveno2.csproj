@@ -20,6 +20,9 @@
     <Reference Include="TextHelper">
       <HintPath>..\..\TextHelper\TextHelper\bin\Release\net8.0\TextHelper.dll</HintPath>
     </Reference>
+    <Reference Include="VekZviratHelper">
+      <HintPath>..\..\VekZviratHelper\VekZviratHelper\bin\Release\net8.0\VekZviratHelper.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
