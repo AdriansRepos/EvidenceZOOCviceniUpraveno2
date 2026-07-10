@@ -85,6 +85,17 @@ namespace EvidenceZOOCviceniUpraveno2
             WriteIndented = true
         };
 
+        private static readonly JsonSerializerOptions ZvireJsonOptionsIndented = new()
+        {
+            WriteIndented = true,
+            Converters = { new DateOnlyConverter() }
+        };
+        
+        private static readonly JsonSerializerOptions ZvireJsonOptions = new()
+        {
+            Converters = { new DateOnlyConverter() }
+        };
+
         // ----------------------------------------------------------------
         // METODY PRO PRÁCI S KLÍČI (registrace a zajištění načtení modulů)
         // ----------------------------------------------------------------
