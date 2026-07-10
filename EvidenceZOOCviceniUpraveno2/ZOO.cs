@@ -720,14 +720,18 @@ namespace EvidenceZOOCviceniUpraveno2
                     case '1':
                         Console.WriteLine($"Počet zvířat: {PocetZvirat()}");
                         break;
+
                     case '2':
                         Console.WriteLine($"Počet zaměstnanců: {PocetZamestnancu()}");
                         break;
+
                     case '3':
                         Console.WriteLine($"Součet mezd: {SoucetMezd()} Kč");
                         break;
+
                     case '4':
                         break;
+
                     default:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Neplatná volba, opakujte zadání:");

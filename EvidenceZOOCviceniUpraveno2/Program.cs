@@ -34,11 +34,25 @@ do
 
     switch (volbaMenu)
     {
-        case '1': spravceZvirat.Menu(); break;
-        case '2': spravceZamestnancu.Menu(); break;
-        case '3': spravceSkladu.Menu(); break;
-        case '4': zoo.MenuStatistiky(); break;
-        case '5': break;
+        case '1': 
+            spravceZvirat.Menu(); 
+            break;
+
+        case '2': 
+            spravceZamestnancu.Menu(); 
+            break;
+
+        case '3': 
+            spravceSkladu.Menu(); 
+            break;
+
+        case '4': 
+            zoo.MenuStatistiky(); 
+            break;
+
+        case '5': 
+            break;
+
         default:
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Neplatná volba, opakujte zadání:");
