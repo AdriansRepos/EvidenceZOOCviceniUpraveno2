@@ -196,5 +196,5 @@ public void Pridat()
 **v1.4.0** – Přidána nová knihovna `VekZviratHelper` pro automatický výpočet věku zvířat. Třída `Zvire` nahrazuje ruční zadávání věku (`int Vek`) datem narození (`DateOnly DatumNarozeni`) – věk se nyní počítá dynamicky při každém zobrazení a je vždy aktuální bez nutnosti ruční aktualizace.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.4.0)
 
-**v1.5.0** – Přidán modul Sklad (krmivo, pomůcky, léky/veterinární materiál) včetně naskladnění, vyskladnění, upozornění na docházející položky a historie pohybů. Přidána automatizovaná roční archivace všech datových souborů do složky `Archiv` s retenční politikou 5 let.
+**v1.5.0** – Přidán modul Sklad (krmivo, pomůcky, léky/veterinární materiál) včetně naskladnění, vyskladnění, upozornění na docházející položky a historie pohybů. Přidána automatizovaná roční archivace všech datových souborů do složky `Archiv` s retenční politikou 5 let.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.5.0)
