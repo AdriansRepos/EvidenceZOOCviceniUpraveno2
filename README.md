@@ -22,8 +22,11 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, provádět **sta
 - Přidání zaměstnance
 - Úprava zaměstnance
 - Smazání zaměstnance
-- Výpis všech zaměstnanců
+- Výpis všech zaměstnanců, včetně adresních a kontaktních údajů
 - Vyhledávání podle příjmení
+- Evidence adresy (město, ulice s číslem, PSČ) a kontaktů (telefon, e-mail)
+- Automatické velké písmena v názvu města s ohledem na české předložky (např. "Ústí nad Labem")
+- Základní formátová validace e-mailové adresy při zadání/úpravě
 - Ukládání do souboru + automatická záloha
 
 ### Sklad
@@ -91,11 +94,11 @@ Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné v
 
 ### Externí knihovny (samostatné projekty)
 
-Část funkčnosti byla vyčleněna do samostatných, znovupoužitelných knihoven, aby šly nezávisle referencovat i v jiných projektech:
+Část funkčnosti byla vyčleněna do samostatných, znovupoužitelných knihoven, aby šly nezávisle referencovat i v jiných projektech (např. v aplikaci Losovač, která používá vlastní, jednodušší verzi `InputHelper`):
 
-- **TextHelper** – zpracování a validace uživatelských vstupů (`UpravaVstupu.ZeptejSeAUprav`)
+- **TextHelper** – zpracování a validace uživatelských vstupů (`UpravaVstupu.ZeptejSeAUprav`), včetně zobrazení konkrétní chybové zprávy při neplatném vstupu
 - **SelectHelper** – výběr položky ze seznamu (`SelectHelp.VybratPolozku`)
-- **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`)
+- **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`) a správné velké písmena v názvech měst s ohledem na české předložky (`MestoTitleCase.ZpracujNazevMesta`)
 - **DateConverterForJson** – JSON konvertor pro typ `DateOnly` (`DateOnlyConverter`)
 - **VekZviratHelper** – výpočet aktuálního věku zvířete z data narození (`VypocetVeku.VypocitejVek`, `VypocetVeku.VypocitejVekTextove`), včetně skloňování slov "rok"/"měsíc"
 
@@ -105,13 +108,14 @@ Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné v
 
 - OOP (třídy, vlastnosti, zapouzdření)
 - Primary constructors
+- Partial třídy a metody se zdrojově generovaným regulárním výrazem (`GeneratedRegex`)
 - Enumy (kategorie skladových položek, typ skladového pohybu)
 - Delegáty pro lazy loading dat (`RegistrujNacitani` / `ZajistiData`)
 - Práce se soubory (`File.ReadAllText`, `File.WriteAllText`, `File.Copy`, `File.Replace`, `File.Move`, `File.Delete`)
 - Crash-safe zápis přes dočasný soubor a atomickou náhradu
 - Automatická obnova dat ze zálohy při poškození nebo ztrátě souboru
 - Automatizovaná roční archivace dat s retenční politikou (uchování 5 let)
-- Validace vstupů
+- Validace vstupů, včetně formátové validace e-mailu
 - Try-catch bloky
 - DateOnly, DateTime
 - Dynamicky počítané vlastnosti (výpočet věku a stavu "dochází" za běhu, bez ukládání zastaralé hodnoty)
@@ -161,7 +165,33 @@ public void Pridat()
         s => int.Parse(s),
         jeNove: true);
 
-    zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
+    string mesto = UpravaVstupu.ZeptejSeAUprav(
+        "", "město", v => v, s => s, jeNove: true);
+
+    string ulice = UpravaVstupu.ZeptejSeAUprav(
+        "", "ulice a číslo popisné", v => v, s => s, jeNove: true);
+
+    string psc = UpravaVstupu.ZeptejSeAUprav(
+        "", "PSČ", v => v, s => s, jeNove: true);
+
+    string telefon = UpravaVstupu.ZeptejSeAUprav(
+        "", "telefonní číslo", v => v, s => s, jeNove: true);
+
+    string email = UpravaVstupu.ZeptejSeAUprav(
+        "", "e-mail",
+        v => v,
+        s =>
+        {
+            if (!Zamestnanec.JePlatnyEmail(s))
+                throw new FormatException("E-mail nemá platný formát (očekává se např. jmeno@domena.cz).");
+            return s;
+        },
+        jeNove: true);
+
+    zoo.Zamestnanci.Add(new Zamestnanec(
+        jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice,
+        mesto, ulice, psc, telefon, email));
+
     zoo.UlozZamestnance();
 
     Console.ForegroundColor = ConsoleColor.Green;
@@ -176,7 +206,6 @@ public void Pridat()
 
 - Základ účetnictví
 - Mzdové účetnictví
-- Rozšíření evidence zaměstnanců o další údaje
 - Přidání transakčního ukládání
 - Přidání logování změn
 - Export statistik
@@ -204,3 +233,6 @@ public void Pridat()
 
 **v1.5.0** – Přidán modul Sklad (krmivo, pomůcky, léky/veterinární materiál) včetně naskladnění, vyskladnění, upozornění na docházející položky a historie pohybů. Přidána automatizovaná roční archivace všech datových souborů do složky `Archiv` s retenční politikou 5 let.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.5.0)
+
+**v1.6.0** – Rozšířena evidence zaměstnanců o adresní a kontaktní údaje (město, ulice s číslem, PSČ, telefon, e-mail). Přidána nová třída `MestoTitleCase` v knihovně `InputHelper` pro správné velké písmena v názvech měst s předložkami (např. "Ústí nad Labem", ne "Ústí Nad Labem"). Validace e-mailu přes zdrojově generovaný regulární výraz (`GeneratedRegex`). Vylepšena knihovna `TextHelper` – při neplatném vstupu se nyní zobrazí konkrétní chybová zpráva a výzva k zadání se opakuje.  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.6.0)
