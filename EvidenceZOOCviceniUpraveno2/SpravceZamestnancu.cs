@@ -77,58 +77,74 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
             string jmeno = UpravaVstupu.ZeptejSeAUprav(
-                "", "jméno",
-                v => v,
-                s => s,
-                jeNove: true);
-
+                "", "jméno", v => v, s => s, jeNove: true);
+        
             string prijmeni = UpravaVstupu.ZeptejSeAUprav(
-                "", "příjmení",
-                v => v,
-                s => s,
-                jeNove: true);
-
+                "", "příjmení", v => v, s => s, jeNove: true);
+        
             string pracovniPozice = UpravaVstupu.ZeptejSeAUprav(
-                "", "pracovní pozice",
-                v => v,
-                s => s,
-                jeNove: true);
-
+                "", "pracovní pozice", v => v, s => s, jeNove: true);
+        
             DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                 DateOnly.MinValue, "datum narození",
-                v => v.ToString(),
-                s => DateOnly.Parse(s),
-                jeNove: true);
-
+                v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
+        
             int mzda = UpravaVstupu.ZeptejSeAUprav(
-                0, "mzda",
-                v => v.ToString(),
-                s => int.Parse(s),
+                0, "mzda", v => v.ToString(), s => int.Parse(s), jeNove: true);
+        
+            string mesto = UpravaVstupu.ZeptejSeAUprav(
+                "", "město", v => v, s => s, jeNove: true);
+        
+            string ulice = UpravaVstupu.ZeptejSeAUprav(
+                "", "ulice a číslo popisné", v => v, s => s, jeNove: true);
+        
+            string psc = UpravaVstupu.ZeptejSeAUprav(
+                "", "PSČ", v => v, s => s, jeNove: true);
+        
+            string telefon = UpravaVstupu.ZeptejSeAUprav(
+                "", "telefonní číslo", v => v, s => s, jeNove: true);
+        
+            string email = UpravaVstupu.ZeptejSeAUprav(
+                "", "e-mail",
+                v => v,
+                s =>
+                {
+                    if (!Zamestnanec.JePlatnyEmail(s))
+                        throw new FormatException("E-mail nemá platný formát (očekává se např. jmeno@domena.cz).");
+                    return s;
+                },
                 jeNove: true);
-
-            zoo.Zamestnanci.Add(new Zamestnanec(jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice));
+        
+            zoo.Zamestnanci.Add(new Zamestnanec(
+                jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice,
+                mesto, ulice, psc, telefon, email));
+        
             zoo.UlozZamestnance();
+        
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
             Console.ResetColor();
         }
 
         /// <summary>
-        /// Vypíše všechny zaměstnance uložené v systému.
+        /// Vypíše všechny zaměstnance uložené v systému, včetně kontaktních
+        /// a adresních údajů.
         /// </summary>
         public void Vypis()
         {
             Console.WriteLine("VÝPIS ZAMĚSTNANCŮ");
             Console.WriteLine();
-
             Console.WriteLine(
                 $"{"Jméno",-15} {"Příjmení",-15} {"Datum narození",-15} {"Mzda",-10} {"Pozice",-20}"
             );
-
             Console.WriteLine(new string('-', 80));
-
+        
             foreach (var zam in zoo.Zamestnanci)
+            {
                 zam.VypisZamestnance();
+                zam.VypisKontaktniUdaje();
+                Console.WriteLine();
+            }
         }
 
         /// <summary>
@@ -149,7 +165,8 @@ namespace EvidenceZOOCviceniUpraveno2
         }
 
         /// <summary>
-        /// Upraví údaje vybraného zaměstnance.
+        /// Upraví údaje vybraného zaměstnance, včetně kontaktních
+        /// a adresních údajů.
         /// </summary>
         public void Upravit()
         {
@@ -161,27 +178,57 @@ namespace EvidenceZOOCviceniUpraveno2
                     zam.Jmeno, "jméno",
                     v => v,
                     s => s);
-
+        
                 zam.Prijmeni = UpravaVstupu.ZeptejSeAUprav(
                     zam.Prijmeni, "příjmení",
                     v => v,
                     s => s);
-
+        
                 zam.PracovniPozice = UpravaVstupu.ZeptejSeAUprav(
                     zam.PracovniPozice, "pracovní pozice",
                     v => v,
                     s => s);
-
+        
                 zam.DatumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                     zam.DatumNarozeni, "datum narození",
                     v => v.ToString(),
                     s => DateOnly.Parse(s));
-
+        
                 zam.Mzda = UpravaVstupu.ZeptejSeAUprav(
                     zam.Mzda, "mzda",
                     v => v.ToString(),
                     s => int.Parse(s));
-
+        
+                zam.Mesto = UpravaVstupu.ZeptejSeAUprav(
+                    zam.Mesto, "město",
+                    v => v,
+                    s => s);
+        
+                zam.Ulice = UpravaVstupu.ZeptejSeAUprav(
+                    zam.Ulice, "ulice a číslo popisné",
+                    v => v,
+                    s => s);
+        
+                zam.PSC = UpravaVstupu.ZeptejSeAUprav(
+                    zam.PSC, "PSČ",
+                    v => v,
+                    s => s);
+        
+                zam.Telefon = UpravaVstupu.ZeptejSeAUprav(
+                    zam.Telefon, "telefonní číslo",
+                    v => v,
+                    s => s);
+        
+                zam.Email = UpravaVstupu.ZeptejSeAUprav(
+                    zam.Email, "e-mail",
+                    v => v,
+                    s =>
+                    {
+                        if (!Zamestnanec.JePlatnyEmail(s))
+                            throw new FormatException("E-mail nemá platný formát (očekává se např. jmeno@domena.cz).");
+                        return s;
+                    });
+        
                 zoo.UlozZamestnance();
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Úprava dokončena.");
