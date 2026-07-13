@@ -6,40 +6,61 @@ namespace EvidenceZOOCviceniUpraveno2
     /// <summary>
     /// Reprezentuje správu zoologické zahrady – načítání dat, ukládání,
     /// roční archivaci, poskytování statistik a práci se soubory.
+    /// Data i jejich zálohy jsou organizovány v oddělených složkách
+    /// Data/ a Zalohy/ uvnitř zvolené kořenové složky.
     /// </summary>
-    /// <param name="souborZam">Cesta k souboru se zaměstnanci.</param>
-    /// <param name="souborZvir">Cesta k souboru se zvířaty.</param>
-    /// <param name="souborSklad">Cesta k souboru se skladem.</param>
-    class ZOO(string souborZam, string souborZvir, string souborSklad)
+    /// <param name="korenovaSlozka">Kořenová složka, ve které jsou uložena všechna data a jejich zálohy.</param>
+    class ZOO(string korenovaSlozka)
     {
         public List<Zvire> Zvirata { get; internal set; } = [];
         public List<Zamestnanec> Zamestnanci { get; internal set; } = [];
         public List<SkladovaPolozka> Sklad { get; internal set; } = [];
         public List<SkladovyPohyb> SkladovaHistorie { get; internal set; } = [];
 
-        public string SouborZamestnanci { get; private set; } = souborZam;
-        public string SouborZvirata { get; private set; } = souborZvir;
-        public string SouborSkladu { get; private set; } = souborSklad;
+        /// <summary>
+        /// Kořenová složka zvolená uživatelem, ve které jsou podsložky
+        /// Data (aktuální soubory) a Zalohy (jejich zálohy).
+        /// </summary>
+        public string KorenovaSlozka { get; private set; } = korenovaSlozka;
+
+        // -----------------------------
+        // CESTY K DATOVÝM SOUBORŮM (Data/...)
+        // -----------------------------
+
+        public string SouborZamestnanci => Path.Combine(KorenovaSlozka, "Data", "Zamestnanci", "zamestnanci.json");
+        public string SouborZvirata => Path.Combine(KorenovaSlozka, "Data", "Zvirata", "zvirata.json");
+        public string SouborSkladu => Path.Combine(KorenovaSlozka, "Data", "Sklad", "sklad.json");
+        public string SouborSkladoveHistorie => Path.Combine(KorenovaSlozka, "Data", "Sklad", "sklad_historie.json");
+
+        // -----------------------------
+        // CESTY K ZÁLOHÁM (Zalohy/...)
+        // -----------------------------
+
+        private string ZalohaZamestnanci => Path.Combine(KorenovaSlozka, "Zalohy", "Zamestnanci", "zamestnanci.json.bak");
+        private string ZalohaZvirata => Path.Combine(KorenovaSlozka, "Zalohy", "Zvirata", "zvirata.json.bak");
+        private string ZalohaSkladu => Path.Combine(KorenovaSlozka, "Zalohy", "Sklad", "sklad.json.bak");
+        private string ZalohaSkladoveHistorie => Path.Combine(KorenovaSlozka, "Zalohy", "Sklad", "sklad_historie.json.bak");
 
         /// <summary>
-        /// Cesta k souboru s historií skladových pohybů. Odvozena
-        /// automaticky ze složky, kde jsou uložena ostatní data.
+        /// Cesta k záloze config.ini, uložené v datové složce uživatele
+        /// (ne v AppData), aby přežila i reinstalaci aplikace nebo systému.
         /// </summary>
-        public string SouborSkladoveHistorie => Path.Combine(SlozkaDat, "sklad_historie.json");
+        private string ZalohaKonfigu => Path.Combine(KorenovaSlozka, "Zalohy", "config.ini.bak");
 
         /// <summary>
-        /// Datová složka, ve které jsou uloženy hlavní datové soubory.
+        /// Složka pro roční archivy dat.
         /// </summary>
-        public string SlozkaDat => Path.GetDirectoryName(SouborZamestnanci)!;
-
-        /// <summary>
-        /// Složka pro roční archivy dat, umístěná uvnitř datové složky.
-        /// </summary>
-        public string ArchivSlozka => Path.Combine(SlozkaDat, "Archiv");
+        public string ArchivSlozka => Path.Combine(KorenovaSlozka, "Archiv");
 
         private readonly Dictionary<string, Action> akceNacitani = [];
         private readonly HashSet<string> nacteno = [];
 
+        /// <summary>
+        /// Cesta ke konfiguračnímu souboru v AppData. Slouží jen jako
+        /// "ukazatel" na kořenovou složku dat – jeho záloha je uložena
+        /// přímo v datové složce uživatele (viz ZalohaKonfigu), protože
+        /// AppData je smazána při reinstalaci aplikace/systému.
+        /// </summary>
         private static readonly string KonfigSoubor =
                  Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                  "EvidenceZOOCviceniUpraveno2",
@@ -112,53 +133,81 @@ namespace EvidenceZOOCviceniUpraveno2
         // KONFIGURACE (config.ini)
         // ------------------------
 
-        public static (string souborZam, string souborZvir, string souborSklad) NactiNeboSeZeptejNaCesty()
+        /// <summary>
+        /// Zjistí kořenovou složku pro data. Při prvním spuštění na daném
+        /// počítači (chybí config.ini v AppData) se uživatele zeptá na
+        /// cestu; pokud v ní najde zálohu config.ini (např. po reinstalaci
+        /// aplikace nebo systému), obnoví z ní nastavení automaticky, aniž
+        /// by uživatel o cokoliv přišel. Pokud záloha neexistuje, jde
+        /// o čerstvou instalaci a vytvoří se kompletní nová struktura složek.
+        /// </summary>
+        public static string NactiNeboSeZeptejNaCesty()
         {
             Directory.CreateDirectory(Path.GetDirectoryName(KonfigSoubor)!);
-
-            if (!File.Exists(KonfigSoubor) && File.Exists(KonfigSoubor + ".bak"))
-            {
-                File.Copy(KonfigSoubor + ".bak", KonfigSoubor);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Config.ini obnoven ze zálohy.");
-                Console.ResetColor();
-            }
 
             if (File.Exists(KonfigSoubor))
             {
                 var hodnoty = NactiKlicoveHodnoty();
-
-                if (hodnoty.TryGetValue("souborZam", out var zamUlozeny)
-                    && hodnoty.TryGetValue("souborZvir", out var zvirUlozeny)
-                    && hodnoty.TryGetValue("souborSklad", out var skladUlozeny)
-                    && !string.IsNullOrWhiteSpace(zamUlozeny)
-                    && !string.IsNullOrWhiteSpace(zvirUlozeny)
-                    && !string.IsNullOrWhiteSpace(skladUlozeny))
+                if (hodnoty.TryGetValue("korenovaSlozka", out var ulozena)
+                    && !string.IsNullOrWhiteSpace(ulozena))
                 {
                     Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"Načteny uložené cesty z: {KonfigSoubor}");
+                    Console.WriteLine($"Načtena uložená složka dat z: {KonfigSoubor}");
                     Console.ResetColor();
-                    return (zamUlozeny, zvirUlozeny, skladUlozeny);
+                    return ulozena;
                 }
             }
 
             Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("=== PRVNÍ SPUŠTĚNÍ — NASTAVENÍ CEST ===");
+            Console.WriteLine("=== NASTAVENÍ SLOŽKY PRO DATA ===");
             Console.ResetColor();
             Console.Write("Zadej cestu ke složce pro ukládání dat: ");
             string slozka = Console.ReadLine()!.Trim();
 
-            Directory.CreateDirectory(slozka);
-            string zam = Path.Combine(slozka, "zamestnanci.json");
-            string zvir = Path.Combine(slozka, "zvirata.json");
-            string sklad = Path.Combine(slozka, "sklad.json");
+            string zalohaKonfigu = Path.Combine(slozka, "Zalohy", "config.ini.bak");
 
-            ZapisKonfigSeZalohou(zam, zvir, sklad);
+            if (File.Exists(zalohaKonfigu))
+            {
+                File.Copy(zalohaKonfigu, KonfigSoubor, overwrite: true);
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("V zadané složce byla nalezena záloha nastavení – config.ini obnoven, nic nebylo ztraceno.");
+                Console.ResetColor();
+
+                VytvorStrukturuSlozek(slozka);
+                return slozka;
+            }
+
+            // Čerstvá instalace – žádná záloha nastavení nenalezena
+            VytvorStrukturuSlozek(slozka);
+            ZapisKonfigSoubor([$"korenovaSlozka={slozka}"], slozka);
 
             Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Cesty uloženy. Data budou ukládána do: {slozka}");
+            Console.WriteLine($"Nastaveno. Data budou ukládána do: {slozka}");
             Console.ResetColor();
-            return (zam, zvir, sklad);
+            return slozka;
+        }
+
+        /// <summary>
+        /// Vytvoří kompletní adresářovou strukturu pro data a jejich
+        /// zálohy uvnitř zadané kořenové složky, včetně podsložek
+        /// pro jednotlivé moduly (zaměstnanci, zvířata, sklad, účetnictví
+        /// a jeho podsložka pokladna).
+        /// </summary>
+        private static void VytvorStrukturuSlozek(string korenovaSlozka)
+        {
+            string[] podslozky =
+            [
+                "Zamestnanci",
+                "Zvirata",
+                "Sklad",
+                Path.Combine("Ucetnictvi", "Pokladna")
+            ];
+
+            foreach (string zaklad in new[] { "Data", "Zalohy" })
+                foreach (string podslozka in podslozky)
+                    Directory.CreateDirectory(Path.Combine(korenovaSlozka, zaklad, podslozka));
+
+            Directory.CreateDirectory(Path.Combine(korenovaSlozka, "Archiv"));
         }
 
         /// <summary>
@@ -188,29 +237,35 @@ namespace EvidenceZOOCviceniUpraveno2
             return hodnoty;
         }
 
-        private static void ZapisKonfigSeZalohou(string souborZam, string souborZvir, string souborSklad)
+        /// <summary>
+        /// Zapíše config.ini v AppData bezpečně (přes dočasný soubor
+        /// a atomickou náhradu) a zároveň synchronizuje jeho zálohu
+        /// do datové složky uživatele (Zalohy/config.ini.bak).
+        /// </summary>
+        private static void ZapisKonfigSoubor(IEnumerable<string> radky, string korenovaSlozka)
         {
-            if (File.Exists(KonfigSoubor))
-                File.Copy(KonfigSoubor, KonfigSoubor + ".bak", overwrite: true);
-
             string docasny = KonfigSoubor + ".tmp";
-            File.WriteAllLines(docasny, [
-                $"souborZam={souborZam}",
-                $"souborZvir={souborZvir}",
-                $"souborSklad={souborSklad}"
-            ]);
+            File.WriteAllLines(docasny, radky);
 
             if (File.Exists(KonfigSoubor))
                 File.Replace(docasny, KonfigSoubor, null);
             else
                 File.Move(docasny, KonfigSoubor);
+
+            if (!string.IsNullOrWhiteSpace(korenovaSlozka))
+            {
+                string zalohaSlozka = Path.Combine(korenovaSlozka, "Zalohy");
+                Directory.CreateDirectory(zalohaSlozka);
+                File.Copy(KonfigSoubor, Path.Combine(zalohaSlozka, "config.ini.bak"), overwrite: true);
+            }
         }
 
         /// <summary>
         /// Zapíše nebo aktualizuje jeden klíč v config.ini, aniž by
-        /// smazal ostatní existující klíče.
+        /// smazal ostatní existující klíče. Zároveň synchronizuje
+        /// zálohu config.ini v datové složce.
         /// </summary>
-        private static void UlozKlic(string klic, string hodnota)
+        private void UlozKlic(string klic, string hodnota)
         {
             var radky = File.Exists(KonfigSoubor)
                 ? File.ReadAllLines(KonfigSoubor).ToList()
@@ -230,263 +285,101 @@ namespace EvidenceZOOCviceniUpraveno2
             if (!nalezeno)
                 radky.Add($"{klic}={hodnota}");
 
-            string docasny = KonfigSoubor + ".tmp";
-            File.WriteAllLines(docasny, radky);
-
-            if (File.Exists(KonfigSoubor))
-                File.Replace(docasny, KonfigSoubor, KonfigSoubor + ".bak");
-            else
-                File.Move(docasny, KonfigSoubor);
+            ZapisKonfigSoubor(radky, KorenovaSlozka);
         }
 
         // ------------------------------
         // VEŘEJNÉ METODY PRO NAČTENÍ DAT
         // ------------------------------
 
-        public void NactiZamestnance(string cesta)
+        public void NactiZamestnance()
         {
-            SouborZamestnanci = cesta;
-            Zamestnanci = NactiZamestnanceZeSouboru();
+            Zamestnanci = NactiZeSouboru(
+                SouborZamestnanci, ZalohaZamestnanci,
+                json => JsonSerializer.Deserialize<List<Zamestnanec>>(json, ZamestnanecJsonOptions) ?? [],
+                "zaměstnanců");
         }
 
-        public void NactiZvirata(string cesta)
+        public void NactiZvirata()
         {
-            SouborZvirata = cesta;
-            Zvirata = NactiZvirataZeSouboru();
+            Zvirata = NactiZeSouboru(
+                SouborZvirata, ZalohaZvirata,
+                json => JsonSerializer.Deserialize<List<Zvire>>(json, ZvireJsonOptions) ?? [],
+                "zvířat");
         }
 
-        public void NactiSklad(string cesta)
+        public void NactiSklad()
         {
-            SouborSkladu = cesta;
-            Sklad = NactiSkladZeSouboru();
-            SkladovaHistorie = NactiSkladovouHistoriiZeSouboru();
+            Sklad = NactiZeSouboru(
+                SouborSkladu, ZalohaSkladu,
+                json => JsonSerializer.Deserialize<List<SkladovaPolozka>>(json, SkladJsonOptions) ?? [],
+                "skladu");
+
+            SkladovaHistorie = NactiZeSouboru(
+                SouborSkladoveHistorie, ZalohaSkladoveHistorie,
+                json => JsonSerializer.Deserialize<List<SkladovyPohyb>>(json, HistorieJsonOptions) ?? [],
+                "historie skladu");
         }
 
-        private List<Zamestnanec> NactiZamestnanceZeSouboru()
+        /// <summary>
+        /// Obecná načítací logika pro libovolný datový soubor: pokud
+        /// hlavní soubor chybí, ale záloha existuje, obnoví ji na místo
+        /// hlavního souboru. Pokud se hlavní soubor nepodaří deserializovat
+        /// (poškozený obsah), automaticky zkusí načíst ze zálohy.
+        /// </summary>
+        private static List<T> NactiZeSouboru<T>(string hlavniSoubor, string zalohaSoubor,
+            Func<string, List<T>> deserializace, string popisProHlasky)
         {
-            if (!File.Exists(SouborZamestnanci) && File.Exists(SouborZamestnanci + ".bak"))
+            if (!File.Exists(hlavniSoubor) && File.Exists(zalohaSoubor))
             {
-                File.Copy(SouborZamestnanci + ".bak", SouborZamestnanci);
+                Directory.CreateDirectory(Path.GetDirectoryName(hlavniSoubor)!);
+                File.Copy(zalohaSoubor, hlavniSoubor);
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Soubor zaměstnanců obnoven ze zálohy.");
+                Console.WriteLine($"Soubor {popisProHlasky} obnoven ze zálohy.");
                 Console.ResetColor();
             }
 
-            if (!File.Exists(SouborZamestnanci))
+            if (!File.Exists(hlavniSoubor))
                 return [];
 
             try
             {
-                string json = File.ReadAllText(SouborZamestnanci);
-                return JsonSerializer.Deserialize<List<Zamestnanec>>(json, ZamestnanecJsonOptions) ?? [];
+                string json = File.ReadAllText(hlavniSoubor);
+                return deserializace(json);
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání zaměstnanců: {ex.Message}");
+                Console.WriteLine($"Chyba při načítání {popisProHlasky}: {ex.Message}");
                 Console.ResetColor();
-                return NactiZeZalohyZamestnanci();
+                return NactiZeZalohy(zalohaSoubor, deserializace, popisProHlasky);
             }
         }
 
-        private List<Zamestnanec> NactiZeZalohyZamestnanci()
+        private static List<T> NactiZeZalohy<T>(string zalohaSoubor,
+            Func<string, List<T>> deserializace, string popisProHlasky)
         {
-            string zaloha = SouborZamestnanci + ".bak";
-
-            if (!File.Exists(zaloha))
+            if (!File.Exists(zalohaSoubor))
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("!!! POZOR: Data zaměstnanců se nepodařilo načíst ani ze zálohy !!!");
+                Console.WriteLine($"!!! POZOR: Data ({popisProHlasky}) se nepodařilo načíst ani ze zálohy !!!");
                 Console.ResetColor();
                 return [];
             }
 
             try
             {
-                string json = File.ReadAllText(zaloha);
-                var data = JsonSerializer.Deserialize<List<Zamestnanec>>(json, ZamestnanecJsonOptions) ?? [];
+                string json = File.ReadAllText(zalohaSoubor);
+                var data = deserializace(json);
                 Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Zaměstnanci úspěšně obnoveni ze zálohy (.bak).");
+                Console.WriteLine($"Data ({popisProHlasky}) úspěšně obnovena ze zálohy.");
                 Console.ResetColor();
                 return data;
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Záloha zaměstnanců je také poškozená: {ex.Message}");
-                Console.ResetColor();
-                return [];
-            }
-        }
-
-        private List<Zvire> NactiZvirataZeSouboru()
-        {
-            if (!File.Exists(SouborZvirata) && File.Exists(SouborZvirata + ".bak"))
-            {
-                File.Copy(SouborZvirata + ".bak", SouborZvirata);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Soubor zvířat obnoven ze zálohy.");
-                Console.ResetColor();
-            }
-
-            if (!File.Exists(SouborZvirata))
-                return [];
-
-            try
-            {
-                string json = File.ReadAllText(SouborZvirata);
-                return JsonSerializer.Deserialize<List<Zvire>>(json, ZvireJsonOptions) ?? [];
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání zvířat: {ex.Message}");
-                Console.ResetColor();
-                return NactiZeZalohyZvirata();
-            }
-        }
-
-        private List<Zvire> NactiZeZalohyZvirata()
-        {
-            string zaloha = SouborZvirata + ".bak";
-
-            if (!File.Exists(zaloha))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("!!! POZOR: Data zvířat se nepodařilo načíst ani ze zálohy !!!");
-                Console.ResetColor();
-                return [];
-            }
-
-            try
-            {
-                string json = File.ReadAllText(zaloha);
-                var data = JsonSerializer.Deserialize<List<Zvire>>(json, ZvireJsonOptions) ?? [];
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Zvířata úspěšně obnovena ze zálohy (.bak).");
-                Console.ResetColor();
-                return data;
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Záloha zvířat je také poškozená: {ex.Message}");
-                Console.ResetColor();
-                return [];
-            }
-        }
-
-        private List<SkladovaPolozka> NactiSkladZeSouboru()
-        {
-            if (!File.Exists(SouborSkladu) && File.Exists(SouborSkladu + ".bak"))
-            {
-                File.Copy(SouborSkladu + ".bak", SouborSkladu);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Soubor skladu obnoven ze zálohy.");
-                Console.ResetColor();
-            }
-
-            if (!File.Exists(SouborSkladu))
-                return [];
-
-            try
-            {
-                string json = File.ReadAllText(SouborSkladu);
-                return JsonSerializer.Deserialize<List<SkladovaPolozka>>(json, SkladJsonOptions) ?? [];
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání skladu: {ex.Message}");
-                Console.ResetColor();
-                return NactiZeZalohySkladu();
-            }
-        }
-
-        private List<SkladovaPolozka> NactiZeZalohySkladu()
-        {
-            string zaloha = SouborSkladu + ".bak";
-
-            if (!File.Exists(zaloha))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("!!! POZOR: Data skladu se nepodařilo načíst ani ze zálohy !!!");
-                Console.ResetColor();
-                return [];
-            }
-
-            try
-            {
-                string json = File.ReadAllText(zaloha);
-                var data = JsonSerializer.Deserialize<List<SkladovaPolozka>>(json, SkladJsonOptions) ?? [];
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Sklad úspěšně obnoven ze zálohy (.bak).");
-                Console.ResetColor();
-                return data;
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Záloha skladu je také poškozená: {ex.Message}");
-                Console.ResetColor();
-                return [];
-            }
-        }
-
-        private List<SkladovyPohyb> NactiSkladovouHistoriiZeSouboru()
-        {
-            string soubor = SouborSkladoveHistorie;
-
-            if (!File.Exists(soubor) && File.Exists(soubor + ".bak"))
-            {
-                File.Copy(soubor + ".bak", soubor);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Historie skladu obnovena ze zálohy.");
-                Console.ResetColor();
-            }
-
-            if (!File.Exists(soubor))
-                return [];
-
-            try
-            {
-                string json = File.ReadAllText(soubor);
-                return JsonSerializer.Deserialize<List<SkladovyPohyb>>(json, HistorieJsonOptions) ?? [];
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání historie skladu: {ex.Message}");
-                Console.ResetColor();
-                return NactiZeZalohySkladoveHistorie();
-            }
-        }
-
-        private List<SkladovyPohyb> NactiZeZalohySkladoveHistorie()
-        {
-            string zaloha = SouborSkladoveHistorie + ".bak";
-
-            if (!File.Exists(zaloha))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("!!! POZOR: Historie skladu se nepodařilo načíst ani ze zálohy !!!");
-                Console.ResetColor();
-                return [];
-            }
-
-            try
-            {
-                string json = File.ReadAllText(zaloha);
-                var data = JsonSerializer.Deserialize<List<SkladovyPohyb>>(json, HistorieJsonOptions) ?? [];
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Historie skladu úspěšně obnovena ze zálohy (.bak).");
-                Console.ResetColor();
-                return data;
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Záloha historie skladu je také poškozená: {ex.Message}");
+                Console.WriteLine($"Záloha ({popisProHlasky}) je také poškozená: {ex.Message}");
                 Console.ResetColor();
                 return [];
             }
@@ -498,73 +391,61 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public void UlozZamestnance()
         {
-            try
-            {
-                string json = JsonSerializer.Serialize(Zamestnanci, ZamestnanecJsonOptionsIndented);
-                ZapisSouborSeZalohou(SouborZamestnanci, json);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání zaměstnanců: {ex.Message}");
-                Console.ResetColor();
-            }
+            UlozDoSouboru(Zamestnanci, ZamestnanecJsonOptionsIndented,
+                SouborZamestnanci, ZalohaZamestnanci, "zaměstnanců");
         }
 
         public void UlozZvirata()
         {
-            try
-            {
-                string json = JsonSerializer.Serialize(Zvirata, ZvireJsonOptionsIndented);
-                ZapisSouborSeZalohou(SouborZvirata, json);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání zvířat: {ex.Message}");
-                Console.ResetColor();
-            }
+            UlozDoSouboru(Zvirata, ZvireJsonOptionsIndented,
+                SouborZvirata, ZalohaZvirata, "zvířat");
         }
 
         public void UlozSklad()
         {
-            try
-            {
-                string json = JsonSerializer.Serialize(Sklad, SkladJsonOptionsIndented);
-                ZapisSouborSeZalohou(SouborSkladu, json);
-            }
-            catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání skladu: {ex.Message}");
-                Console.ResetColor();
-            }
+            UlozDoSouboru(Sklad, SkladJsonOptionsIndented,
+                SouborSkladu, ZalohaSkladu, "skladu");
         }
 
         public void UlozSkladovouHistorii()
         {
+            UlozDoSouboru(SkladovaHistorie, HistorieJsonOptionsIndented,
+                SouborSkladoveHistorie, ZalohaSkladoveHistorie, "historie skladu");
+        }
+
+        private static void UlozDoSouboru<T>(T data, JsonSerializerOptions options,
+            string cilovySoubor, string zalohovySoubor, string popisProHlasky)
+        {
             try
             {
-                string json = JsonSerializer.Serialize(SkladovaHistorie, HistorieJsonOptionsIndented);
-                ZapisSouborSeZalohou(SouborSkladoveHistorie, json);
+                string json = JsonSerializer.Serialize(data, options);
+                ZapisSouborSeZalohou(cilovySoubor, zalohovySoubor, json);
             }
             catch (Exception ex)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání historie skladu: {ex.Message}");
+                Console.WriteLine($"Chyba při ukládání ({popisProHlasky}): {ex.Message}");
                 Console.ResetColor();
             }
         }
 
-        private static void ZapisSouborSeZalohou(string cilovySoubor, string obsah)
+        /// <summary>
+        /// Bezpečně zapíše text do cílového souboru: zapíše nový obsah
+        /// do dočasného souboru (.tmp) a atomicky ho nahradí na místo
+        /// cílového souboru, přičemž File.Replace zároveň přesune
+        /// předchozí obsah cílového souboru do zálohy (i pokud leží
+        /// v jiné složce, např. paralelní strom Zalohy/...).
+        /// </summary>
+        private static void ZapisSouborSeZalohou(string cilovySoubor, string zalohovySoubor, string obsah)
         {
-            string docasny = cilovySoubor + ".tmp";
-            string zaloha = cilovySoubor + ".bak";
+            Directory.CreateDirectory(Path.GetDirectoryName(cilovySoubor)!);
+            Directory.CreateDirectory(Path.GetDirectoryName(zalohovySoubor)!);
 
+            string docasny = cilovySoubor + ".tmp";
             File.WriteAllText(docasny, obsah);
 
             if (File.Exists(cilovySoubor))
-                File.Replace(docasny, cilovySoubor, zaloha);
+                File.Replace(docasny, cilovySoubor, zalohovySoubor);
             else
                 File.Move(docasny, cilovySoubor);
         }
@@ -574,12 +455,8 @@ namespace EvidenceZOOCviceniUpraveno2
         // -----------------------------
 
         /// <summary>
-        /// Zkontroluje, zda je potřeba provést roční archivaci dat
-        /// (soubory jsou platné vždy jen do konce kalendářního roku,
-        /// bez ohledu na to, kdy byly založeny). Pokud ano, vytvoří
-        /// kopie aktuálních souborů do složky Archiv a zároveň odstraní
-        /// archivní soubory starší než 5 let. Volá se jednou při startu
-        /// aplikace.
+        /// Zkontroluje, zda je potřeba provést roční archivaci dat.
+        /// Volá se jednou při startu aplikace.
         /// </summary>
         public void ZkontrolujRocniArchivaci()
         {
@@ -588,16 +465,12 @@ namespace EvidenceZOOCviceniUpraveno2
             int aktualniRok = DateTime.Now.Year;
             int posledniArchivovanyRok = NactiPosledniArchivovanyRok();
 
-            // První spuštění aplikace vůbec – není co archivovat,
-            // jen si zapamatujeme výchozí stav pro budoucí porovnání.
             if (posledniArchivovanyRok == 0)
             {
                 UlozKlic("posledniArchivovanyRok", (aktualniRok - 1).ToString());
                 return;
             }
 
-            // Dožene i více přeskočených let najednou (např. pokud
-            // aplikace nebyla spuštěna přes přelom více let).
             while (posledniArchivovanyRok < aktualniRok - 1)
             {
                 int rokKArchivaci = posledniArchivovanyRok + 1;
@@ -619,11 +492,6 @@ namespace EvidenceZOOCviceniUpraveno2
             return 0;
         }
 
-        /// <summary>
-        /// Vytvoří kopie aktuálních datových souborů pro daný rok
-        /// ve složce Archiv. Původní pracovní soubory zůstávají
-        /// nedotčené a aplikace v nich pokračuje dál.
-        /// </summary>
         private void ArchivujRok(int rok)
         {
             ArchivujSoubor(SouborZamestnanci, "zamestnanci", rok);
@@ -655,10 +523,6 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-        /// <summary>
-        /// Odstraní archivní soubory starší než 5 let vzhledem
-        /// k aktuálnímu roku.
-        /// </summary>
         private void VycistiStareArchivy(int aktualniRok)
         {
             if (!Directory.Exists(ArchivSlozka))
@@ -720,25 +584,20 @@ namespace EvidenceZOOCviceniUpraveno2
                     case '1':
                         Console.WriteLine($"Počet zvířat: {PocetZvirat()}");
                         break;
-
                     case '2':
                         Console.WriteLine($"Počet zaměstnanců: {PocetZamestnancu()}");
                         break;
-
                     case '3':
                         Console.WriteLine($"Součet mezd: {SoucetMezd()} Kč");
                         break;
-
                     case '4':
                         break;
-
                     default:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Neplatná volba, opakujte zadání:");
                         Console.ResetColor();
                         break;
                 }
-
             }
             while (volba != '4');
         }
