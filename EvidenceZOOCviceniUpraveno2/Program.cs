@@ -1,16 +1,15 @@
 ﻿using EvidenceZOOCviceniUpraveno2;
 
-var (souborZam, souborZvir, souborSklad) = ZOO.NactiNeboSeZeptejNaCesty();
-
-ZOO zoo = new(souborZam, souborZvir, souborSklad);
+string korenovaSlozka = ZOO.NactiNeboSeZeptejNaCesty();
+ZOO zoo = new(korenovaSlozka);
 
 // Zkontroluje a případně provede roční archivaci – musí proběhnout
 // hned po vytvoření zoo, ještě před prvním použitím dat.
 zoo.ZkontrolujRocniArchivaci();
 
-zoo.RegistrujNacitani("Zaměstnanci", () => zoo.NactiZamestnance(souborZam));
-zoo.RegistrujNacitani("Zvířata", () => zoo.NactiZvirata(souborZvir));
-zoo.RegistrujNacitani("Sklad", () => zoo.NactiSklad(souborSklad));
+zoo.RegistrujNacitani("Zaměstnanci", zoo.NactiZamestnance);
+zoo.RegistrujNacitani("Zvířata", zoo.NactiZvirata);
+zoo.RegistrujNacitani("Sklad", zoo.NactiSklad);
 
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
