@@ -14,6 +14,9 @@
     <Reference Include="InputHelper">
       <HintPath>..\..\InputHelper\InputHelper\bin\Release\net8.0\InputHelper.dll</HintPath>
     </Reference>
+    <Reference Include="PohybHelper">
+      <HintPath>..\..\PohybHelper\PohybHelper\bin\Release\net8.0\PohybHelper.dll</HintPath>
+    </Reference>
     <Reference Include="SelectHelper">
       <HintPath>..\..\SelectHelper\SelectHelper\bin\Release\net8.0\SelectHelper.dll</HintPath>
     </Reference>
