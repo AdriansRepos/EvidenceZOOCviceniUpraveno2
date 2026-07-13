@@ -1,4 +1,5 @@
 ﻿using System.Text.Json.Serialization;
+using PohybHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
@@ -6,15 +7,15 @@ namespace EvidenceZOOCviceniUpraveno2
     /// Reprezentuje jeden záznam o pohybu na skladě (naskladnění
     /// nebo vyskladnění položky) včetně data a množství.
     /// </summary>
-    [method: JsonConstructor] 
-    class SkladovyPohyb(string nazevPolozky, TypPohybu typPohybu,
-        double mnozstvi, DateTime datumCas)
+    [method: JsonConstructor]
+    class SkladovyPohyb(string nazevPolozky, SkladovyTypPohybu typPohybu,
+        double mnozstvi, DateTime datumCas) : IPohyb
     {
         [JsonPropertyName("nazevPolozky")]
         public string NazevPolozky { get; internal set; } = nazevPolozky;
 
         [JsonPropertyName("typPohybu")]
-        public TypPohybu TypPohybu { get; internal set; } = typPohybu;
+        public SkladovyTypPohybu TypPohybu { get; internal set; } = typPohybu;
 
         [JsonPropertyName("mnozstvi")]
         public double Mnozstvi { get; internal set; } = mnozstvi;
@@ -22,14 +23,19 @@ namespace EvidenceZOOCviceniUpraveno2
         [JsonPropertyName("datumCas")]
         public DateTime DatumCas { get; internal set; } = datumCas;
 
+        public string Popis()
+        {
+            string typText = TypPohybu == SkladovyTypPohybu.Naskladneni ? "Naskladnění" : "Vyskladnění";
+            return $"{typText}: {NazevPolozky} ({Mnozstvi:0.##})";
+        }
+
         public void VypisPohyb()
         {
-            string typText = TypPohybu == TypPohybu.Naskladneni ? "Naskladnění" : "Vyskladnění";
-            Console.ForegroundColor = TypPohybu == TypPohybu.Naskladneni
+            Console.ForegroundColor = TypPohybu == SkladovyTypPohybu.Naskladneni
                 ? ConsoleColor.Green
                 : ConsoleColor.Yellow;
 
-            Console.WriteLine($"{DatumCas,-20:g} {typText,-15} {NazevPolozky,-20} {Mnozstvi,8:0.##}");
+            Console.WriteLine($"{DatumCas,-20:g} {Popis(),-45}");
             Console.ResetColor();
         }
     }
