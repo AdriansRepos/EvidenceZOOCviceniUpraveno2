@@ -1,5 +1,6 @@
 ﻿using TextHelper;
 using SelectHelper;
+using PohybHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
@@ -12,8 +13,7 @@ namespace EvidenceZOOCviceniUpraveno2
             zoo.ZajistiData("Sklad");
             char volba;
             do
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
+            {Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("\n=== MENU SKLAD ===");
                 Console.WriteLine("\t1. Přidat novou položku");
                 Console.WriteLine("\t2. Vypsat sklad");
@@ -21,7 +21,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 Console.WriteLine("\t4. Vyskladnit (odebrat množství)");
                 Console.WriteLine("\t5. Smazat položku");
                 Console.WriteLine("\t6. Vypsat docházející položky");
-                Console.WriteLine("\t7. Vypsat historii pohybů");
+                Console.WriteLine("\t7. Vypsat pohyby (inventura)");
                 Console.WriteLine("\t8. Návrat do hlavního menu");
                 Console.ResetColor();
                 Console.Write("Vyber možnost: ");
@@ -29,7 +29,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 volba = Console.ReadKey().KeyChar;
                 Console.WriteLine();
 
-                switch (volba)
+               switch (volba)
                 {
                     case '1': 
                         PridatPolozku(); 
@@ -56,7 +56,7 @@ namespace EvidenceZOOCviceniUpraveno2
                         break;
 
                     case '7': 
-                        VypisHistorii(); 
+                        VypisPohybyInventura(); 
                         break;
 
                     case '8': 
@@ -125,7 +125,7 @@ namespace EvidenceZOOCviceniUpraveno2
             polozka.Mnozstvi += pridat;
 
             zoo.SkladovaHistorie.Add(new SkladovyPohyb(
-                polozka.Nazev, TypPohybu.Naskladneni, pridat, DateTime.Now));
+                polozka.Nazev, SkladovyTypPohybu.Naskladneni, pridat, DateTime.Now));
 
             zoo.UlozSklad();
             zoo.UlozSkladovouHistorii();
@@ -154,7 +154,7 @@ namespace EvidenceZOOCviceniUpraveno2
             polozka.Mnozstvi -= odebrat;
 
             zoo.SkladovaHistorie.Add(new SkladovyPohyb(
-                polozka.Nazev, TypPohybu.Vyskladneni, odebrat, DateTime.Now));
+                polozka.Nazev, SkladovyTypPohybu.Vyskladneni, odebrat, DateTime.Now));
 
             zoo.UlozSklad();
             zoo.UlozSkladovouHistorii();
@@ -206,14 +206,32 @@ namespace EvidenceZOOCviceniUpraveno2
                 polozka.VypisPolozku();
         }
 
-        public void VypisHistorii()
+        /// <summary>
+        /// Vypíše skladové pohyby filtrované podle typu a rozmezí data –
+        /// určeno pro měsíční nebo roční inventury.
+        /// </summary>
+        public void VypisPohybyInventura()
         {
-            Console.WriteLine("HISTORIE SKLADOVÝCH POHYBŮ");
-            Console.WriteLine();
-            Console.WriteLine($"{"Datum a čas",-20} {"Typ",-15} {"Položka",-20} {"Množství",8}");
+            Console.WriteLine("VÝPIS SKLADOVÝCH POHYBŮ (inventura)");
+
+            var typFiltr = SelectHelp.VybratTypNeboVse<SkladovyTypPohybu>();
+            var vysledek = SelectHelp.VybratRozmeziData(zoo.SkladovaHistorie);
+
+            if (typFiltr != null)
+                vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
+
+            if (vysledek.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Žádné pohyby neodpovídají zadaným kritériím.");
+                Console.ResetColor();
+                return;
+            }
+
+            Console.WriteLine($"{"Datum a čas",-20} {"Popis",-45}");
             Console.WriteLine(new string('-', 65));
 
-            foreach (var pohyb in zoo.SkladovaHistorie.OrderByDescending(p => p.DatumCas))
+            foreach (var pohyb in vysledek.OrderByDescending(p => p.DatumCas))
                 pohyb.VypisPohyb();
         }
     }
