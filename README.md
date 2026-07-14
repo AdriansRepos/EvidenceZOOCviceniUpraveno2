@@ -48,7 +48,6 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, **pokladnu**, pr
 
 ### Statistiky
 
-**Statistiky:** 
 - počet zvířat
 - počet zaměstnanců
 - součet mezd
