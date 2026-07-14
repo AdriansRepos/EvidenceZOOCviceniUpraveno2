@@ -13,7 +13,8 @@ namespace EvidenceZOOCviceniUpraveno2
             zoo.ZajistiData("Sklad");
             char volba;
             do
-            {Console.ForegroundColor = ConsoleColor.Blue;
+            {
+                Console.ForegroundColor = ConsoleColor.Blue;
                 Console.WriteLine("\n=== MENU SKLAD ===");
                 Console.WriteLine("\t1. Přidat novou položku");
                 Console.WriteLine("\t2. Vypsat sklad");
@@ -29,46 +30,22 @@ namespace EvidenceZOOCviceniUpraveno2
                 volba = Console.ReadKey().KeyChar;
                 Console.WriteLine();
 
-               switch (volba)
+                switch (volba)
                 {
-                    case '1': 
-                        PridatPolozku(); 
-                        break;
-
-                    case '2': 
-                        Vypis(); 
-                        break;
-
-                    case '3': 
-                        Naskladnit(); 
-                        break;
-
-                    case '4': 
-                        Vyskladnit(); 
-                        break;
-
-                    case '5': 
-                        Smazat(); 
-                        break;
-
-                    case '6': 
-                        VypisDochazejici(); 
-                        break;
-
-                    case '7': 
-                        VypisPohybyInventura(); 
-                        break;
-
-                    case '8': 
-                        break;
-
+                    case '1': PridatPolozku(); break;
+                    case '2': Vypis(); break;
+                    case '3': Naskladnit(); break;
+                    case '4': Vyskladnit(); break;
+                    case '5': Smazat(); break;
+                    case '6': VypisDochazejici(); break;
+                    case '7': VypisPohybyInventura(); break;
+                    case '8': break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Neplatná volba, opakujte zadání:");
                         Console.ResetColor();
                         break;
                 }
-
             } while (volba != '8');
         }
 
@@ -76,8 +53,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("PŘIDÁNÍ NOVÉ SKLADOVÉ POLOŽKY");
 
-            string nazev = UpravaVstupu.ZeptejSeAUprav(
-                "", "název položky", v => v, s => s, jeNove: true);
+            string nazev = UpravaVstupu.ZeptejSeAUprav("", "název položky", v => v, s => s, jeNove: true);
 
             Console.WriteLine("Kategorie: 1 = Krmivo, 2 = Pomůcky, 3 = Léky/veterinární materiál");
             KategoriePolozky kategorie = UpravaVstupu.ZeptejSeAUprav(
@@ -95,12 +71,20 @@ namespace EvidenceZOOCviceniUpraveno2
             double minimalniStav = UpravaVstupu.ZeptejSeAUprav(
                 0.0, "minimální stav pro upozornění", v => v.ToString(), s => double.Parse(s), jeNove: true);
 
-            zoo.Sklad.Add(new SkladovaPolozka(nazev, kategorie, mnozstvi, jednotka, minimalniStav));
-            zoo.UlozSklad();
+            var novaPolozka = new SkladovaPolozka(nazev, kategorie, mnozstvi, jednotka, minimalniStav);
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Položka byla úspěšně přidána.");
-            Console.ResetColor();
+            bool uspech = Transakce.ProvedSUlozenim(
+                akce: () => zoo.Sklad.Add(novaPolozka),
+                rollback: () => zoo.Sklad.Remove(novaPolozka),
+                ulozeni: zoo.UlozSklad,
+                popisOperace: "přidání skladové položky");
+
+            if (uspech)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine("Položka byla úspěšně přidána.");
+                Console.ResetColor();
+            }
         }
 
         public void Vypis()
@@ -122,17 +106,39 @@ namespace EvidenceZOOCviceniUpraveno2
             double pridat = UpravaVstupu.ZeptejSeAUprav(
                 0.0, "množství k naskladnění", v => v.ToString(), s => double.Parse(s), jeNove: true);
 
-            polozka.Mnozstvi += pridat;
+            double puvodniMnozstvi = polozka.Mnozstvi;
 
-            zoo.SkladovaHistorie.Add(new SkladovyPohyb(
-                polozka.Nazev, SkladovyTypPohybu.Naskladneni, pridat, DateTime.Now));
+            var pohyb = new SkladovyPohyb(polozka.Nazev, SkladovyTypPohybu.Naskladneni, pridat, DateTime.Now);
 
-            zoo.UlozSklad();
-            zoo.UlozSkladovouHistorii();
+            bool uspech = Transakce.ProvedSUlozenim(
+                akce: () =>
+                {
+                    polozka.Mnozstvi += pridat;
+                    zoo.SkladovaHistorie.Add(pohyb);
+                },
+                rollback: () =>
+                {
+                    polozka.Mnozstvi = puvodniMnozstvi;
+                    zoo.SkladovaHistorie.Remove(pohyb);
+                },
+                ulozeni: () =>
+                {
+                    zoo.UlozSklad();
+                    zoo.UlozSkladovouHistorii();
+                },
+                popisOperace: "naskladnění");
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Naskladněno {pridat} {polozka.Jednotka} položky {polozka.Nazev}.");
-            Console.ResetColor();
+            if (uspech)
+            {
+                // Skladové pohyby auditujeme kvůli ochraně proti úbytku majetku
+                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                    "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – naskladnění",
+                    puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Naskladněno {pridat} {polozka.Jednotka} položky {polozka.Nazev}.");
+                Console.ResetColor();
+            }
         }
 
         public void Vyskladnit()
@@ -151,13 +157,33 @@ namespace EvidenceZOOCviceniUpraveno2
                 return;
             }
 
-            polozka.Mnozstvi -= odebrat;
+            double puvodniMnozstvi = polozka.Mnozstvi;
 
-            zoo.SkladovaHistorie.Add(new SkladovyPohyb(
-                polozka.Nazev, SkladovyTypPohybu.Vyskladneni, odebrat, DateTime.Now));
+            var pohyb = new SkladovyPohyb(polozka.Nazev, SkladovyTypPohybu.Vyskladneni, odebrat, DateTime.Now);
 
-            zoo.UlozSklad();
-            zoo.UlozSkladovouHistorii();
+            bool uspech = Transakce.ProvedSUlozenim(
+                akce: () =>
+                {
+                    polozka.Mnozstvi -= odebrat;
+                    zoo.SkladovaHistorie.Add(pohyb);
+                },
+                rollback: () =>
+                {
+                    polozka.Mnozstvi = puvodniMnozstvi;
+                    zoo.SkladovaHistorie.Remove(pohyb);
+                },
+                ulozeni: () =>
+                {
+                    zoo.UlozSklad();
+                    zoo.UlozSkladovouHistorii();
+                },
+                popisOperace: "vyskladnění");
+
+            if (!uspech) return;
+
+            zoo.ZapisAudit(AuditZaznam.Vytvor(
+                "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – vyskladnění",
+                puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
 
             if (polozka.JeDochazejici)
             {
@@ -178,12 +204,22 @@ namespace EvidenceZOOCviceniUpraveno2
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky ke smazání");
             if (polozka == null) return;
 
-            zoo.Sklad.Remove(polozka);
-            zoo.UlozSklad();
+            bool uspech = Transakce.ProvedSUlozenim(
+                akce: () => zoo.Sklad.Remove(polozka),
+                rollback: () => zoo.Sklad.Add(polozka),
+                ulozeni: zoo.UlozSklad,
+                popisOperace: "smazání skladové položky");
 
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"Položka {polozka.Nazev} byla smazána.");
-            Console.ResetColor();
+            if (uspech)
+            {
+                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                    "Sklad", TypAkce.Smazano, polozka.Nazev,
+                    puvodniHodnota: $"{polozka.Mnozstvi:0.##} {polozka.Jednotka}"));
+
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"Položka {polozka.Nazev} byla smazána.");
+                Console.ResetColor();
+            }
         }
 
         public void VypisDochazejici()
@@ -206,10 +242,6 @@ namespace EvidenceZOOCviceniUpraveno2
                 polozka.VypisPolozku();
         }
 
-        /// <summary>
-        /// Vypíše skladové pohyby filtrované podle typu a rozmezí data –
-        /// určeno pro měsíční nebo roční inventury.
-        /// </summary>
         public void VypisPohybyInventura()
         {
             Console.WriteLine("VÝPIS SKLADOVÝCH POHYBŮ (inventura)");
@@ -218,7 +250,7 @@ namespace EvidenceZOOCviceniUpraveno2
             var vysledek = SelectHelp.VybratRozmeziData(zoo.SkladovaHistorie);
 
             if (typFiltr != null)
-                vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
+                vysledek = vysledek.Where(p => p.TypPohybu == typFiltr).ToList();
 
             if (vysledek.Count == 0)
             {
