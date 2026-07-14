@@ -20,6 +20,8 @@ namespace EvidenceZOOCviceniUpraveno2
         public List<SkladovyPohyb> SkladovaHistorie { get; internal set; } = [];
         public List<PokladniPohyb> PokladniPohyby { get; internal set; } = [];
         public Cenik Cenik { get; internal set; } = new();
+        public List<AuditZaznam> AuditLog { get; internal set; } = [];
+        public List<TechnickyZaznam> TechnickyLog { get; internal set; } = [];
 
         /// <summary>
         /// Kořenová složka zvolená uživatelem, ve které jsou podsložky
@@ -37,6 +39,8 @@ namespace EvidenceZOOCviceniUpraveno2
         public string SouborSkladoveHistorie => Path.Combine(KorenovaSlozka, "Data", "Sklad", "sklad_historie.json");
         public string SouborPokladny => Path.Combine(KorenovaSlozka, "Data", "Ucetnictvi", "Pokladna", "pokladna.json");
         public string SouborCeniku => Path.Combine(KorenovaSlozka, "Data", "Ucetnictvi", "Pokladna", "cenik.json");
+        public string SouborAuditLogu => Path.Combine(KorenovaSlozka, "Data", "Log", "audit.json");
+        public string SouborTechnickehoLogu => Path.Combine(KorenovaSlozka, "Data", "Log", "technicky.json");
 
         // -----------------------------
         // CESTY K ZÁLOHÁM (Zalohy/...)
@@ -48,6 +52,8 @@ namespace EvidenceZOOCviceniUpraveno2
         private string ZalohaSkladoveHistorie => Path.Combine(KorenovaSlozka, "Zalohy", "Sklad", "sklad_historie.json.bak");
         private string ZalohaPokladny => Path.Combine(KorenovaSlozka, "Zalohy", "Ucetnictvi", "Pokladna", "pokladna.json.bak");
         private string ZalohaCeniku => Path.Combine(KorenovaSlozka, "Zalohy", "Ucetnictvi", "Pokladna", "cenik.json.bak");
+        private string ZalohaAuditLogu => Path.Combine(KorenovaSlozka, "Zalohy", "Log", "audit.json.bak");
+        private string ZalohaTechnickehoLogu => Path.Combine(KorenovaSlozka, "Zalohy", "Log", "technicky.json.bak");
 
         /// <summary>
         /// Cesta k záloze config.ini, uložené v datové složce uživatele
@@ -118,6 +124,13 @@ namespace EvidenceZOOCviceniUpraveno2
         };
         
         private static readonly JsonSerializerOptions CenikJsonOptionsIndented = new()
+        {
+            WriteIndented = true
+        };
+
+        private static readonly JsonSerializerOptions LogJsonOptions = new();
+        
+        private static readonly JsonSerializerOptions LogJsonOptionsIndented = new()
         {
             WriteIndented = true
         };
@@ -220,13 +233,14 @@ namespace EvidenceZOOCviceniUpraveno2
                 "Zamestnanci",
                 "Zvirata",
                 "Sklad",
+                "Log",
                 Path.Combine("Ucetnictvi", "Pokladna")
             ];
-
+        
             foreach (string zaklad in new[] { "Data", "Zalohy" })
                 foreach (string podslozka in podslozky)
                     Directory.CreateDirectory(Path.Combine(korenovaSlozka, zaklad, podslozka));
-
+        
             Directory.CreateDirectory(Path.Combine(korenovaSlozka, "Archiv"));
         }
 
@@ -401,6 +415,19 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        public void NactiLogy()
+        {
+            AuditLog = NactiZeSouboru(
+                SouborAuditLogu, ZalohaAuditLogu,
+                json => JsonSerializer.Deserialize<List<AuditZaznam>>(json, LogJsonOptions) ?? [],
+                "auditního logu");
+        
+            TechnickyLog = NactiZeSouboru(
+                SouborTechnickehoLogu, ZalohaTechnickehoLogu,
+                json => JsonSerializer.Deserialize<List<TechnickyZaznam>>(json, LogJsonOptions) ?? [],
+                "technického logu");
+        }
+
         /// <summary>
         /// Obecná načítací logika pro libovolný datový soubor: pokud
         /// hlavní soubor chybí, ale záloha existuje, obnoví ji na místo
@@ -514,6 +541,25 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        /// <summary>
+        /// Přidá nový záznam do auditního logu a okamžitě jej uloží.
+        /// Log je append-only – existující záznamy se nikdy neupravují ani nemažou.
+        /// </summary>
+        public void ZapisAudit(AuditZaznam zaznam)
+        {
+            AuditLog.Add(zaznam);
+            UlozDoSouboru(AuditLog, LogJsonOptionsIndented, SouborAuditLogu, ZalohaAuditLogu, "auditního logu");
+        }
+        
+        /// <summary>
+        /// Přidá nový záznam do technického logu a okamžitě jej uloží.
+        /// </summary>
+        public void ZapisTechnickyLog(UrovenLogu uroven, string zprava)
+        {
+            TechnickyLog.Add(new TechnickyZaznam(uroven, zprava, DateTime.Now));
+            UlozDoSouboru(TechnickyLog, LogJsonOptionsIndented, SouborTechnickehoLogu, ZalohaTechnickehoLogu, "technického logu");
+        }
+
         private static void UlozDoSouboru<T>(T data, JsonSerializerOptions options,
             string cilovySoubor, string zalohovySoubor, string popisProHlasky)
         {
@@ -600,6 +646,8 @@ namespace EvidenceZOOCviceniUpraveno2
             ArchivujSoubor(SouborSkladu, "sklad", rok);
             ArchivujSoubor(SouborSkladoveHistorie, "sklad_historie", rok);
             ArchivujSoubor(SouborPokladny, "pokladna", rok);
+            ArchivujSoubor(SouborAuditLogu, "audit", rok);
+            ArchivujSoubor(SouborTechnickehoLogu, "technicky_log", rok);
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Data za rok {rok} byla archivována do složky: {ArchivSlozka}");
@@ -629,16 +677,21 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             if (!Directory.Exists(ArchivSlozka))
                 return;
-
+        
             foreach (string soubor in Directory.GetFiles(ArchivSlozka, "*_*.json"))
             {
                 string jmenoSouboru = Path.GetFileNameWithoutExtension(soubor);
+        
+                // Auditní log se z retenční politiky vyjímá - jde o trvalý doklad
+                if (jmenoSouboru.StartsWith("audit_"))
+                    continue;
+        
                 int podtrzitko = jmenoSouboru.LastIndexOf('_');
                 if (podtrzitko < 0) continue;
-
+        
                 if (!int.TryParse(jmenoSouboru[(podtrzitko + 1)..], out int rokSouboru))
                     continue;
-
+        
                 if (aktualniRok - rokSouboru > 5)
                 {
                     try
