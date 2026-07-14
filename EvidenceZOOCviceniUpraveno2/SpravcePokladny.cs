@@ -214,25 +214,40 @@ namespace EvidenceZOOCviceniUpraveno2
             var prodeje = pohyby.Where(p => p.TypPohybu == PokladniTypPohybu.Prodej).ToList();
             var storna = pohyby.Where(p => p.TypPohybu == PokladniTypPohybu.Storno).ToList();
         
-            Console.WriteLine();
-            Console.WriteLine("PRODEJE PODLE KATEGORIÍ:");
-            VypisRozpadPodleKategorie(prodeje);
+            if (prodeje.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("PRODEJE PODLE KATEGORIÍ:");
+                VypisRozpadPodleKategorie(prodeje);
+            }
         
-            Console.WriteLine();
-            Console.WriteLine("STORNA PODLE KATEGORIÍ:");
-            VypisRozpadPodleKategorie(storna);
+            if (storna.Count > 0)
+            {
+                Console.WriteLine();
+                Console.WriteLine("STORNA PODLE KATEGORIÍ:");
+                VypisRozpadPodleKategorie(storna);
+            }
         
             decimal celkovyPrijemZProdeju = prodeje.Sum(p => p.Castka);
             decimal celkoveStorno = storna.Sum(p => p.Castka);
             decimal cistyPrijem = celkovyPrijemZProdeju - celkoveStorno;
         
             Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Celkový příjem z prodejů: {celkovyPrijemZProdeju:0.##} Kč");
-            Console.ResetColor();
-            Console.ForegroundColor = ConsoleColor.DarkYellow;
-            Console.WriteLine($"Celkové storno:           {celkoveStorno:0.##} Kč");
-            Console.ResetColor();
+        
+            if (prodeje.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Celkový příjem z prodejů: {celkovyPrijemZProdeju:0.##} Kč");
+                Console.ResetColor();
+            }
+        
+            if (storna.Count > 0)
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine($"Celkové storno:           {celkoveStorno:0.##} Kč");
+                Console.ResetColor();
+            }
+        
             Console.ForegroundColor = ConsoleColor.Cyan;
             Console.WriteLine($"Čistý příjem:             {cistyPrijem:0.##} Kč");
             Console.ResetColor();
@@ -265,12 +280,16 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("VÝPIS POKLADNÍCH POHYBŮ");
         
+            var typFiltr = SelectHelp.VybratTypNeboVse<PokladniTypPohybu>();
             var vysledek = SelectHelp.VybratRozmeziData(zoo.PokladniPohyby);
+        
+            if (typFiltr != null)
+                vysledek = vysledek.Where(p => p.TypPohybu == typFiltr).ToList();
         
             if (vysledek.Count == 0)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Žádné pohyby neodpovídají zadanému rozmezí.");
+                Console.WriteLine("Žádné pohyby neodpovídají zadaným kritériím.");
                 Console.ResetColor();
                 return;
             }
