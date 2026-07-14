@@ -123,7 +123,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 },
                 ulozeni: () =>
                 {
-                    zoo.UlozSkladSHistorii;
+                    zoo.UlozSkladSHistorii();
                 },
                 popisOperace: "naskladnění");
 
@@ -173,7 +173,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 },
                 ulozeni: () =>
                 {
-                    zoo.UlozSkladSHistorii;
+                    zoo.UlozSkladSHistorii();
                 },
                 popisOperace: "vyskladnění");
 
