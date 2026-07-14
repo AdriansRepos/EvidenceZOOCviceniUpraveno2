@@ -109,6 +109,16 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 ├── SpravcePokladny.cs
 
+├── Transakce.cs
+
+├── AuditZaznam.cs
+
+├── TechnickyZaznam.cs
+
+├── TypAkce.cs
+
+├── UrovenLogu.cs
+
 └── README.md
 
 ---
@@ -137,6 +147,8 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 - Crash-safe zápis přes dočasný soubor a atomickou náhradu
 - Automatická obnova dat ze zálohy při poškození nebo ztrátě souboru
 - Automatizovaná roční archivace dat s retenční politikou (uchování 5 let)
+- Transakční zpracování s rollbackem v paměti při selhání zápisu (`Transakce.ProvedSUlozenim`)
+- Append-only auditní log s ochranou proti přepisu, vyjmutý z retenční politiky archivace
 - Validace vstupů, včetně formátové validace e-mailu
 - Try-catch bloky
 - DateOnly, DateTime
@@ -261,3 +273,6 @@ public void Pridat()
 
 **v1.7.0** – Přidán modul Pokladna s prodejem a stornem vstupenek (dětská, dospělá, ZTP, důchodce, rodinná úplná/neúplná, skupinová), konfigurovatelným ceníkem včetně rodinných a skupinových slev, denní uzávěrkou s rozpadem podle kategorií a filtrovaným výpisem pohybů podle typu a rozmezí data (měsíční/roční uzávěrky). Přidána nová knihovna `PohybHelper` sjednocující typy pohybů (sklad, pokladna) přes společné rozhraní `IPohyb`. Rozšířeny Statistiky o průměrnou denní návštěvnost počítanou z prodaných vstupenek za zvolený měsíc. Kompletně přepracována struktura ukládání dat – oddělené složky `Data/` a `Zalohy/` s podsložkami po modulech, záloha `config.ini` uložená v datové složce uživatele (přežije reinstalaci aplikace i systému).  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.7.0)
+
+**v1.8.0** – Přidáno transakční ukládání s rollbackem v paměti při selhání zápisu na disk (`Transakce.ProvedSUlozenim`), zajišťující konzistenci mezi daty v paměti a na disku napříč zaměstnanci, skladem a pokladnou. Přidán auditní log (`AuditZaznam`) zaznamenávající důležité změny – mzdy, ceník, skladové a pokladní pohyby, smazání záznamů – včetně původní a nové hodnoty, času a přihlášeného uživatele; log je koncipován jako append-only a vyjmutý z retenční politiky archivace. Přidán technický log (`TechnickyZaznam`) pro diagnostiku na úrovni IT podpory. Ošetřena konzistence mezi souborem skladu a historií skladových pohybů při selhání dílčího zápisu.  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.8.0)
