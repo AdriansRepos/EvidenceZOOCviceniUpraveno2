@@ -2,6 +2,7 @@
 
 string korenovaSlozka = ZOO.NactiNeboSeZeptejNaCesty();
 ZOO zoo = new(korenovaSlozka);
+zoo.ZajistiData("Logy");
 
 // Zkontroluje a případně provede roční archivaci – musí proběhnout
 // hned po vytvoření zoo, ještě před prvním použitím dat.
@@ -11,6 +12,7 @@ zoo.RegistrujNacitani("Zaměstnanci", zoo.NactiZamestnance);
 zoo.RegistrujNacitani("Zvířata", zoo.NactiZvirata);
 zoo.RegistrujNacitani("Sklad", zoo.NactiSklad);
 zoo.RegistrujNacitani("Pokladna", zoo.NactiPokladnu);
+zoo.RegistrujNacitani("Logy", zoo.NactiLogy);
 
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
@@ -36,29 +38,23 @@ do
 
     switch (volbaMenu)
     {
-        case '1': 
-            spravceZvirat.Menu(); 
+        case '1':
+            spravceZvirat.Menu();
             break;
-
-        case '2': 
-            spravceZamestnancu.Menu(); 
+        case '2':
+            spravceZamestnancu.Menu();
             break;
-
-        case '3': 
-            spravceSkladu.Menu(); 
+        case '3':
+            spravceSkladu.Menu();
             break;
-
-        case '4': 
-            zoo.MenuStatistiky(); 
-            break;
-
-        case '5': 
+        case '4':
             spravcePokladny.Menu();
             break;
-
+        case '5':
+            zoo.MenuStatistiky();
+            break;
         case '6':
             break;
-
         default:
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Neplatná volba, opakujte zadání:");
@@ -66,4 +62,4 @@ do
             break;
     }
 }
-while (volbaMenu != '5');
+while (volbaMenu != '6');
