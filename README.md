@@ -240,8 +240,6 @@ public void Pridat()
 
 - Základ účetnictví
 - Mzdové účetnictví
-- Přidání transakčního ukládání
-- Přidání logování změn
 - Export statistik
 - Automatické testy
 - GUI verze (WPF nebo MAUI)
