@@ -520,6 +520,42 @@ namespace EvidenceZOOCviceniUpraveno2
                 SouborSkladoveHistorie, ZalohaSkladoveHistorie, "historie skladu");
         }
 
+        /// <summary>
+        /// Uloží sklad i historii skladových pohybů jako jednu logickou jednotku.
+        /// Pokud se nepodaří uložit historii poté, co už byl úspěšně uložen sklad,
+        /// obnoví sklad zpět z jeho čerstvě vytvořené zálohy, aby oba soubory
+        /// zůstaly navzájem konzistentní.
+        /// </summary>
+        public void UlozSkladSHistorii()
+        {
+            bool skladUlozen = false;
+        
+            try
+            {
+                string jsonSklad = JsonSerializer.Serialize(Sklad, SkladJsonOptionsIndented);
+                ZapisSouborSeZalohou(SouborSkladu, ZalohaSkladu, jsonSklad);
+                skladUlozen = true;
+        
+                string jsonHistorie = JsonSerializer.Serialize(SkladovaHistorie, HistorieJsonOptionsIndented);
+                ZapisSouborSeZalohou(SouborSkladoveHistorie, ZalohaSkladoveHistorie, jsonHistorie);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Chyba při ukládání skladu/historie: {ex.Message}");
+                Console.ResetColor();
+        
+                if (skladUlozen && File.Exists(ZalohaSkladu))
+                {
+                    // Historie se nepovedla uložit - vrať sklad zpět na předchozí
+                    // stav, aby soubory na disku zůstaly vzájemně konzistentní.
+                    File.Copy(ZalohaSkladu, SouborSkladu, overwrite: true);
+                }
+        
+                throw; // předej výjimku dál, ať ji zachytí Transakce.ProvedSUlozenim a udělá rollback v paměti
+            }
+        }
+
         public void UlozPokladnu()
         {
             UlozDoSouboru(PokladniPohyby, PokladnaJsonOptionsIndented,
