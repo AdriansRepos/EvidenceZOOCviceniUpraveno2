@@ -1,7 +1,7 @@
 # ZOO – Konzolová aplikace v C#
 
 Tento projekt je jednoduchá, ale plně funkční konzolová aplikace pro správu ZOO.  
-Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, provádět **statistiky**, ukládat data do souborů a pracovat s uživatelskými vstupy.
+Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, **pokladnu**, provádět **statistiky**, ukládat data do souborů a pracovat s uživatelskými vstupy.
 
 ---
 
@@ -15,7 +15,6 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, provádět **sta
 - Smazání zvířete
 - Vyhledávání podle názvu
 - Automatický výpočet aktuálního věku z data narození (roky, měsíce)
-- Statistiky (průměrná váha, počet druhů…)
 
 ### Zaměstnanci
 
@@ -38,31 +37,43 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, provádět **sta
 - Historie všech skladových pohybů (naskladnění/vyskladnění, množství, datum a čas)
 - Výpis aktuálního stavu skladu i docházejících položek zvlášť
 
+### Pokladna
+
+- Prodej vstupenek: dětská, dospělá, ZTP, důchodce (65+), rodinná (úplná/neúplná), skupinová
+- U rodinných a skupinových vstupenek ruční zadání počtu dětí, případně i dospělých
+- Storno prodané vstupenky
+- Konfigurovatelný ceník (základní ceny + procentuální slevy na rodinné a skupinové vstupenky), upravitelný za běhu aplikace
+- Denní uzávěrka s rozpadem tržby podle kategorií vstupenek
+- Filtrovaný výpis pohybů podle typu (prodej/storno) a rozmezí data – pro měsíční i roční uzávěrky
+
+### Statistiky
+
+**Statistiky:** 
+- počet zvířat
+- počet zaměstnanců
+- součet mezd
+- průměrná denní návštěvnost za zvolený měsíc
+
 ---
 
 ## Ukládání a zabezpečení dat
 
-Aplikace ukládá data do souborů JSON:
+Aplikace ukládá data do dvou oddělených větví uvnitř uživatelem zvolené kořenové složky:
 
-- `zamestnanci.json` + `zamestnanci.json.bak` (automatická záloha)
-- `zvirata.json` + `zvirata.json.bak` (automatická záloha)
-- `sklad.json` + `sklad.json.bak` (automatická záloha)
-- `sklad_historie.json` + `sklad_historie.json.bak` (automatická záloha)
-- `config.ini` + `config.ini.bak` (cesty k datovým souborům a stav roční archivace, nastavené při prvním spuštění)
+- `Data/` – aktuální pracovní soubory, rozdělené do podsložek podle modulu (Zamestnanci, Zvirata, Sklad, Ucetnictvi/Pokladna)
+- `Zalohy/` – zálohy odpovídajících souborů se stejnou podsložkovou strukturou
+- `Archiv/` – roční archivy dat
+
+Konfigurační soubor `config.ini` (cesta ke kořenové složce) je uložen v `AppData` a slouží jako "ukazatel" při startu aplikace. Jeho záloha (`config.ini.bak`) je ale uložena přímo v datové složce uživatele (`Zalohy/config.ini.bak`), ne v `AppData` – díky tomu přežije i reinstalaci aplikace nebo operačního systému. Pokud aplikace při prvním spuštění na novém/přeinstalovaném počítači najde tuto zálohu v zadané složce, automaticky obnoví veškeré nastavení bez nutnosti cokoliv zadávat znovu.
 
 **Bezpečný zápis (crash-safe)**  
-Ukládání neprobíhá přímým přepsáním souboru, ale přes dočasný soubor (`.tmp`) a atomickou náhradu (`File.Replace`). Díky tomu nemůže při pádu aplikace nebo výpadku uprostřed zápisu dojít k poškození nebo ztrátě posledního platného souboru – buď se zápis provede celý, nebo se nic nezmění a zůstane zachovaná předchozí verze.
+Ukládání neprobíhá přímým přepsáním souboru, ale přes dočasný soubor (`.tmp`) a atomickou náhradu (`File.Replace`). Díky tomu nemůže při pádu aplikace nebo výpadku uprostřed zápisu dojít k poškození nebo ztrátě posledního platného souboru.
 
 **Automatická obnova**  
-Pokud je při načítání hlavní soubor (zaměstnanci, zvířata, sklad, historie skladu nebo `config.ini`) poškozený nebo chybí, aplikace se automaticky pokusí obnovit data ze zálohy `.bak`. Uživatel je o průběhu informován barevně odlišenými hláškami v konzoli (zelená = úspěch, červená = chyba/varování).
+Pokud je při načítání hlavní soubor poškozený nebo chybí, aplikace se automaticky pokusí obnovit data ze zálohy. Uživatel je o průběhu informován barevně odlišenými hláškami v konzoli.
 
 **Roční archivace dat**  
-Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné vždy jen do konce kalendářního roku, bez ohledu na to, kdy byly založeny. Při každém spuštění aplikace se zkontroluje, zda uplynul kalendářní rok od poslední archivace:
-
-- Pokud ano, vytvoří se kopie aktuálních souborů (např. `zamestnanci_2026.json`) do složky `Archiv` uvnitř datové složky
-- Pracovní soubory zůstávají nedotčené a aplikace v nich pokračuje dál i po přelomu roku
-- Archivní soubory starší než 5 let jsou automaticky odstraněny
-- Stav poslední provedené archivace se ukládá do `config.ini`, takže se archivace neprovede vícekrát za stejný rok
+Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každém spuštění aplikace se zkontroluje, zda uplynul kalendářní rok od poslední archivace – pokud ano, vytvoří se kopie aktuálních souborů do složky `Archiv`. Pracovní soubory zůstávají nedotčené. Archivní soubory starší než 5 let jsou automaticky odstraněny.
 
 ---
 
@@ -82,11 +93,21 @@ Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné v
 
 ├── SkladovyPohyb.cs
 
+├── Cenik.cs
+
+├── TypVstupenky.cs
+
+├── VypocetCenyVstupenky.cs
+
+├── PokladniPohyb.cs
+
 ├── SpravceZamestnancu.cs
 
 ├── SpravceZvirat.cs
 
 ├── SpravceSkladu.cs
+
+├── SpravcePokladny.cs
 
 └── README.md
 
@@ -101,6 +122,7 @@ Datové soubory (zaměstnanci, zvířata, sklad, historie skladu) jsou platné v
 - **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`) a správné velké písmena v názvech měst s ohledem na české předložky (`MestoTitleCase.ZpracujNazevMesta`)
 - **DateConverterForJson** – JSON konvertor pro typ `DateOnly` (`DateOnlyConverter`)
 - **VekZviratHelper** – výpočet aktuálního věku zvířete z data narození (`VypocetVeku.VypocitejVek`, `VypocetVeku.VypocitejVekTextove`), včetně skloňování slov "rok"/"měsíc"
+- **PohybHelper** – sdílené rozhraní `IPohyb` a výčtové typy pohybů (`SkladovyTypPohybu`, `PokladniTypPohybu`, `FinancniTypPohybu`) pro sklad, pokladnu a budoucí účetnictví, včetně čitelných popisků (`PopiskyHelper`)
 
 ---
 
@@ -236,3 +258,6 @@ public void Pridat()
 
 **v1.6.0** – Rozšířena evidence zaměstnanců o adresní a kontaktní údaje (město, ulice s číslem, PSČ, telefon, e-mail). Přidána nová třída `MestoTitleCase` v knihovně `InputHelper` pro správné velké písmena v názvech měst s předložkami (např. "Ústí nad Labem", ne "Ústí Nad Labem"). Validace e-mailu přes zdrojově generovaný regulární výraz (`GeneratedRegex`). Vylepšena knihovna `TextHelper` – při neplatném vstupu se nyní zobrazí konkrétní chybová zpráva a výzva k zadání se opakuje.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.6.0)
+
+**v1.7.0** – Přidán modul Pokladna s prodejem a stornem vstupenek (dětská, dospělá, ZTP, důchodce, rodinná úplná/neúplná, skupinová), konfigurovatelným ceníkem včetně rodinných a skupinových slev, denní uzávěrkou s rozpadem podle kategorií a filtrovaným výpisem pohybů podle typu a rozmezí data (měsíční/roční uzávěrky). Přidána nová knihovna `PohybHelper` sjednocující typy pohybů (sklad, pokladna) přes společné rozhraní `IPohyb`. Rozšířeny Statistiky o průměrnou denní návštěvnost počítanou z prodaných vstupenek za zvolený měsíc. Kompletně přepracována struktura ukládání dat – oddělené složky `Data/` a `Zalohy/` s podsložkami po modulech, záloha `config.ini` uložená v datové složce uživatele (přežije reinstalaci aplikace i systému).  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.7.0)
