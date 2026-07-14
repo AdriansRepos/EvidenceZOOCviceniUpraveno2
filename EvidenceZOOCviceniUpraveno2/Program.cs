@@ -10,10 +10,12 @@ zoo.ZkontrolujRocniArchivaci();
 zoo.RegistrujNacitani("Zaměstnanci", zoo.NactiZamestnance);
 zoo.RegistrujNacitani("Zvířata", zoo.NactiZvirata);
 zoo.RegistrujNacitani("Sklad", zoo.NactiSklad);
+zoo.RegistrujNacitani("Pokladna", zoo.NactiPokladnu);
 
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
 SpravceSkladu spravceSkladu = new(zoo);
+SpravcePokladny spravcePokladny = new(zoo);
 
 char volbaMenu;
 do
@@ -23,8 +25,9 @@ do
     Console.WriteLine("\t1. Zvířata");
     Console.WriteLine("\t2. Zaměstnanci");
     Console.WriteLine("\t3. Sklad");
-    Console.WriteLine("\t4. Statistiky");
-    Console.WriteLine("\t5. Konec programu");
+    Console.WriteLine("\t4. Správce pokladny");
+    Console.WriteLine("\t5. Statistiky");
+    Console.WriteLine("\t6. Konec");
     Console.ResetColor();
     Console.Write("Vyber možnost: ");
 
@@ -50,6 +53,10 @@ do
             break;
 
         case '5': 
+            spravcePokladny.Menu();
+            break;
+
+        case '6':
             break;
 
         default:
