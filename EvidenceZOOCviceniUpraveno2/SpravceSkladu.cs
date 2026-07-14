@@ -250,7 +250,7 @@ namespace EvidenceZOOCviceniUpraveno2
             var vysledek = SelectHelp.VybratRozmeziData(zoo.SkladovaHistorie);
 
             if (typFiltr != null)
-                vysledek = vysledek.Where(p => p.TypPohybu == typFiltr).ToList();
+                vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
 
             if (vysledek.Count == 0)
             {

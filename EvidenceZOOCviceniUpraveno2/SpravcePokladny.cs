@@ -317,7 +317,7 @@ namespace EvidenceZOOCviceniUpraveno2
             var vysledek = SelectHelp.VybratRozmeziData(zoo.PokladniPohyby);
 
             if (typFiltr != null)
-                vysledek = vysledek.Where(p => p.TypPohybu == typFiltr).ToList();
+                vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
 
             if (vysledek.Count == 0)
             {
