@@ -41,20 +41,26 @@ do
         case '1':
             spravceZvirat.Menu();
             break;
+
         case '2':
             spravceZamestnancu.Menu();
             break;
+
         case '3':
             spravceSkladu.Menu();
             break;
+
         case '4':
             spravcePokladny.Menu();
             break;
+
         case '5':
             zoo.MenuStatistiky();
             break;
+
         case '6':
             break;
+
         default:
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Neplatná volba, opakujte zadání:");
