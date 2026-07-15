@@ -56,10 +56,12 @@ namespace EvidenceZOOCviceniUpraveno2
         private string ZalohaTechnickehoLogu => Path.Combine(KorenovaSlozka, "Zalohy", "Log", "technicky.json.bak");
 
         /// <summary>
-        /// Cesta k záloze config.ini, uložené v datové složce uživatele
+        /// Vrátí cestu k záloze config.ini uložené v datové složce uživatele
         /// (ne v AppData), aby přežila i reinstalaci aplikace nebo systému.
         /// </summary>
-        private string ZalohaKonfigu => Path.Combine(KorenovaSlozka, "Zalohy", "config.ini.bak");
+        /// <param name="korenovaSlozka">Kořenová složka, ve které jsou uložena data uživatele.</param>
+        private static string ZalohaKonfigu(string korenovaSlozka)
+            => Path.Combine(korenovaSlozka, "Zalohy", "config.ini.bak");
 
         /// <summary>
         /// Složka pro roční archivy dat.
@@ -197,7 +199,7 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.Write("Zadej cestu ke složce pro ukládání dat: ");
             string slozka = Console.ReadLine()!.Trim();
 
-            string zalohaKonfigu = Path.Combine(slozka, "Zalohy", "config.ini.bak");
+            string zalohaKonfigu = ZalohaKonfigu(slozka);
 
             if (File.Exists(zalohaKonfigu))
             {
@@ -288,9 +290,9 @@ namespace EvidenceZOOCviceniUpraveno2
 
             if (!string.IsNullOrWhiteSpace(korenovaSlozka))
             {
-                string zalohaSlozka = Path.Combine(korenovaSlozka, "Zalohy");
-                Directory.CreateDirectory(zalohaSlozka);
-                File.Copy(KonfigSoubor, Path.Combine(zalohaSlozka, "config.ini.bak"), overwrite: true);
+                string cestaKZaloze = ZalohaKonfigu(korenovaSlozka);
+                Directory.CreateDirectory(Path.GetDirectoryName(cestaKZaloze)!);
+                File.Copy(KonfigSoubor, cestaKZaloze, overwrite: true);
             }
         }
 
