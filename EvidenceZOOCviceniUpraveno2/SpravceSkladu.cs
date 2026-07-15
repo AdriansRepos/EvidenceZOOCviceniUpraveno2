@@ -32,14 +32,37 @@ namespace EvidenceZOOCviceniUpraveno2
 
                 switch (volba)
                 {
-                    case '1': PridatPolozku(); break;
-                    case '2': Vypis(); break;
-                    case '3': Naskladnit(); break;
-                    case '4': Vyskladnit(); break;
-                    case '5': Smazat(); break;
-                    case '6': VypisDochazejici(); break;
-                    case '7': VypisPohybyInventura(); break;
-                    case '8': break;
+                    case '1': 
+                        PridatPolozku(); 
+                        break;
+
+                    case '2': 
+                        Vypis(); 
+                        break;
+
+                    case '3': 
+                        Naskladnit(); 
+                        break;
+
+                    case '4': 
+                        Vyskladnit(); 
+                        break;
+
+                    case '5': 
+                        Smazat(); 
+                        break;
+
+                    case '6': 
+                        VypisDochazejici(); 
+                        break;
+
+                    case '7': 
+                        VypisPohybyInventura(); 
+                        break;
+
+                    case '8': 
+                        break;
+
                     default:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Neplatná volba, opakujte zadání:");
