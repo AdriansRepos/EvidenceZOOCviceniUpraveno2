@@ -59,7 +59,7 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, **pokladnu**, pr
 
 Aplikace ukládá data do dvou oddělených větví uvnitř uživatelem zvolené kořenové složky:
 
-- `Data/` – aktuální pracovní soubory, rozdělené do podsložek podle modulu (Zamestnanci, Zvirata, Sklad, Ucetnictvi/Pokladna)
+- `Data/` – aktuální pracovní soubory, rozdělené do podsložek podle modulu (Zamestnanci, Zvirata, Sklad, Účetnictví/Pokladna)
 - `Zalohy/` – zálohy odpovídajících souborů se stejnou podsložkovou strukturou
 - `Archiv/` – roční archivy dat
 
