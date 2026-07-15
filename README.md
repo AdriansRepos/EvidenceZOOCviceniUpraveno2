@@ -273,3 +273,6 @@ public void Pridat()
 
 **v1.8.0** – Přidáno transakční ukládání s rollbackem v paměti při selhání zápisu na disk (`Transakce.ProvedSUlozenim`), zajišťující konzistenci mezi daty v paměti a na disku napříč zaměstnanci, skladem a pokladnou. Přidán auditní log (`AuditZaznam`) zaznamenávající důležité změny – mzdy, ceník, skladové a pokladní pohyby, smazání záznamů – včetně původní a nové hodnoty, času a přihlášeného uživatele; log je koncipován jako append-only a vyjmutý z retenční politiky archivace. Přidán technický log (`TechnickyZaznam`) pro diagnostiku na úrovni IT podpory. Ošetřena konzistence mezi souborem skladu a historií skladových pohybů při selhání dílčího zápisu.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.8.0)
+
+**v1.8.1** – Odstranění duplicitního kódu a sjednocení metod pro práci s konfiguračním souborem a jeho zálohou.
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.8.1)
