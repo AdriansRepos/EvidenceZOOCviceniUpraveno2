@@ -2,6 +2,7 @@
 using PohybHelper;
 using System.Text.Json;
 using TextHelper;
+using FileNameHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
@@ -15,13 +16,21 @@ namespace EvidenceZOOCviceniUpraveno2
     class ZOO(string korenovaSlozka)
     {
         public List<Zvire> Zvirata { get; internal set; } = [];
+        public CisloZvireteKonfigurace CisloZvireteKonfigurace { get; internal set; } = new();
         public List<Zamestnanec> Zamestnanci { get; internal set; } = [];
+        public CisloZamestnanceKonfigurace CisloZamestnanceKonfigurace { get; internal set; } = new();
         public List<SkladovaPolozka> Sklad { get; internal set; } = [];
         public List<SkladovyPohyb> SkladovaHistorie { get; internal set; } = [];
         public List<PokladniPohyb> PokladniPohyby { get; internal set; } = [];
         public Cenik Cenik { get; internal set; } = new();
         public List<AuditZaznam> AuditLog { get; internal set; } = [];
         public List<TechnickyZaznam> TechnickyLog { get; internal set; } = [];
+
+        /// <summary>
+        /// Volitelná cesta k externí/síťové záloze, nastavitelná uživatelem
+        /// přes menu. Pokud není nastavena, tento krok zálohování se přeskočí.
+        /// </summary>
+        public string? ExterniZalohaSlozka { get; internal set; }
 
         /// <summary>
         /// Kořenová složka zvolená uživatelem, ve které jsou podsložky
@@ -34,7 +43,18 @@ namespace EvidenceZOOCviceniUpraveno2
         // -----------------------------
 
         public string SouborZamestnanci => Path.Combine(KorenovaSlozka, "Data", "Zamestnanci", "zamestnanci.json");
+        public string SouborCislaZamestnance => Path.Combine(KorenovaSlozka, "Data", "Zamestnanci", "cislovani.json");
+
+        private string SlozkaZamestnance(Zamestnanec zam) => Path.Combine(KorenovaSlozka, "Data", "Zamestnanci",
+            $"{NazevSouboru.OcistiProNazevSouboru(zam.Prijmeni)}_{zam.OsobniCislo}");
+
         public string SouborZvirata => Path.Combine(KorenovaSlozka, "Data", "Zvirata", "zvirata.json");
+        private string SlozkaZvirat => Path.Combine(KorenovaSlozka, "Data", "Zvirata");
+        private string SouborCislaZvirete => Path.Combine(SlozkaZvirat, "cislovani.json");
+
+        public string SouborZvirete(Zvire zvire) =>
+            Path.Combine(SlozkaZvirat, $"{NazevSouboru.OcistiProNazevSouboru(zvire.Nazev)}_{zvire.Id}.json");
+
         public string SouborSkladu => Path.Combine(KorenovaSlozka, "Data", "Sklad", "sklad.json");
         public string SouborSkladoveHistorie => Path.Combine(KorenovaSlozka, "Data", "Sklad", "sklad_historie.json");
         public string SouborPokladny => Path.Combine(KorenovaSlozka, "Data", "Ucetnictvi", "Pokladna", "pokladna.json");
@@ -47,7 +67,18 @@ namespace EvidenceZOOCviceniUpraveno2
         // -----------------------------
 
         private string ZalohaZamestnanci => Path.Combine(KorenovaSlozka, "Zalohy", "Zamestnanci", "zamestnanci.json.bak");
+        private string ZalohaCislaZamestnance => Path.Combine(KorenovaSlozka, "Zalohy", "Zamestnanci", "cislovani.json.bak");
+
+        private string ZalohaSlozkaZamestnance(Zamestnanec zam) => Path.Combine(KorenovaSlozka, "Zalohy", "Zamestnanci",
+            $"{NazevSouboru.OcistiProNazevSouboru(zam.Prijmeni)}_{zam.OsobniCislo}");
+
         private string ZalohaZvirata => Path.Combine(KorenovaSlozka, "Zalohy", "Zvirata", "zvirata.json.bak");
+        private string ZalohaSlozkaZvirat => Path.Combine(KorenovaSlozka, "Zalohy", "Zvirata");
+        private string ZalohaCislaZvirete => Path.Combine(ZalohaSlozkaZvirat, "cislovani.json.bak");
+
+        private string ZalohaZvirete(Zvire zvire) => Path.Combine(ZalohaSlozkaZvirat,
+            $"{NazevSouboru.OcistiProNazevSouboru(zvire.Nazev)}_{zvire.Id}.json.bak");
+
         private string ZalohaSkladu => Path.Combine(KorenovaSlozka, "Zalohy", "Sklad", "sklad.json.bak");
         private string ZalohaSkladoveHistorie => Path.Combine(KorenovaSlozka, "Zalohy", "Sklad", "sklad_historie.json.bak");
         private string ZalohaPokladny => Path.Combine(KorenovaSlozka, "Zalohy", "Ucetnictvi", "Pokladna", "pokladna.json.bak");
@@ -67,6 +98,16 @@ namespace EvidenceZOOCviceniUpraveno2
         /// Složka pro roční archivy dat.
         /// </summary>
         public string ArchivSlozka => Path.Combine(KorenovaSlozka, "Archiv");
+
+        /// <summary>
+        /// Cesta k nouzové sekundární záloze, uložené mimo kořenovou složku
+        /// uživatele (v LOCALAPPDATA). Chrání proti ztrátě/poškození celé
+        /// kořenové složky. Aktualizuje se jen na ruční pokyn uživatele, ne
+        /// při každém zápisu.
+        /// </summary>
+        private static string NouzovaZalohaSlozka =>
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "EvidenceZOOCviceniUpraveno2", "NouzovaZaloha");
 
         private readonly Dictionary<string, Action> akceNacitani = [];
         private readonly HashSet<string> nacteno = [];
@@ -91,6 +132,11 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             WriteIndented = true,
             Converters = { new DateOnlyConverter() }
+        };
+
+        private static readonly JsonSerializerOptions CisloZamestnanceJsonOptionsIndented = new()
+        {
+            WriteIndented = true
         };
 
         private static readonly JsonSerializerOptions ZvireJsonOptions = new()
@@ -119,19 +165,19 @@ namespace EvidenceZOOCviceniUpraveno2
         };
 
         private static readonly JsonSerializerOptions PokladnaJsonOptions = new();
-        
+
         private static readonly JsonSerializerOptions PokladnaJsonOptionsIndented = new()
         {
             WriteIndented = true
         };
-        
+
         private static readonly JsonSerializerOptions CenikJsonOptionsIndented = new()
         {
             WriteIndented = true
         };
 
         private static readonly JsonSerializerOptions LogJsonOptions = new();
-        
+
         private static readonly JsonSerializerOptions LogJsonOptionsIndented = new()
         {
             WriteIndented = true
@@ -238,11 +284,11 @@ namespace EvidenceZOOCviceniUpraveno2
                 "Log",
                 Path.Combine("Ucetnictvi", "Pokladna")
             ];
-        
+
             foreach (string zaklad in new[] { "Data", "Zalohy" })
                 foreach (string podslozka in podslozky)
                     Directory.CreateDirectory(Path.Combine(korenovaSlozka, zaklad, podslozka));
-        
+
             Directory.CreateDirectory(Path.Combine(korenovaSlozka, "Archiv"));
         }
 
@@ -334,14 +380,86 @@ namespace EvidenceZOOCviceniUpraveno2
                 SouborZamestnanci, ZalohaZamestnanci,
                 json => JsonSerializer.Deserialize<List<Zamestnanec>>(json, ZamestnanecJsonOptions) ?? [],
                 "zaměstnanců");
+
+            NactiCisloZamestnanceKonfiguraci();
+        }
+
+        private void NactiCisloZamestnanceKonfiguraci()
+        {
+            if (!File.Exists(SouborCislaZamestnance) && File.Exists(ZalohaCislaZamestnance))
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(SouborCislaZamestnance)!);
+                File.Copy(ZalohaCislaZamestnance, SouborCislaZamestnance);
+            }
+
+            if (!File.Exists(SouborCislaZamestnance))
+                return;
+
+            try
+            {
+                string json = File.ReadAllText(SouborCislaZamestnance);
+                CisloZamestnanceKonfigurace = JsonSerializer.Deserialize<CisloZamestnanceKonfigurace>(json) ?? new();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Chyba při načítání číslování zaměstnanců: {ex.Message}");
+                Console.ResetColor();
+            }
         }
 
         public void NactiZvirata()
         {
-            Zvirata = NactiZeSouboru(
-                SouborZvirata, ZalohaZvirata,
-                json => JsonSerializer.Deserialize<List<Zvire>>(json, ZvireJsonOptions) ?? [],
-                "zvířat");
+            Zvirata = [];
+
+            if (Directory.Exists(SlozkaZvirat))
+            {
+                foreach (string soubor in Directory.GetFiles(SlozkaZvirat, "*.json"))
+                {
+                    if (Path.GetFileName(soubor) == "cislovani.json")
+                        continue;
+
+                    try
+                    {
+                        string json = File.ReadAllText(soubor);
+                        var zvire = JsonSerializer.Deserialize<Zvire>(json, ZvireJsonOptions);
+                        if (zvire != null)
+                            Zvirata.Add(zvire);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Red;
+                        Console.WriteLine($"Chyba při načítání souboru zvířete '{Path.GetFileName(soubor)}': {ex.Message}");
+                        Console.ResetColor();
+                    }
+                }
+            }
+
+            NactiCisloZvireteKonfiguraci();
+        }
+
+        private void NactiCisloZvireteKonfiguraci()
+        {
+            if (!File.Exists(SouborCislaZvirete) && File.Exists(ZalohaCislaZvirete))
+            {
+                Directory.CreateDirectory(SlozkaZvirat);
+                File.Copy(ZalohaCislaZvirete, SouborCislaZvirete);
+            }
+
+            if (!File.Exists(SouborCislaZvirete))
+                return;
+
+            try
+            {
+                string json = File.ReadAllText(SouborCislaZvirete);
+                CisloZvireteKonfigurace = JsonSerializer.Deserialize<CisloZvireteKonfigurace>(json) ?? new();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Chyba při načítání číslování zvířat: {ex.Message}");
+                Console.ResetColor();
+            }
         }
 
         public void NactiSklad()
@@ -363,7 +481,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 SouborPokladny, ZalohaPokladny,
                 json => JsonSerializer.Deserialize<List<PokladniPohyb>>(json, PokladnaJsonOptions) ?? [],
                 "pokladny");
-        
+
             NactiCenik();
         }
 
@@ -382,10 +500,10 @@ namespace EvidenceZOOCviceniUpraveno2
                 Console.WriteLine("Ceník obnoven ze zálohy.");
                 Console.ResetColor();
             }
-        
+
             if (!File.Exists(SouborCeniku))
-                return; // zůstává výchozí ceník definovaný v Cenik.cs
-        
+                return;
+
             try
             {
                 string json = File.ReadAllText(SouborCeniku);
@@ -396,7 +514,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Chyba při načítání ceníku: {ex.Message}");
                 Console.ResetColor();
-        
+
                 if (File.Exists(ZalohaCeniku))
                 {
                     try
@@ -417,13 +535,34 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
+        /// <summary>
+        /// Načte volitelnou cestu k externí záloze z config.ini, pokud byla
+        /// dříve nastavena přes menu.
+        /// </summary>
+        public void NactiExterniZalohuCestu()
+        {
+            var hodnoty = NactiKlicoveHodnoty();
+            if (hodnoty.TryGetValue("externiZaloha", out var cesta) && !string.IsNullOrWhiteSpace(cesta))
+                ExterniZalohaSlozka = cesta;
+        }
+
+        /// <summary>
+        /// Nastaví (nebo změní) cestu k externí záloze a uloží ji do config.ini.
+        /// Prázdný nebo whitespace řetězec externí zálohu vypne.
+        /// </summary>
+        public void NastavitExterniZalohuCestu(string cesta)
+        {
+            ExterniZalohaSlozka = string.IsNullOrWhiteSpace(cesta) ? null : cesta;
+            UlozKlic("externiZaloha", ExterniZalohaSlozka ?? "");
+        }
+
         public void NactiLogy()
         {
             AuditLog = NactiZeSouboru(
                 SouborAuditLogu, ZalohaAuditLogu,
                 json => JsonSerializer.Deserialize<List<AuditZaznam>>(json, LogJsonOptions) ?? [],
                 "auditního logu");
-        
+
             TechnickyLog = NactiZeSouboru(
                 SouborTechnickehoLogu, ZalohaTechnickehoLogu,
                 json => JsonSerializer.Deserialize<List<TechnickyZaznam>>(json, LogJsonOptions) ?? [],
@@ -504,10 +643,122 @@ namespace EvidenceZOOCviceniUpraveno2
                 SouborZamestnanci, ZalohaZamestnanci, "zaměstnanců");
         }
 
-        public void UlozZvirata()
+        public void UlozCisloZamestnanceKonfiguraci()
         {
-            UlozDoSouboru(Zvirata, ZvireJsonOptionsIndented,
-                SouborZvirata, ZalohaZvirata, "zvířat");
+            try
+            {
+                string json = JsonSerializer.Serialize(CisloZamestnanceKonfigurace, CisloZamestnanceJsonOptionsIndented);
+                ZapisSouborSeZalohou(SouborCislaZamestnance, ZalohaCislaZamestnance, json);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Chyba při ukládání číslování zaměstnanců: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+
+        /// <summary>
+        /// Vytvoří dokumentovou složku zaměstnance (Data i Zálohy), pokud
+        /// ještě neexistuje.
+        /// </summary>
+        public void VytvorSlozkuZamestnance(Zamestnanec zam)
+        {
+            Directory.CreateDirectory(SlozkaZamestnance(zam));
+            Directory.CreateDirectory(ZalohaSlozkaZamestnance(zam));
+        }
+
+        /// <summary>
+        /// Přejmenuje dokumentovou složku zaměstnance (Data i Zálohy) podle
+        /// nového příjmení. Volej PŘED tím, než se Prijmeni na objektu skutečně změní.
+        /// </summary>
+        public void PrejmenovatSlozkuZamestnance(Zamestnanec zam, string puvodniPrijmeni)
+        {
+            string stareJmeno = $"{NazevSouboru.OcistiProNazevSouboru(puvodniPrijmeni)}_{zam.OsobniCislo}";
+            string staraCestaData = Path.Combine(KorenovaSlozka, "Data", "Zamestnanci", stareJmeno);
+            string staraCestaZaloha = Path.Combine(KorenovaSlozka, "Zalohy", "Zamestnanci", stareJmeno);
+
+            if (Directory.Exists(staraCestaData) && staraCestaData != SlozkaZamestnance(zam))
+                Directory.Move(staraCestaData, SlozkaZamestnance(zam));
+
+            if (Directory.Exists(staraCestaZaloha) && staraCestaZaloha != ZalohaSlozkaZamestnance(zam))
+                Directory.Move(staraCestaZaloha, ZalohaSlozkaZamestnance(zam));
+        }
+
+        /// <summary>
+        /// Uloží libovolný dokument zaměstnance (výplatní páska, roční
+        /// zúčtování, srážka...) jako samostatný JSON soubor v jeho
+        /// dokumentové složce, včetně crash-safe zápisu a zálohy.
+        /// </summary>
+        public void UlozDokumentZamestnance<T>(Zamestnanec zam, string nazevDokumentu, T data)
+        {
+            VytvorSlozkuZamestnance(zam);
+
+            string soubor = Path.Combine(SlozkaZamestnance(zam), $"{nazevDokumentu}.json");
+            string zaloha = Path.Combine(ZalohaSlozkaZamestnance(zam), $"{nazevDokumentu}.json.bak");
+
+            string json = JsonSerializer.Serialize(data, CisloZamestnanceJsonOptionsIndented);
+            ZapisSouborSeZalohou(soubor, zaloha, json);
+        }
+
+        /// <summary>
+        /// Vrátí seznam názvů všech dokumentů uložených ve složce zaměstnance.
+        /// </summary>
+        public List<string> VypisDokumentyZamestnance(Zamestnanec zam)
+        {
+            string slozka = SlozkaZamestnance(zam);
+            if (!Directory.Exists(slozka))
+                return [];
+
+            return Directory.GetFiles(slozka, "*.json")
+                .Select(Path.GetFileNameWithoutExtension)
+                .Where(nazev => nazev != null)
+                .Select(nazev => nazev!)
+                .ToList();
+        }
+
+        /// <summary>
+        /// Uloží jedno zvíře do jeho vlastního souboru. Pokud se změnil název
+        /// zvířete (a tedy i název souboru), stará verze souboru se smaže.
+        /// </summary>
+        public void UlozZvire(Zvire zvire, string? puvodniNazevSouboru = null)
+        {
+            Directory.CreateDirectory(SlozkaZvirat);
+            Directory.CreateDirectory(ZalohaSlozkaZvirat);
+
+            if (puvodniNazevSouboru != null && puvodniNazevSouboru != SouborZvirete(zvire))
+            {
+                if (File.Exists(puvodniNazevSouboru))
+                    File.Delete(puvodniNazevSouboru);
+            }
+
+            string json = JsonSerializer.Serialize(zvire, ZvireJsonOptionsIndented);
+            ZapisSouborSeZalohou(SouborZvirete(zvire), ZalohaZvirete(zvire), json);
+        }
+
+        /// <summary>
+        /// Smaže soubor konkrétního zvířete.
+        /// </summary>
+        public void SmazatZvireSoubor(Zvire zvire)
+        {
+            string soubor = SouborZvirete(zvire);
+            if (File.Exists(soubor))
+                File.Delete(soubor);
+        }
+
+        public void UlozCisloZvireteKonfiguraci()
+        {
+            try
+            {
+                string json = JsonSerializer.Serialize(CisloZvireteKonfigurace, CisloZamestnanceJsonOptionsIndented);
+                ZapisSouborSeZalohou(SouborCislaZvirete, ZalohaCislaZvirete, json);
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Chyba při ukládání číslování zvířat: {ex.Message}");
+                Console.ResetColor();
+            }
         }
 
         public void UlozSklad()
@@ -531,13 +782,13 @@ namespace EvidenceZOOCviceniUpraveno2
         public void UlozSkladSHistorii()
         {
             bool skladUlozen = false;
-        
+
             try
             {
                 string jsonSklad = JsonSerializer.Serialize(Sklad, SkladJsonOptionsIndented);
                 ZapisSouborSeZalohou(SouborSkladu, ZalohaSkladu, jsonSklad);
                 skladUlozen = true;
-        
+
                 string jsonHistorie = JsonSerializer.Serialize(SkladovaHistorie, HistorieJsonOptionsIndented);
                 ZapisSouborSeZalohou(SouborSkladoveHistorie, ZalohaSkladoveHistorie, jsonHistorie);
             }
@@ -546,15 +797,13 @@ namespace EvidenceZOOCviceniUpraveno2
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"Chyba při ukládání skladu/historie: {ex.Message}");
                 Console.ResetColor();
-        
+
                 if (skladUlozen && File.Exists(ZalohaSkladu))
                 {
-                    // Historie se nepovedla uložit - vrať sklad zpět na předchozí
-                    // stav, aby soubory na disku zůstaly vzájemně konzistentní.
                     File.Copy(ZalohaSkladu, SouborSkladu, overwrite: true);
                 }
-        
-                throw; // předej výjimku dál, ať ji zachytí Transakce.ProvedSUlozenim a udělá rollback v paměti
+
+                throw;
             }
         }
 
@@ -563,7 +812,7 @@ namespace EvidenceZOOCviceniUpraveno2
             UlozDoSouboru(PokladniPohyby, PokladnaJsonOptionsIndented,
                 SouborPokladny, ZalohaPokladny, "pokladny");
         }
-        
+
         public void UlozCenik()
         {
             try
@@ -588,7 +837,7 @@ namespace EvidenceZOOCviceniUpraveno2
             AuditLog.Add(zaznam);
             UlozDoSouboru(AuditLog, LogJsonOptionsIndented, SouborAuditLogu, ZalohaAuditLogu, "auditního logu");
         }
-        
+
         /// <summary>
         /// Přidá nový záznam do technického logu a okamžitě jej uloží.
         /// </summary>
@@ -715,22 +964,26 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             if (!Directory.Exists(ArchivSlozka))
                 return;
-        
+
             foreach (string soubor in Directory.GetFiles(ArchivSlozka, "*_*.json"))
             {
                 string jmenoSouboru = Path.GetFileNameWithoutExtension(soubor);
-        
+
                 // Auditní log se z retenční politiky vyjímá - jde o trvalý doklad
                 if (jmenoSouboru.StartsWith("audit_"))
                     continue;
-        
+
                 int podtrzitko = jmenoSouboru.LastIndexOf('_');
                 if (podtrzitko < 0) continue;
-        
+
                 if (!int.TryParse(jmenoSouboru[(podtrzitko + 1)..], out int rokSouboru))
                     continue;
-        
-                if (aktualniRok - rokSouboru > 5)
+
+                // Zaměstnanecká/mzdová data podléhají zákonné retenční lhůtě 30 let,
+                // ostatní data (zvířata, sklad, pokladna) jen 5 let.
+                int hraniceRoku = jmenoSouboru.StartsWith("zamestnanci_") ? 30 : 5;
+
+                if (aktualniRok - rokSouboru > hraniceRoku)
                 {
                     try
                     {
@@ -746,6 +999,80 @@ namespace EvidenceZOOCviceniUpraveno2
                         Console.ResetColor();
                     }
                 }
+            }
+        }
+
+        // -----------------------------
+        // DEFENZIVNÍ ZÁLOHOVÁNÍ (ruční)
+        // -----------------------------
+
+        /// <summary>
+        /// Provede ruční zálohu celé datové složky (Data/) do nouzové zálohy
+        /// v LOCALAPPDATA a případně i na volitelnou externí cestu, pokud je
+        /// nastavena. Chrání proti ztrátě/poškození celé kořenové složky,
+        /// nezávisle na běžné crash-safe záloze u jednotlivých souborů.
+        /// </summary>
+        public void ProvedRucniZalohu()
+        {
+            string zdroj = Path.Combine(KorenovaSlozka, "Data");
+
+            if (!Directory.Exists(zdroj))
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Datová složka neexistuje, není co zálohovat.");
+                Console.ResetColor();
+                return;
+            }
+
+            ZalohujDoSlozky(zdroj, NouzovaZalohaSlozka, "nouzové zálohy (LOCALAPPDATA)");
+
+            if (!string.IsNullOrWhiteSpace(ExterniZalohaSlozka))
+                ZalohujDoSlozky(zdroj, ExterniZalohaSlozka, "externí zálohy");
+            else
+            {
+                Console.ForegroundColor = ConsoleColor.DarkYellow;
+                Console.WriteLine("Externí záloha není nastavena (menu → Nastavit cestu k externí záloze).");
+                Console.ResetColor();
+            }
+        }
+
+        private static void ZalohujDoSlozky(string zdroj, string cil, string popis)
+        {
+            try
+            {
+                Directory.CreateDirectory(cil);
+                KopirovatSlozkuRekurzivne(zdroj, cil);
+
+                Console.ForegroundColor = ConsoleColor.Green;
+                Console.WriteLine($"Vytvořena kopie ({popis}) do: {cil}");
+                Console.ResetColor();
+            }
+            catch (Exception ex)
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"Chyba při vytváření {popis}: {ex.Message}");
+                Console.ResetColor();
+            }
+        }
+
+        /// <summary>
+        /// Rekurzivně zkopíruje obsah zdrojové složky (včetně podsložek)
+        /// do cílové složky, přepíše existující soubory.
+        /// </summary>
+        private static void KopirovatSlozkuRekurzivne(string zdroj, string cil)
+        {
+            Directory.CreateDirectory(cil);
+
+            foreach (string soubor in Directory.GetFiles(zdroj))
+            {
+                string cilovySoubor = Path.Combine(cil, Path.GetFileName(soubor));
+                File.Copy(soubor, cilovySoubor, overwrite: true);
+            }
+
+            foreach (string podslozka in Directory.GetDirectories(zdroj))
+            {
+                string cilovaPodslozka = Path.Combine(cil, Path.GetFileName(podslozka));
+                KopirovatSlozkuRekurzivne(podslozka, cilovaPodslozka);
             }
         }
 
@@ -806,7 +1133,7 @@ namespace EvidenceZOOCviceniUpraveno2
                             jeNove: true);
 
                         double navstevnost = PrumernaDenniNavstevnost(rokNavstevnost, mesicNavstevnost);
-                                                
+
                         Console.WriteLine($"Průměrná denní návštěvnost za {mesicNavstevnost}/{rokNavstevnost}: {navstevnost:0.##} osob/den");
                         break;
 
@@ -822,25 +1149,26 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public int PocetZvirat() => Zvirata.Count;
         public int PocetZamestnancu() => Zamestnanci.Count;
-        public int SoucetMezd() => Zamestnanci.Sum(z => z.Mzda);    
+        public int SoucetMezd() => Zamestnanci.Sum(z => z.Mzda);
+
         public double PrumernaDenniNavstevnost(int rok, int mesic)
         {
             var pohybyVMesici = PokladniPohyby
                 .Where(p => p.DatumCas.Year == rok && p.DatumCas.Month == mesic)
                 .ToList();
-        
+
             if (pohybyVMesici.Count == 0)
                 return 0;
-        
+
             int celkemOsob = pohybyVMesici.Sum(p =>
             {
                 int pocetOsob = p.TypVstupenky is TypVstupenky.Detska or TypVstupenky.Dospela or TypVstupenky.ZTP or TypVstupenky.Duchodce
                     ? p.PocetKusu
                     : p.PocetDospelych + p.PocetDeti;
-        
+
                 return p.TypPohybu == PokladniTypPohybu.Prodej ? pocetOsob : -pocetOsob;
             });
-        
+
             int pocetDniVMesici = DateTime.DaysInMonth(rok, mesic);
             return (double)celkemOsob / pocetDniVMesici;
         }
