@@ -1,20 +1,15 @@
-﻿using System.Text.Json.Serialization;
+﻿using InputHelper;
+using PohybHelper;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
-using InputHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
-    /// <summary>
-    /// Reprezentuje jednoho zaměstnance zoologické zahrady.
-    /// Uchovává jeho jméno, příjmení, datum narození, mzdu, pracovní
-    /// pozici a kontaktní/adresní údaje.
-    /// </summary>
     partial class Zamestnanec
     {
-        /// <summary>
-        /// Křestní jméno zaměstnance. Nikdy nesmí být null.
-        /// Automaticky převáděno do formátu TitleCase.
-        /// </summary>
+        [JsonPropertyName("osobniCislo")]
+        public string OsobniCislo { get; internal set; } = string.Empty;
+
         private string _jmeno = string.Empty;
         [JsonPropertyName("jmeno")]
         public string Jmeno
@@ -23,9 +18,6 @@ namespace EvidenceZOOCviceniUpraveno2
             internal set => _jmeno = TitleCase.ToTitleCase(value);
         }
 
-        /// <summary>
-        /// Příjmení zaměstnance. Automaticky převáděno do TitleCase.
-        /// </summary>
         private string _prijmeni = string.Empty;
         [JsonPropertyName("prijmeni")]
         public string Prijmeni
@@ -34,21 +26,12 @@ namespace EvidenceZOOCviceniUpraveno2
             internal set => _prijmeni = TitleCase.ToTitleCase(value);
         }
 
-        /// <summary>
-        /// Datum narození zaměstnance.
-        /// </summary>
         [JsonPropertyName("datumNarozeni")]
         public DateOnly DatumNarozeni { get; internal set; }
 
-        /// <summary>
-        /// Mzda zaměstnance v českých korunách.
-        /// </summary>
         [JsonPropertyName("mzda")]
         public int Mzda { get; internal set; }
 
-        /// <summary>
-        /// Pracovní pozice zaměstnance. Automaticky převáděna do TitleCase.
-        /// </summary>
         private string _pracovniPozice = string.Empty;
         [JsonPropertyName("pracovniPozice")]
         public string PracovniPozice
@@ -57,10 +40,6 @@ namespace EvidenceZOOCviceniUpraveno2
             internal set => _pracovniPozice = TitleCase.ToTitleCase(value);
         }
 
-        /// <summary>
-        /// Město trvalého bydliště. Automaticky převáděno do formátu
-        /// TitleCase s ohledem na české předložky v názvu (např. "Ústí nad Labem").
-        /// </summary>
         private string _mesto = string.Empty;
         [JsonPropertyName("mesto")]
         public string Mesto
@@ -69,17 +48,9 @@ namespace EvidenceZOOCviceniUpraveno2
             internal set => _mesto = MestoTitleCase.ZpracujNazevMesta(value);
         }
 
-        /// <summary>
-        /// Ulice a popisné/orientační číslo (např. "Hlavní 123", "Nová 45/2").
-        /// Slouží pouze jako informační údaj, nijak dál nezpracovávaný.
-        /// </summary>
         [JsonPropertyName("ulice")]
         public string Ulice { get; internal set; } = string.Empty;
 
-        /// <summary>
-        /// Poštovní směrovací číslo ve formátu "12345" nebo "123 45".
-        /// Slouží pouze jako informační údaj.
-        /// </summary>
         private string _psc = string.Empty;
         [JsonPropertyName("psc")]
         public string PSC
@@ -88,27 +59,34 @@ namespace EvidenceZOOCviceniUpraveno2
             internal set => _psc = NormalizujPsc(value);
         }
 
-        /// <summary>
-        /// Telefonní číslo zaměstnance. Slouží pouze jako informační
-        /// údaj, nijak dál nezpracovávaný.
-        /// </summary>
         [JsonPropertyName("telefon")]
         public string Telefon { get; internal set; } = string.Empty;
 
-        /// <summary>
-        /// E-mailová adresa zaměstnance.
-        /// </summary>
         [JsonPropertyName("email")]
         public string Email { get; internal set; } = string.Empty;
 
-        /// <summary>
-        /// Vytvoří nového zaměstnance a nastaví všechny jeho vlastnosti.
-        /// </summary>
+        [JsonPropertyName("rodinnyStav")]
+        public RodinnyStav RodinnyStav { get; internal set; }
+
+        [JsonPropertyName("zdravotniStav")]
+        public ZdravotniStav ZdravotniStav { get; internal set; }
+
+        [JsonPropertyName("typDokladu")]
+        public string TypDokladu { get; internal set; } = string.Empty;
+
+        [JsonPropertyName("cisloDokladu")]
+        public string CisloDokladu { get; internal set; } = string.Empty;
+
+        [JsonPropertyName("deti")]
+        public List<Dite> Deti { get; internal set; } = [];
+
         [JsonConstructor]
-        public Zamestnanec(string jmeno, string prijmeni, DateOnly datumNarozeni,
-            int mzda, string pracovniPozice, string mesto, string ulice,
-            string psc, string telefon, string email)
+        public Zamestnanec(string osobniCislo, string jmeno, string prijmeni, DateOnly datumNarozeni,
+            int mzda, string pracovniPozice, string mesto, string ulice, string psc,
+            string telefon, string email, RodinnyStav rodinnyStav, ZdravotniStav zdravotniStav,
+            string typDokladu, string cisloDokladu, List<Dite> deti)
         {
+            OsobniCislo = osobniCislo;
             Jmeno = jmeno;
             Prijmeni = prijmeni;
             DatumNarozeni = datumNarozeni;
@@ -119,13 +97,13 @@ namespace EvidenceZOOCviceniUpraveno2
             PSC = psc;
             Telefon = telefon;
             Email = email;
+            RodinnyStav = rodinnyStav;
+            ZdravotniStav = zdravotniStav;
+            TypDokladu = typDokladu;
+            CisloDokladu = cisloDokladu;
+            Deti = deti;
         }
 
-        /// <summary>
-        /// Převede PSČ na jednotný formát "123 45" (mezera po třetí číslici),
-        /// pokud vstup obsahuje přesně 5 číslic. Jinak vrátí ořezaný
-        /// vstup beze změny.
-        /// </summary>
         private static string NormalizujPsc(string vstup)
         {
             string cisliceJen = new([.. vstup.Where(char.IsDigit)]);
@@ -136,33 +114,37 @@ namespace EvidenceZOOCviceniUpraveno2
             return vstup.Trim();
         }
 
-        /// <summary>
-        /// Ověří, zda text vypadá jako platná e-mailová adresa
-        /// (základní formátová kontrola, ne ověření existence).
-        /// </summary>
         public static bool JePlatnyEmail(string email)
         {
             return EmailRegex().IsMatch(email);
         }
 
-        /// <summary>
-        /// Vypíše všechny informace o zaměstnanci do konzole.
-        /// </summary>
         public void VypisZamestnance()
         {
             Console.WriteLine(
-                $"{Jmeno,-15} {Prijmeni,-15} {DatumNarozeni,-15} {Mzda,-10} {PracovniPozice,-20}"
+                $"{OsobniCislo,-12} {Jmeno,-15} {Prijmeni,-15} {DatumNarozeni,-15} {Mzda,-10} {PracovniPozice,-20}"
             );
         }
 
-        /// <summary>
-        /// Vypíše kompletní kontaktní a adresní údaje zaměstnance.
-        /// </summary>
         public void VypisKontaktniUdaje()
         {
-            Console.WriteLine($"Adresa:  {Ulice}, {PSC} {Mesto}");
-            Console.WriteLine($"Telefon: {Telefon}");
-            Console.WriteLine($"E-mail:  {Email}");
+            Console.WriteLine($"Adresa:            {Ulice}, {PSC} {Mesto}");
+            Console.WriteLine($"Telefon:           {Telefon}");
+            Console.WriteLine($"E-mail:            {Email}");
+            Console.WriteLine($"Rodinný stav:      {PopiskyHelper.ZiskejPopisek(RodinnyStav)}");
+            Console.WriteLine($"Zdravotní stav:    {PopiskyHelper.ZiskejPopisek(ZdravotniStav)}");
+            Console.WriteLine($"Doklad totožnosti: {TypDokladu} {CisloDokladu}");
+
+            if (Deti.Count > 0)
+            {
+                Console.WriteLine("Děti:");
+                foreach (Dite dite in Deti)
+                {
+                    string bonus = dite.UplatnenBonus ? " (uplatněn bonus)" : "";
+                    string invalidita = dite.Invalidita ? " [invalidní]" : "";
+                    Console.WriteLine($"  - {dite.Jmeno} {dite.Prijmeni}, nar. {dite.DatumNarozeni:d}, {dite.Skola}{invalidita}{bonus}");
+                }
+            }
         }
 
         [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
