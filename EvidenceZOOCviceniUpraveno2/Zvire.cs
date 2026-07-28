@@ -44,18 +44,34 @@ namespace EvidenceZOOCviceniUpraveno2
         [JsonIgnore]
         public string Vek => VypocetVeku.VypocitejVekTextove(DatumNarozeni);
 
+        [JsonPropertyName("datumPrijetiZJineZoo")]
+        public DateOnly? DatumPrijetiZJineZoo { get; internal set; } // null = narozeno v této zoo
+
+        [JsonPropertyName("zdravotniZaznamy")]
+        public List<ZdravotniZaznam> ZdravotniZaznamy { get; internal set; } = [];
+
+        [JsonPropertyName("id")]
+        public string Id { get; internal set; } = string.Empty;
+
         /// <summary>
         /// Vytvoří nové zvíře a nastaví jeho název, datum narození a váhu.
         /// </summary>
         /// <param name="nazev">Název zvířete.</param>
         /// <param name="datumNarozeni">Datum narození.</param>
         /// <param name="vaha">Váha v kilogramech.</param>
+        /// <param name="datumPrijetiZJineZoo">Datum přijetí zvířete z jiné zoo.</param>
+        /// <param name="zdravotniZaznamy">Zdravotní záznamy zvířete.</param>
+        /// <param name="id">Unikátní id pro rozlišování zvířat jednoho druhu.</param>
         [JsonConstructor]
-        public Zvire(string nazev, DateOnly datumNarozeni, double vaha)
+        public Zvire(string nazev, DateOnly datumNarozeni, double vaha, DateOnly? datumPrijetiZJineZoo,
+            List<ZdravotniZaznam> zdravotniZaznamy, string id)
         {
             Nazev = nazev;
             DatumNarozeni = datumNarozeni;
             Vaha = vaha;
+            DatumPrijetiZJineZoo = datumPrijetiZJineZoo;
+            ZdravotniZaznamy = zdravotniZaznamy;
+            Id = id;
         }
 
         /// <summary>
