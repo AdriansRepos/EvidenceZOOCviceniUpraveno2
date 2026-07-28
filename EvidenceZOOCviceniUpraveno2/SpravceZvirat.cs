@@ -34,24 +34,12 @@ namespace EvidenceZOOCviceniUpraveno2
 
                 switch (volba)
                 {
-                    case '1': Pridat();
-                        break;
-
-                    case '2': Vypis();
-                        break;
-
-                    case '3': Smazat();
-                        break;
-
-                    case '4': Upravit();
-                        break;
-
-                    case '5': Vyhledat();
-                        break;
-
-                    case '6':
-                        break;
-
+                    case '1': Pridat(); break;
+                    case '2': Vypis(); break;
+                    case '3': Smazat(); break;
+                    case '4': Upravit(); break;
+                    case '5': Vyhledat(); break;
+                    case '6': break;
                     default:
                         Console.ForegroundColor = ConsoleColor.Yellow;
                         Console.WriteLine("Neplatná volba, opakujte zadání:");
@@ -62,33 +50,36 @@ namespace EvidenceZOOCviceniUpraveno2
             } while (volba != '6');
         }
 
-        /// <summary>
-        /// Přidá nové zvíře na základě vstupů od uživatele.
-        /// Vstupy jsou validovány.
-        /// </summary>
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
+
+            string id = zoo.CisloZvireteKonfigurace.DalsiId();
+            zoo.UlozCisloZvireteKonfiguraci();
+
             string nazev = UpravaVstupu.ZeptejSeAUprav(
-                "", "název",
-                v => v,
-                s => s,
-                jeNove: true);
+                "", "název", v => v, s => s, jeNove: true);
 
             DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                 DateOnly.MinValue, "datum narození",
-                v => v.ToString(),
-                s => DateOnly.Parse(s),
-                jeNove: true);
+                v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
 
             double vaha = UpravaVstupu.ZeptejSeAUprav(
-                0.0, "váha",
-                v => v.ToString(),
-                s => double.Parse(s),
-                jeNove: true);
+                0.0, "váha", v => v.ToString(), s => double.Parse(s), jeNove: true);
 
-            zoo.Zvirata.Add(new Zvire(nazev, datumNarozeni, vaha));
-            zoo.UlozZvirata();
+            Console.Write("Bylo zvíře přijato z jiné zoo? (Enter = ne, narozeno zde) Datum přijetí: ");
+            string vstupDatumPrijeti = Console.ReadLine()!.Trim();
+            DateOnly? datumPrijetiZJineZoo = string.IsNullOrWhiteSpace(vstupDatumPrijeti)
+                ? null
+                : DateOnly.Parse(vstupDatumPrijeti);
+
+            List<ZdravotniZaznam> zdravotniZaznamy = [];
+
+            Zvire nove = new(nazev, datumNarozeni, vaha, datumPrijetiZJineZoo, zdravotniZaznamy, id);
+
+            zoo.Zvirata.Add(nove);
+            zoo.UlozZvire(nove);
+
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Zvíře bylo úspěšně přidáno.");
             Console.ResetColor();
@@ -115,39 +106,35 @@ namespace EvidenceZOOCviceniUpraveno2
             var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
+                zoo.Zvirata.Remove(zvire);
+                zoo.SmazatZvireSoubor(zvire);
+
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"Zvíře {zvire.Nazev} bylo smazáno.");
                 Console.ResetColor();
-                zoo.Zvirata.Remove(zvire);
-                zoo.UlozZvirata();
             }
         }
 
-        /// <summary>
-        /// Upraví údaje vybraného zvířete.
-        /// </summary>
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZVÍŘETE");
             var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
+                string puvodniSoubor = zoo.SouborZvirete(zvire);
+
                 zvire.Nazev = UpravaVstupu.ZeptejSeAUprav(
-                    zvire.Nazev, "název",
-                    v => v,
-                    s => s);
+                    zvire.Nazev, "název", v => v, s => s);
 
                 zvire.DatumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                     zvire.DatumNarozeni, "datum narození",
-                    v => v.ToString(),
-                    s => DateOnly.Parse(s));
+                    v => v.ToString(), s => DateOnly.Parse(s));
 
                 zvire.Vaha = UpravaVstupu.ZeptejSeAUprav(
-                    zvire.Vaha, "váha",
-                    v => v.ToString(),
-                    s => double.Parse(s));
+                    zvire.Vaha, "váha", v => v.ToString(), s => double.Parse(s));
 
-                zoo.UlozZvirata();
+                zoo.UlozZvire(zvire, puvodniSoubor);
+
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Úprava dokončena.");
                 Console.ResetColor();
