@@ -7,6 +7,7 @@ zoo.ZajistiData("Logy");
 // Zkontroluje a případně provede roční archivaci – musí proběhnout
 // hned po vytvoření zoo, ještě před prvním použitím dat.
 zoo.ZkontrolujRocniArchivaci();
+zoo.NactiExterniZalohuCestu();
 
 zoo.RegistrujNacitani("Zaměstnanci", zoo.NactiZamestnance);
 zoo.RegistrujNacitani("Zvířata", zoo.NactiZvirata);
@@ -29,7 +30,9 @@ do
     Console.WriteLine("\t3. Sklad");
     Console.WriteLine("\t4. Správce pokladny");
     Console.WriteLine("\t5. Statistiky");
-    Console.WriteLine("\t6. Konec");
+    Console.WriteLine("\t6. Zálohovat teď");
+    Console.WriteLine("\t7. Nastavit cestu k externí záloze");
+    Console.WriteLine("\t0. Konec");
     Console.ResetColor();
     Console.Write("Vyber možnost: ");
 
@@ -59,6 +62,19 @@ do
             break;
 
         case '6':
+            zoo.ProvedRucniZalohu();
+            break;
+        
+        case '7':
+            Console.Write("Zadej cestu k externí záloze (prázdné = vypnout): ");
+            string cesta = Console.ReadLine()!.Trim();
+            zoo.NastavitExterniZalohuCestu(cesta);
+            Console.ForegroundColor = ConsoleColor.Green;
+            Console.WriteLine("Nastavení uloženo.");
+            Console.ResetColor();
+            break;
+
+        case '0':
             break;
 
         default:
@@ -68,4 +84,4 @@ do
             break;
     }
 }
-while (volbaMenu != '6');
+while (volbaMenu != '0');
