@@ -11,6 +11,9 @@
     <Reference Include="DateConverterForJson">
       <HintPath>..\..\DateConverterForJson\DateConverterForJson\bin\Release\net8.0\DateConverterForJson.dll</HintPath>
     </Reference>
+    <Reference Include="FileNameHelper">
+      <HintPath>..\..\FileNameHelper\FileNameHelper\bin\Release\net8.0\FileNameHelper.dll</HintPath>
+    </Reference>
     <Reference Include="InputHelper">
       <HintPath>..\..\InputHelper\InputHelper\bin\Release\net8.0\InputHelper.dll</HintPath>
     </Reference>
