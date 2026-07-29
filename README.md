@@ -15,6 +15,9 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, **pokladnu**, pr
 - Smazání zvířete
 - Vyhledávání podle názvu
 - Automatický výpočet aktuálního věku z data narození (roky, měsíce)
+- Evidence data přijetí z jiné zoo
+- Zdravotní záznamy zvířete (nemoci, léčba)
+- Konfigurovatelné číslování zvířat
 
 ### Zaměstnanci
 
@@ -27,6 +30,10 @@ Umožňuje evidovat **zvířata**, **zaměstnance**, **sklad**, **pokladnu**, pr
 - Automatické velké písmena v názvu města s ohledem na české předložky (např. "Ústí nad Labem")
 - Základní formátová validace e-mailové adresy při zadání/úpravě
 - Ukládání do souboru + automatická záloha
+- Evidence rodinného a zdravotního stavu, doklad totožnosti
+- Evidence dětí zaměstnance (jméno, datum narození, adresa, škola, invalidita, uplatnění daňového bonusu)
+- Konfigurovatelné číslování zaměstnanců (formát upravitelný za běhu)
+- Dokumentová složka pro každého zaměstnance (základ pro budoucí mzdové dokumenty)
 
 ### Sklad
 
@@ -68,6 +75,9 @@ Konfigurační soubor `config.ini` (cesta ke kořenové složce) je uložen v `A
 **Bezpečný zápis (crash-safe)**  
 Ukládání neprobíhá přímým přepsáním souboru, ale přes dočasný soubor (`.tmp`) a atomickou náhradu (`File.Replace`). Díky tomu nemůže při pádu aplikace nebo výpadku uprostřed zápisu dojít k poškození nebo ztrátě posledního platného souboru.
 
+**Defenzivní zálohování**  
+Kromě běžné crash-safe zálohy (`Zalohy/`) lze ručně spustit zálohu celé datové složky na dvě nezávislá místa – nouzovou zálohu v `LOCALAPPDATA` a volitelnou externí/síťovou cestu nastavenou v menu. Chrání proti ztrátě nebo poškození celé kořenové datové složky, ne jen jednotlivých souborů.
+
 **Automatická obnova**  
 Pokud je při načítání hlavní soubor poškozený nebo chybí, aplikace se automaticky pokusí obnovit data ze zálohy. Uživatel je o průběhu informován barevně odlišenými hláškami v konzoli.
 
@@ -79,14 +89,25 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 ## Struktura projektu
 
 /ZOO
-
 ├── Program.cs
 
 ├── ZOO.cs
 
 ├── Zamestnanec.cs
 
+├── RodinnyStav.cs
+
+├── ZdravotniStav.cs
+
+├── Dite.cs
+
+├── CisloZamestnanceKonfigurace.cs
+
 ├── Zvire.cs
+
+├── ZdravotniZaznam.cs
+
+├── CisloZvireteKonfigurace.cs
 
 ├── SkladovaPolozka.cs
 
@@ -100,6 +121,16 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 ├── PokladniPohyb.cs
 
+├── AuditZaznam.cs
+
+├── TypAkce.cs
+
+├── TechnickyZaznam.cs
+
+├── UrovenLogu.cs
+
+├── Transakce.cs
+
 ├── SpravceZamestnancu.cs
 
 ├── SpravceZvirat.cs
@@ -107,16 +138,6 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 ├── SpravceSkladu.cs
 
 ├── SpravcePokladny.cs
-
-├── Transakce.cs
-
-├── AuditZaznam.cs
-
-├── TechnickyZaznam.cs
-
-├── TypAkce.cs
-
-├── UrovenLogu.cs
 
 └── README.md
 
@@ -127,11 +148,18 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 Část funkčnosti byla vyčleněna do samostatných, znovupoužitelných knihoven, aby šly nezávisle referencovat i v jiných projektech (např. v aplikaci Losovač, která používá vlastní, jednodušší verzi `InputHelper`):
 
 - **TextHelper** – zpracování a validace uživatelských vstupů (`UpravaVstupu.ZeptejSeAUprav`), včetně zobrazení konkrétní chybové zprávy při neplatném vstupu
+
 - **SelectHelper** – výběr položky ze seznamu (`SelectHelp.VybratPolozku`)
+
 - **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`) a správné velké písmena v názvech měst s ohledem na české předložky (`MestoTitleCase.ZpracujNazevMesta`)
+
 - **DateConverterForJson** – JSON konvertor pro typ `DateOnly` (`DateOnlyConverter`)
+
 - **VekZviratHelper** – výpočet aktuálního věku zvířete z data narození (`VypocetVeku.VypocitejVek`, `VypocetVeku.VypocitejVekTextove`), včetně skloňování slov "rok"/"měsíc"
+
 - **PohybHelper** – sdílené rozhraní `IPohyb` a výčtové typy pohybů (`SkladovyTypPohybu`, `PokladniTypPohybu`, `FinancniTypPohybu`) pro sklad, pokladnu a budoucí účetnictví, včetně čitelných popisků (`PopiskyHelper`)
+
+- **FileNameHelper** – čištění textu pro bezpečné použití jako název souboru/složky (`NazevSouboru.OcistiProNazevSouboru`)
 
 ---
 
@@ -276,3 +304,6 @@ public void Pridat()
 
 **v1.8.1** – Odstranění duplicitního kódu a sjednocení metod pro práci s konfiguračním souborem a jeho zálohou.
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.8.1)
+
+**v1.9.0** – Rozšířena evidence zaměstnanců o rodinný a zdravotní stav, evidenci dětí (včetně uplatnění daňového bonusu) a doklad totožnosti. Rozšířena evidence zvířat o datum přijetí z jiné zoo a zdravotní záznamy (nemoci, léčba). Kompletně přepracována struktura ukládání dat – zvířata se nyní ukládají po jednom do vlastního souboru (`Zvirata/Nazev_Id.json`), zaměstnanci mají vlastní dokumentovou složku (`Zamestnanci/Prijmeni_OsobniCislo/`) připravenou pro budoucí mzdové dokumenty (výplatní pásky, roční zúčtování, srážky). Přidáno konfigurovatelné číslování zaměstnanců a zvířat s možností upravit formát za běhu. Retenční politika archivace nyní rozlišuje 30 let u zaměstnaneckých/mzdových dat (zákonná lhůta) a 5 let u ostatních dat. Přidáno třívrstvé zálohování – crash-safe zápis, běžná záloha a nová ruční nouzová záloha (LOCALAPPDATA + volitelná externí/síťová cesta), chránící proti ztrátě nebo poškození celé datové složky.  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.0)
