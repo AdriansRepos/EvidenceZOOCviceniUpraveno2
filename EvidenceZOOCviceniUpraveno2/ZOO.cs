@@ -710,11 +710,10 @@ namespace EvidenceZOOCviceniUpraveno2
             if (!Directory.Exists(slozka))
                 return [];
 
-            return Directory.GetFiles(slozka, "*.json")
+            return [.. Directory.GetFiles(slozka, "*.json")
                 .Select(Path.GetFileNameWithoutExtension)
                 .Where(nazev => nazev != null)
-                .Select(nazev => nazev!)
-                .ToList();
+                .Select(nazev => nazev!)];
         }
 
         /// <summary>
