@@ -307,3 +307,6 @@ public void Pridat()
 
 **v1.9.0** – Rozšířena evidence zaměstnanců o rodinný a zdravotní stav, evidenci dětí (včetně uplatnění daňového bonusu) a doklad totožnosti. Rozšířena evidence zvířat o datum přijetí z jiné zoo a zdravotní záznamy (nemoci, léčba). Kompletně přepracována struktura ukládání dat – zvířata se nyní ukládají po jednom do vlastního souboru (`Zvirata/Nazev_Id.json`), zaměstnanci mají vlastní dokumentovou složku (`Zamestnanci/Prijmeni_OsobniCislo/`) připravenou pro budoucí mzdové dokumenty (výplatní pásky, roční zúčtování, srážky). Přidáno konfigurovatelné číslování zaměstnanců a zvířat s možností upravit formát za běhu. Retenční politika archivace nyní rozlišuje 30 let u zaměstnaneckých/mzdových dat (zákonná lhůta) a 5 let u ostatních dat. Přidáno třívrstvé zálohování – crash-safe zápis, běžná záloha a nová ruční nouzová záloha (LOCALAPPDATA + volitelná externí/síťová cesta), chránící proti ztrátě nebo poškození celé datové složky.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.0)
+
+**v1.9.1** – Oprava formátování zdrojového kódu.
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.1)
