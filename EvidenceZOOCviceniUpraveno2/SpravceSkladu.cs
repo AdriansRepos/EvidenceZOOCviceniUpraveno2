@@ -124,7 +124,8 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Naskladnit()
         {
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky k naskladnění");
-            if (polozka == null) return;
+            if (polozka == null) 
+                return;
 
             double pridat = UpravaVstupu.ZeptejSeAUprav(
                 0.0, "množství k naskladnění", v => v.ToString(), s => double.Parse(s), jeNove: true);
@@ -166,7 +167,8 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Vyskladnit()
         {
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky k vyskladnění");
-            if (polozka == null) return;
+            if (polozka == null) 
+                return;
 
             double odebrat = UpravaVstupu.ZeptejSeAUprav(
                 0.0, "množství k vyskladnění", v => v.ToString(), s => double.Parse(s), jeNove: true);
@@ -200,7 +202,8 @@ namespace EvidenceZOOCviceniUpraveno2
                 },
                 popisOperace: "vyskladnění");
 
-            if (!uspech) return;
+            if (!uspech) 
+                return;
 
             zoo.ZapisAudit(AuditZaznam.Vytvor(
                 "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – vyskladnění",
@@ -223,7 +226,8 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Smazat()
         {
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky ke smazání");
-            if (polozka == null) return;
+            if (polozka == null) 
+                return;
 
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Sklad.Remove(polozka),

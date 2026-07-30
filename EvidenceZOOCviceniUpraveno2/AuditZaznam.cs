@@ -56,7 +56,8 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public void VypisZaznam()
         {
-            Console.ForegroundColor = Akce switch
+            Console.ForegroundColor = Akce 
+            switch
             {
                 TypAkce.Smazano => ConsoleColor.Red,
                 TypAkce.Upraveno => ConsoleColor.Yellow,

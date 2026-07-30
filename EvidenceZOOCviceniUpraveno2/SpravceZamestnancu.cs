@@ -207,7 +207,8 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
             var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
-            if (zam == null) return;
+            if (zam == null) 
+                return;
 
             int puvodniMzda = zam.Mzda;
             string puvodniPrijmeni = zam.Prijmeni;
@@ -271,7 +272,8 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
             var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
-            if (zam == null) return;
+            if (zam == null) 
+                return;
 
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Remove(zam),

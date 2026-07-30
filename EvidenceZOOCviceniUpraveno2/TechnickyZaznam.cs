@@ -20,7 +20,8 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public void VypisZaznam()
         {
-            Console.ForegroundColor = Uroven switch
+            Console.ForegroundColor = Uroven 
+            switch
             {
                 UrovenLogu.Chyba => ConsoleColor.Red,
                 UrovenLogu.Varovani => ConsoleColor.Yellow,

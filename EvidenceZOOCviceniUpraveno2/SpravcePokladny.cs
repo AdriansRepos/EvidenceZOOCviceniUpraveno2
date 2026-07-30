@@ -154,7 +154,8 @@ namespace EvidenceZOOCviceniUpraveno2
             }
 
             var vybrany = SelectHelp.VybratPolozku(prodeje, p => p.Popis(), "prodeje ke stornování");
-            if (vybrany == null) return;
+            if (vybrany == null) 
+                return;
 
             var storno = new PokladniPohyb(
                 PokladniTypPohybu.Storno, vybrany.TypVstupenky,
