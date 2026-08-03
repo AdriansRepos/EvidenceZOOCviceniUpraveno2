@@ -93,7 +93,11 @@ namespace EvidenceZOOCviceniUpraveno2
             }
         }
 
-         public void UlozZvire(Zvire zvire, string? puvodniNazevSouboru = null)
+        /// <summary>
+        /// Uloží jedno zvíře do jeho vlastního souboru. Pokud se změnil název
+        /// zvířete (a tedy i název souboru), stará verze souboru se smaže.
+        /// </summary>
+        public void UlozZvire(Zvire zvire, string? puvodniNazevSouboru = null)
         {
             Directory.CreateDirectory(SlozkaZvirat);
             Directory.CreateDirectory(ZalohaSlozkaZvirat);
