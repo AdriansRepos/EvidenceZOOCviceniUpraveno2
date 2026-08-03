@@ -21,13 +21,7 @@ namespace EvidenceZOOCviceniUpraveno2
         public Cenik Cenik { get; internal set; } = new();
         public List<AuditZaznam> AuditLog { get; internal set; } = [];
         public List<TechnickyZaznam> TechnickyLog { get; internal set; } = [];
-
-        /// <summary>
-        /// Volitelná cesta k externí/síťové záloze, nastavitelná uživatelem
-        /// přes menu. Pokud není nastavena, tento krok zálohování se přeskočí.
-        /// </summary>
-        public string? ExterniZalohaSlozka { get; internal set; }
-
+        
         /// <summary>
         /// Kořenová složka zvolená uživatelem, ve které jsou podsložky
         /// Data (aktuální soubory) a Zalohy (jejich zálohy).
@@ -96,28 +90,7 @@ namespace EvidenceZOOCviceniUpraveno2
                     );
                 }
             }
-        }
-
-        /// <summary>
-        /// Načte volitelnou cestu k externí záloze z config.ini, pokud byla
-        /// dříve nastavena přes menu.
-        /// </summary>
-        public void NactiExterniZalohuCestu()
-        {
-            var hodnoty = NactiKlicoveHodnoty();
-            if (hodnoty.TryGetValue("externiZaloha", out var cesta) && !string.IsNullOrWhiteSpace(cesta))
-                ExterniZalohaSlozka = cesta;
-        }
-
-        /// <summary>
-        /// Nastaví (nebo změní) cestu k externí záloze a uloží ji do config.ini.
-        /// Prázdný nebo whitespace řetězec externí zálohu vypne.
-        /// </summary>
-        public void NastavitExterniZalohuCestu(string cesta)
-        {
-            ExterniZalohaSlozka = string.IsNullOrWhiteSpace(cesta) ? null : cesta;
-            UlozKlic("externiZaloha", ExterniZalohaSlozka ?? "");
-        }
+        }        
 
         /// <summary>
         /// Obecná načítací logika pro libovolný datový soubor: pokud
