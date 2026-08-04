@@ -91,9 +91,6 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 /ZOO
 ├── Program.cs
 
-/ZOO
-├── Program.cs
-
 ├── ZOO.cs
 
 ├── ZOO.Konfigurace.cs
