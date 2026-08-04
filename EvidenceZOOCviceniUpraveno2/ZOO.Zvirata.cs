@@ -40,6 +40,11 @@ namespace EvidenceZOOCviceniUpraveno2
             Converters = { new DateOnlyConverter() }
         };
 
+        private static readonly JsonSerializerOptions CisloZvireteJsonOptionsIndented = new()
+        {
+            WriteIndented = true
+        };
+
         public void NactiZvirata()
         {
             Zvirata = [];
@@ -127,7 +132,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             try
             {
-                string json = JsonSerializer.Serialize(CisloZvireteKonfigurace, CisloZamestnanceJsonOptionsIndented);
+                string json = JsonSerializer.Serialize(CisloZvireteKonfigurace, CisloZvireteJsonOptionsIndented);
                 ZapisSouborSeZalohou(SouborCislaZvirete, ZalohaCislaZvirete, json);
             }
             catch (Exception ex)
