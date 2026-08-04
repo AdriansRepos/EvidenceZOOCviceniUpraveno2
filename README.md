@@ -91,7 +91,30 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 /ZOO
 ├── Program.cs
 
+/ZOO
+├── Program.cs
+
 ├── ZOO.cs
+
+├── ZOO.Konfigurace.cs
+
+├── ZOO.Zamestnanci.cs
+
+├── ZOO.Zvirata.cs
+
+├── ZOO.Sklad.cs
+
+├── ZOO.Pokladna.cs
+
+├── ZOO.Logy.cs
+
+├── ZOO.Archivace.cs
+
+├── ZOO.Zalohovani.cs
+
+├── ZOO.Statistiky.cs
+
+├── Zamestnanec.cs
 
 ├── Zamestnanec.cs
 
@@ -151,7 +174,7 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 - **SelectHelper** – výběr položky ze seznamu (`SelectHelp.VybratPolozku`)
 
-- **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`) a správné velké písmena v názvech měst s ohledem na české předložky (`MestoTitleCase.ZpracujNazevMesta`)
+- **InputHelper** – převod textu na TitleCase (`TitleCase.ToTitleCase`), správné velké písmena v názvech měst s ohledem na české předložky (`MestoTitleCase.ZpracujNazevMesta`) a rozdělení celého jména na křestní jméno a příjmení (`OsobniJmeno.Rozdel`); metody vyhazují `ArgumentException` při neplatném vstupu, takže se automaticky napojí na opakovaný dotaz v `TextHelper`
 
 - **DateConverterForJson** – JSON konvertor pro typ `DateOnly` (`DateOnlyConverter`)
 
@@ -166,7 +189,8 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 ## Použité techniky
 
 - OOP (třídy, vlastnosti, zapouzdření)
-- Primary constructors
+- Primární konstruktory
+- Rozdělení třídy `ZOO` na partial soubory podle domény (konfigurace, zaměstnanci, zvířata, sklad, pokladna, logy, archivace, zálohování, statistiky) pro přehlednost a udržovatelnost
 - Partial třídy a metody se zdrojově generovaným regulárním výrazem (`GeneratedRegex`)
 - Enumy (kategorie skladových položek, typ skladového pohybu)
 - Delegáty pro lazy loading dat (`RegistrujNacitani` / `ZajistiData`)
@@ -310,3 +334,6 @@ public void Pridat()
 
 **v1.9.1** – Oprava formátování zdrojového kódu.
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.1)
+
+**v1.9.2** – Refaktoring: třída `ZOO` rozdělena na partial soubory podle domény (`ZOO.Konfigurace.cs`, `ZOO.Zamestnanci.cs`, `ZOO.Zvirata.cs`, `ZOO.Sklad.cs`, `ZOO.Pokladna.cs`, `ZOO.Logy.cs`, `ZOO.Archivace.cs`, `ZOO.Zalohovani.cs`, `ZOO.Statistiky.cs`) pro lepší čitelnost a snazší budoucí rozšiřování. Žádná změna funkčnosti pro uživatele.  
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.2)
