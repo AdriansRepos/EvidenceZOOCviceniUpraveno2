@@ -3,17 +3,15 @@ using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2
 {
-    partial class ZOO
+    class Statistiky(ZOO zoo)
     {
-        // -----------------------------
-        // STATISTIKY
-        // -----------------------------
-
+        private readonly ZOO zoo = zoo;
+                
         public void MenuStatistiky()
         {
-            ZajistiData("Zaměstnanci");
-            ZajistiData("Zvířata");
-            ZajistiData("Pokladna");
+            zoo.ZajistiData("Zaměstnanci");
+            zoo.ZajistiData("Zvířata");
+            zoo.ZajistiData("Pokladna");
             char volba;
             do
             {
@@ -76,13 +74,13 @@ namespace EvidenceZOOCviceniUpraveno2
             while (volba != '5');
         }
 
-        public int PocetZvirat() => Zvirata.Count;
-        public int PocetZamestnancu() => Zamestnanci.Count;
-        public int SoucetMezd() => Zamestnanci.Sum(z => z.Mzda);
+        public int PocetZvirat() => zoo.Zvirata.Count;
+        public int PocetZamestnancu() => zoo.Zamestnanci.Count;
+        public int SoucetMezd() => zoo.Zamestnanci.Sum(z => z.Mzda);
 
         public double PrumernaDenniNavstevnost(int rok, int mesic)
         {
-            var pohybyVMesici = PokladniPohyby
+            var pohybyVMesici = zoo.PokladniPohyby
                 .Where(p => p.DatumCas.Year == rok && p.DatumCas.Month == mesic)
                 .ToList();
 
