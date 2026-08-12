@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
     /// <summary>
     /// Konfigurace generování unikátních identifikátorů zvířat.

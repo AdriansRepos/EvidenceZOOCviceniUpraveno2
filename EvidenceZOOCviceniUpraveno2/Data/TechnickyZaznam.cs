@@ -1,6 +1,7 @@
-﻿using System.Text.Json.Serialization;
+﻿using EvidenceZOOCviceniUpraveno2.Enumy;
+using System.Text.Json.Serialization;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
     /// <summary>
     /// Jeden záznam technického logu – událost na úrovni aplikace/systému

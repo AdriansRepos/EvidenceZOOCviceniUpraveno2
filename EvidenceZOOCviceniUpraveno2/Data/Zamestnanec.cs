@@ -1,11 +1,12 @@
-﻿using InputHelper;
+﻿using EvidenceZOOCviceniUpraveno2.Enumy;
+using InputHelper;
 using PohybHelper;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
-    partial class Zamestnanec
+    public partial class Zamestnanec
     {
         [JsonPropertyName("osobniCislo")]
         public string OsobniCislo { get; internal set; } = string.Empty;

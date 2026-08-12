@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
     /// <summary>
     /// Ceník vstupného. Obsahuje základní ceny pro jednotlivé kategorie

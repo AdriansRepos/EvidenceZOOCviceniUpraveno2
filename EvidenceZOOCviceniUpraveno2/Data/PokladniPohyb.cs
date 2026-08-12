@@ -1,7 +1,8 @@
 ﻿using System.Text.Json.Serialization;
+using EvidenceZOOCviceniUpraveno2.Enumy;
 using PohybHelper;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
     /// <summary>
     /// Reprezentuje jeden pokladní pohyb – prodej nebo storno vstupenky.

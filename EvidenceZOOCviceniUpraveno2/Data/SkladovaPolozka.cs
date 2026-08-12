@@ -1,18 +1,9 @@
 ﻿using System.Text.Json.Serialization;
+using EvidenceZOOCviceniUpraveno2.Enumy;
 using InputHelper;
 
-namespace EvidenceZOOCviceniUpraveno2
-{
-    /// <summary>
-    /// Kategorie skladové položky.
-    /// </summary>
-    enum KategoriePolozky
-    {
-        Krmivo,
-        Pomucky,
-        LekyAVeterinarniMaterial
-    }
-
+namespace EvidenceZOOCviceniUpraveno2.Data
+{   
     /// <summary>
     /// Reprezentuje jednu skladovou položku (krmivo, pomůcku,
     /// lék nebo veterinární materiál). Sleduje aktuální množství

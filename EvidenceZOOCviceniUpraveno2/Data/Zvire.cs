@@ -3,7 +3,7 @@ using InputHelper;
 using DateConverterForJson;
 using VekZviratHelper;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
     /// <summary>
     /// Reprezentuje jedno zvíře v zoologické zahradě.

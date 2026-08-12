@@ -1,13 +1,11 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
     /// <summary>
     /// Jeden zdravotní záznam zvířete (nemoc, léčba, podaný lék, kontrola).
     /// </summary>
-    [method: JsonConstructor]    /// <summary>
-                                 /// Jeden zdravotní záznam zvířete (nemoc, léčba, podaný lék, kontrola).
-                                 /// </summary>
+    [method: JsonConstructor]   
     class ZdravotniZaznam(DateOnly datum, string popis)
     {
         [JsonPropertyName("datum")]

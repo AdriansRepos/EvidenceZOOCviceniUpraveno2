@@ -1,9 +1,9 @@
 ﻿using System.Text.Json.Serialization;
 using InputHelper;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Data
 {
-    class Dite
+    public class Dite
     {
         private string _jmeno = string.Empty;
         [JsonPropertyName("jmeno")]
