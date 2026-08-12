@@ -1,24 +1,26 @@
-﻿using EvidenceZOOCviceniUpraveno2;
+﻿using EvidenceZOOCviceniUpraveno2.Logika;
+using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.Zaloha;
 
-string korenovaSlozka = ZOO.NactiNeboSeZeptejNaCesty();
-ZOO zoo = new(korenovaSlozka);
-zoo.ZajistiData("Logy");
+string korenovaSlozka = KonfiguraceRepository.NactiNeboSeZeptejNaCesty();
+Zoo zoo = new(korenovaSlozka);
 
 // Zkontroluje a případně provede roční archivaci – musí proběhnout
 // hned po vytvoření zoo, ještě před prvním použitím dat.
-zoo.ZkontrolujRocniArchivaci();
-zoo.NactiExterniZalohuCestu();
+new ArchivacniSluzba(zoo).ZkontrolujRocniArchivaci();
+zoo.Konfigurace.NactiExterniZalohuCestu();
 
-zoo.RegistrujNacitani("Zaměstnanci", zoo.NactiZamestnance);
-zoo.RegistrujNacitani("Zvířata", zoo.NactiZvirata);
-zoo.RegistrujNacitani("Sklad", zoo.NactiSklad);
-zoo.RegistrujNacitani("Pokladna", zoo.NactiPokladnu);
-zoo.RegistrujNacitani("Logy", zoo.NactiLogy);
+zoo.Zamestnanci.Nacti();
+zoo.Zvirata.Nacti();
+zoo.Sklad.Nacti();
+zoo.Pokladna.Nacti();
+zoo.Logy.Nacti();
 
 SpravceZamestnancu spravceZamestnancu = new(zoo);
 SpravceZvirat spravceZvirat = new(zoo);
 SpravceSkladu spravceSkladu = new(zoo);
 SpravcePokladny spravcePokladny = new(zoo);
+Statistiky statistiky = new(zoo);
 
 char volbaMenu;
 do
@@ -58,17 +60,17 @@ do
             break;
 
         case '5':
-            zoo.MenuStatistiky();
+            statistiky.MenuStatistiky();
             break;
 
         case '6':
-            zoo.ProvedRucniZalohu();
+            new ZalohovaciSluzba(zoo).ProvedRucniZalohu();
             break;
-        
+
         case '7':
             Console.Write("Zadej cestu k externí záloze (prázdné = vypnout): ");
             string cesta = Console.ReadLine()!.Trim();
-            zoo.NastavitExterniZalohuCestu(cesta);
+            zoo.Konfigurace.NastavitExterniZalohuCestu(cesta);
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Nastavení uloženo.");
             Console.ResetColor();
