@@ -1,16 +1,18 @@
 ﻿using TextHelper;
 using SelectHelper;
 using PohybHelper;
+using EvidenceZOOCviceniUpraveno2.Enumy;
+using EvidenceZOOCviceniUpraveno2.Data;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class SpravcePokladny(ZOO zoo)
+    class SpravcePokladny(Zoo zoo)
     {
-        private readonly ZOO zoo = zoo;
+        private readonly Zoo zoo = zoo;
 
         public void Menu()
         {
-            zoo.ZajistiData("Pokladna");
+            zoo.Pokladna.Nacti();
             char volba;
             do
             {
@@ -109,7 +111,7 @@ namespace EvidenceZOOCviceniUpraveno2
                     break;
             }
 
-            decimal jednotkovaCena = VypocetCenyVstupenky.Vypocitej(typ, zoo.Cenik, pocetDospelych, pocetDeti);
+            decimal jednotkovaCena = VypocetCenyVstupenky.Vypocitej(typ, zoo.Pokladna.Cenik, pocetDospelych, pocetDeti);
             decimal celkovaCastka = typ is TypVstupenky.Detska or TypVstupenky.Dospela or TypVstupenky.ZTP or TypVstupenky.Duchodce
                 ? jednotkovaCena * pocetKusu
                 : jednotkovaCena;
@@ -119,14 +121,14 @@ namespace EvidenceZOOCviceniUpraveno2
                 celkovaCastka, DateTime.Now);
 
             bool uspech = Transakce.ProvedSUlozenim(
-                akce: () => zoo.PokladniPohyby.Add(pohyb),
-                rollback: () => zoo.PokladniPohyby.Remove(pohyb),
-                ulozeni: zoo.UlozPokladnu,
+                akce: () => zoo.Pokladna.PokladniPohyby.Add(pohyb),
+                rollback: () => zoo.Pokladna.PokladniPohyby.Remove(pohyb),
+                ulozeni: zoo.Pokladna.UlozPokladnu,
                 popisOperace: "prodej vstupenky");
 
             if (uspech)
             {
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Pokladna", TypAkce.Pridano, pohyb.Popis(),
                     novaHodnota: $"{celkovaCastka:0.##} Kč"));
 
@@ -140,7 +142,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("STORNO VSTUPENKY");
 
-            var prodeje = zoo.PokladniPohyby
+            var prodeje = zoo.Pokladna.PokladniPohyby
                 .Where(p => p.TypPohybu == PokladniTypPohybu.Prodej)
                 .OrderByDescending(p => p.DatumCas)
                 .ToList();
@@ -163,15 +165,15 @@ namespace EvidenceZOOCviceniUpraveno2
                 vybrany.Castka, DateTime.Now);
 
             bool uspech = Transakce.ProvedSUlozenim(
-                akce: () => zoo.PokladniPohyby.Add(storno),
-                rollback: () => zoo.PokladniPohyby.Remove(storno),
-                ulozeni: zoo.UlozPokladnu,
+                akce: () => zoo.Pokladna.PokladniPohyby.Add(storno),
+                rollback: () => zoo.Pokladna.PokladniPohyby.Remove(storno),
+                ulozeni: zoo.Pokladna.UlozPokladnu,
                 popisOperace: "storno vstupenky");
 
             if (uspech)
             {
                 // Storno je typický vektor podvodu, auditujeme vždy
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Pokladna", TypAkce.Pridano, $"Storno: {storno.Popis()}",
                     puvodniHodnota: $"{storno.Castka:0.##} Kč"));
 
@@ -185,7 +187,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("ÚPRAVA CENÍKU");
 
-            var cenik = zoo.Cenik;
+            var cenik = zoo.Pokladna.Cenik;
 
             decimal puvodniDetska = cenik.CenaDetska;
             decimal puvodniDospela = cenik.CenaDospela;
@@ -212,7 +214,7 @@ namespace EvidenceZOOCviceniUpraveno2
             cenik.SlevaSkupinaProcenta = UpravaVstupu.ZeptejSeAUprav(
                 cenik.SlevaSkupinaProcenta, "sleva na skupinovou vstupenku (%)", v => v.ToString(), s => decimal.Parse(s));
 
-            zoo.UlozCenik();
+            zoo.Pokladna.UlozCenik();
 
             ZapisZmenuCeniku("cena dětské", puvodniDetska, cenik.CenaDetska);
             ZapisZmenuCeniku("cena dospělé", puvodniDospela, cenik.CenaDospela);
@@ -230,7 +232,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             if (puvodni != nova)
             {
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Pokladna – Ceník", TypAkce.Upraveno, popisPolozky,
                     puvodni.ToString("0.##"), nova.ToString("0.##")));
             }
@@ -240,7 +242,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("DENNÍ UZÁVĚRKA");
 
-            var dnesniPohyby = zoo.PokladniPohyby
+            var dnesniPohyby = zoo.Pokladna.PokladniPohyby
                 .Where(p => p.DatumCas.Date == DateTime.Today)
                 .ToList();
 
@@ -332,7 +334,7 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.WriteLine("VÝPIS POKLADNÍCH POHYBŮ");
 
             var typFiltr = SelectHelp.VybratTypNeboVse<PokladniTypPohybu>();
-            var vysledek = SelectHelp.VybratRozmeziData(zoo.PokladniPohyby);
+            var vysledek = SelectHelp.VybratRozmeziData(zoo.Pokladna.PokladniPohyby);
 
             if (typFiltr != null)
                 vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];

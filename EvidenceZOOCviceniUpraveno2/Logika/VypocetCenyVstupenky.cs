@@ -1,4 +1,7 @@
-﻿namespace EvidenceZOOCviceniUpraveno2
+﻿using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.Enumy;
+
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
     /// <summary>
     /// Vypočítá cenu vstupenky podle jejího typu a ceníku. U jednoduchých

@@ -1,4 +1,4 @@
-﻿namespace EvidenceZOOCviceniUpraveno2
+﻿namespace EvidenceZOOCviceniUpraveno2.Logika
 {
     /// <summary>
     /// Provede operaci nad daty drženými v paměti a jejich uložení jako

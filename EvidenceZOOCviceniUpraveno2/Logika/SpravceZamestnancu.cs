@@ -1,16 +1,18 @@
 ﻿using TextHelper;
 using SelectHelper;
 using PohybHelper;
+using EvidenceZOOCviceniUpraveno2.Enumy;
+using EvidenceZOOCviceniUpraveno2.Data;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class SpravceZamestnancu(ZOO zoo)
+    class SpravceZamestnancu(Zoo zoo)
     {
-        private readonly ZOO zoo = zoo;
+        private readonly Zoo zoo = zoo;
 
         public void Menu()
         {
-            zoo.ZajistiData("Zaměstnanci");
+            zoo.Zamestnanci.Nacti();
             char volba;
             do
             {
@@ -72,8 +74,8 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
 
-            string osobniCislo = zoo.CisloZamestnanceKonfigurace.DalsiCislo();
-            zoo.UlozCisloZamestnanceKonfiguraci();
+            string osobniCislo = zoo.Zamestnanci.CisloKonfigurace.DalsiCislo();
+            zoo.Zamestnanci.UlozCisloKonfiguraci();
 
             string jmeno = UpravaVstupu.ZeptejSeAUprav("", "jméno", v => v, s => s, jeNove: true);
             string prijmeni = UpravaVstupu.ZeptejSeAUprav("", "příjmení", v => v, s => s, jeNove: true);
@@ -115,16 +117,16 @@ namespace EvidenceZOOCviceniUpraveno2
                 mesto, ulice, psc, telefon, email, rodinnyStav, zdravotniStav, typDokladu, cisloDokladu, deti);
 
             bool uspech = Transakce.ProvedSUlozenim(
-                akce: () => zoo.Zamestnanci.Add(novy),
-                rollback: () => zoo.Zamestnanci.Remove(novy),
-                ulozeni: zoo.UlozZamestnance,
+                akce: () => zoo.Zamestnanci.Zamestnanci.Add(novy),
+                rollback: () => zoo.Zamestnanci.Zamestnanci.Remove(novy),
+                ulozeni: zoo.Zamestnanci.Uloz,
                 popisOperace: "přidání zaměstnance");
 
             if (uspech)
             {
-                zoo.VytvorSlozkuZamestnance(novy);
+                zoo.Zamestnanci.VytvorSlozkuZamestnance(novy);
 
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Pridano, $"{jmeno} {prijmeni} ({osobniCislo})",
                     novaHodnota: $"mzda {mzda} Kč"));
 
@@ -195,7 +197,7 @@ namespace EvidenceZOOCviceniUpraveno2
             );
             Console.WriteLine(new string('-', 90));
 
-            foreach (var zam in zoo.Zamestnanci)
+            foreach (var zam in zoo.Zamestnanci.Zamestnanci)
             {
                 zam.VypisZamestnance();
                 zam.VypisKontaktniUdaje();
@@ -206,7 +208,7 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
-            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci.Zamestnanci, z => z.Prijmeni, "zaměstnance");
             if (zam == null) 
                 return;
 
@@ -251,14 +253,14 @@ namespace EvidenceZOOCviceniUpraveno2
             if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
                 zam.Deti = ZadatDeti();
 
-            zoo.UlozZamestnance();
+            zoo.Zamestnanci.Uloz();
 
             if (zam.Prijmeni != puvodniPrijmeni)
-                zoo.PrejmenovatSlozkuZamestnance(zam, puvodniPrijmeni);
+                zoo.Zamestnanci.PrejmenovatSlozkuZamestnance(zam, puvodniPrijmeni);
 
             if (zam.Mzda != puvodniMzda)
             {
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Upraveno, $"{zam.Jmeno} {zam.Prijmeni} – mzda",
                     puvodniMzda.ToString(), zam.Mzda.ToString()));
             }
@@ -271,19 +273,19 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
-            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci, z => z.Prijmeni, "zaměstnance");
+            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci.Zamestnanci, z => z.Prijmeni, "zaměstnance");
             if (zam == null) 
                 return;
 
             bool uspech = Transakce.ProvedSUlozenim(
-                akce: () => zoo.Zamestnanci.Remove(zam),
-                rollback: () => zoo.Zamestnanci.Add(zam),
-                ulozeni: zoo.UlozZamestnance,
+                akce: () => zoo.Zamestnanci.Zamestnanci.Remove(zam),
+                rollback: () => zoo.Zamestnanci.Zamestnanci.Add(zam),
+                ulozeni: zoo.Zamestnanci.Uloz,
                 popisOperace: "smazání zaměstnance");
 
             if (uspech)
             {
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Smazano, $"{zam.Jmeno} {zam.Prijmeni}",
                     puvodniHodnota: $"mzda {zam.Mzda} Kč"));
 
@@ -300,7 +302,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
             bool nalezeno = false;
 
-            foreach (var zam in zoo.Zamestnanci)
+            foreach (var zam in zoo.Zamestnanci.Zamestnanci)
             {
                 if (zam.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {
@@ -320,7 +322,7 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("NASTAVENÍ ČÍSLOVÁNÍ ZAMĚSTNANCŮ");
 
-            var konfigurace = zoo.CisloZamestnanceKonfigurace;
+            var konfigurace = zoo.Zamestnanci.CisloKonfigurace;
 
             Console.WriteLine($"Aktuální ukázka dalšího čísla: {konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}");
 
@@ -334,7 +336,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 konfigurace.PosledniCislo, "poslední vydané číslo (další zaměstnanec dostane o 1 vyšší)",
                 v => v.ToString(), s => long.Parse(s));
 
-            zoo.UlozCisloZamestnanceKonfiguraci();
+            zoo.Zamestnanci.UlozCisloKonfiguraci();
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine($"Nastavení uloženo. Další vydané číslo bude: {konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}");

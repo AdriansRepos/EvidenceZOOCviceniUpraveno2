@@ -1,20 +1,21 @@
 ﻿using TextHelper;
 using SelectHelper;
+using EvidenceZOOCviceniUpraveno2.Data;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
     /// <summary>
     /// Třída zodpovědná za správu zvířat – přidávání, mazání, úpravy,
-    /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="ZOO"/>.
+    /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="Zoo"/>.
     /// </summary>
-    /// <param name="zoo">Instance třídy ZOO obsahující seznam zvířat.</param>
-    class SpravceZvirat(ZOO zoo)
+    /// <param name="zoo">Instance třídy Zoo obsahující repository pro zvířata.</param>
+    class SpravceZvirat(Zoo zoo)
     {
-        private readonly ZOO zoo = zoo;
+        private readonly Zoo zoo = zoo;
 
         public void Menu()
         {
-            zoo.ZajistiData("Zvířata");
+            zoo.Zvirata.Nacti();
             char volba;
             do
             {
@@ -71,8 +72,8 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
 
-            string id = zoo.CisloZvireteKonfigurace.DalsiId();
-            zoo.UlozCisloZvireteKonfiguraci();
+            string id = zoo.Zvirata.CisloKonfigurace.DalsiId();
+            zoo.Zvirata.UlozCisloKonfiguraci();
 
             string nazev = UpravaVstupu.ZeptejSeAUprav(
                 "", "název", v => v, s => s, jeNove: true);
@@ -94,8 +95,8 @@ namespace EvidenceZOOCviceniUpraveno2
 
             Zvire nove = new(nazev, datumNarozeni, vaha, datumPrijetiZJineZoo, zdravotniZaznamy, id);
 
-            zoo.Zvirata.Add(nove);
-            zoo.UlozZvire(nove);
+            zoo.Zvirata.Zvirata.Add(nove);
+            zoo.Zvirata.UlozZvire(nove);
 
             Console.ForegroundColor = ConsoleColor.Green;
             Console.WriteLine("Zvíře bylo úspěšně přidáno.");
@@ -112,7 +113,7 @@ namespace EvidenceZOOCviceniUpraveno2
             );
 
             Console.WriteLine(new string('-', 45));
-            foreach (var zvire in zoo.Zvirata)
+            foreach (var zvire in zoo.Zvirata.Zvirata)
                 zvire.VypisZvire();
         }
 
@@ -120,11 +121,11 @@ namespace EvidenceZOOCviceniUpraveno2
         {
             Console.WriteLine("SMAZÁNÍ ZVÍŘETE");
 
-            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
+            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
-                zoo.Zvirata.Remove(zvire);
-                zoo.SmazatZvireSoubor(zvire);
+                zoo.Zvirata.Zvirata.Remove(zvire);
+                zoo.Zvirata.SmazatZvireSoubor(zvire);
 
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine($"Zvíře {zvire.Nazev} bylo smazáno.");
@@ -135,10 +136,10 @@ namespace EvidenceZOOCviceniUpraveno2
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZVÍŘETE");
-            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata, z => z.Nazev, "zvířete");
+            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
-                string puvodniSoubor = zoo.SouborZvirete(zvire);
+                string puvodniSoubor = zoo.Zvirata.SouborZvirete(zvire);
 
                 zvire.Nazev = UpravaVstupu.ZeptejSeAUprav(
                     zvire.Nazev, "název", v => v, s => s);
@@ -150,7 +151,7 @@ namespace EvidenceZOOCviceniUpraveno2
                 zvire.Vaha = UpravaVstupu.ZeptejSeAUprav(
                     zvire.Vaha, "váha", v => v.ToString(), s => double.Parse(s));
 
-                zoo.UlozZvire(zvire, puvodniSoubor);
+                zoo.Zvirata.UlozZvire(zvire, puvodniSoubor);
 
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine("Úprava dokončena.");
@@ -165,7 +166,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
             bool nalezeno = false;
 
-            foreach (var zvire in zoo.Zvirata)
+            foreach (var zvire in zoo.Zvirata.Zvirata)
             {
                 if (zvire.Nazev.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {

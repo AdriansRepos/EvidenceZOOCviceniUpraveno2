@@ -1,16 +1,18 @@
 ﻿using TextHelper;
 using SelectHelper;
 using PohybHelper;
+using EvidenceZOOCviceniUpraveno2.Enumy;
+using EvidenceZOOCviceniUpraveno2.Data;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class SpravceSkladu(ZOO zoo)
+    class SpravceSkladu(Zoo zoo)
     {
-        private readonly ZOO zoo = zoo;
+        private readonly Zoo zoo = zoo;
 
         public void Menu()
         {
-            zoo.ZajistiData("Sklad");
+            zoo.Sklad.Nacti();
             char volba;
             do
             {
@@ -97,9 +99,9 @@ namespace EvidenceZOOCviceniUpraveno2
             var novaPolozka = new SkladovaPolozka(nazev, kategorie, mnozstvi, jednotka, minimalniStav);
 
             bool uspech = Transakce.ProvedSUlozenim(
-                akce: () => zoo.Sklad.Add(novaPolozka),
-                rollback: () => zoo.Sklad.Remove(novaPolozka),
-                ulozeni: zoo.UlozSklad,
+                akce: () => zoo.Sklad.Sklad.Add(novaPolozka),
+                rollback: () => zoo.Sklad.Sklad.Remove(novaPolozka),
+                ulozeni: zoo.Sklad.UlozSklad,
                 popisOperace: "přidání skladové položky");
 
             if (uspech)
@@ -117,13 +119,13 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.WriteLine($"{"Název",-20} {"Kategorie",-25} {"Množství",8} {"Jednotka",-8}");
             Console.WriteLine(new string('-', 70));
 
-            foreach (var polozka in zoo.Sklad)
+            foreach (var polozka in zoo.Sklad.Sklad)
                 polozka.VypisPolozku();
         }
 
         public void Naskladnit()
         {
-            var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky k naskladnění");
+            var polozka = SelectHelp.VybratPolozku(zoo.Sklad.Sklad, p => p.Nazev, "položky k naskladnění");
             if (polozka == null) 
                 return;
 
@@ -138,23 +140,20 @@ namespace EvidenceZOOCviceniUpraveno2
                 akce: () =>
                 {
                     polozka.Mnozstvi += pridat;
-                    zoo.SkladovaHistorie.Add(pohyb);
+                    zoo.Sklad.SkladovaHistorie.Add(pohyb);
                 },
                 rollback: () =>
                 {
                     polozka.Mnozstvi = puvodniMnozstvi;
-                    zoo.SkladovaHistorie.Remove(pohyb);
+                    zoo.Sklad.SkladovaHistorie.Remove(pohyb);
                 },
-                ulozeni: () =>
-                {
-                    zoo.UlozSkladSHistorii();
-                },
+                ulozeni: zoo.Sklad.UlozSkladSHistorii,
                 popisOperace: "naskladnění");
 
             if (uspech)
             {
                 // Skladové pohyby auditujeme kvůli ochraně proti úbytku majetku
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – naskladnění",
                     puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
 
@@ -166,7 +165,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public void Vyskladnit()
         {
-            var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky k vyskladnění");
+            var polozka = SelectHelp.VybratPolozku(zoo.Sklad.Sklad, p => p.Nazev, "položky k vyskladnění");
             if (polozka == null) 
                 return;
 
@@ -189,23 +188,20 @@ namespace EvidenceZOOCviceniUpraveno2
                 akce: () =>
                 {
                     polozka.Mnozstvi -= odebrat;
-                    zoo.SkladovaHistorie.Add(pohyb);
+                    zoo.Sklad.SkladovaHistorie.Add(pohyb);
                 },
                 rollback: () =>
                 {
                     polozka.Mnozstvi = puvodniMnozstvi;
-                    zoo.SkladovaHistorie.Remove(pohyb);
+                    zoo.Sklad.SkladovaHistorie.Remove(pohyb);
                 },
-                ulozeni: () =>
-                {
-                    zoo.UlozSkladSHistorii();
-                },
+                ulozeni: zoo.Sklad.UlozSkladSHistorii,
                 popisOperace: "vyskladnění");
 
             if (!uspech) 
                 return;
 
-            zoo.ZapisAudit(AuditZaznam.Vytvor(
+            zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                 "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – vyskladnění",
                 puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
 
@@ -225,19 +221,19 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public void Smazat()
         {
-            var polozka = SelectHelp.VybratPolozku(zoo.Sklad, p => p.Nazev, "položky ke smazání");
+            var polozka = SelectHelp.VybratPolozku(zoo.Sklad.Sklad, p => p.Nazev, "položky ke smazání");
             if (polozka == null) 
                 return;
 
             bool uspech = Transakce.ProvedSUlozenim(
-                akce: () => zoo.Sklad.Remove(polozka),
-                rollback: () => zoo.Sklad.Add(polozka),
-                ulozeni: zoo.UlozSklad,
+                akce: () => zoo.Sklad.Sklad.Remove(polozka),
+                rollback: () => zoo.Sklad.Sklad.Add(polozka),
+                ulozeni: zoo.Sklad.UlozSklad,
                 popisOperace: "smazání skladové položky");
 
             if (uspech)
             {
-                zoo.ZapisAudit(AuditZaznam.Vytvor(
+                zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Sklad", TypAkce.Smazano, polozka.Nazev,
                     puvodniHodnota: $"{polozka.Mnozstvi:0.##} {polozka.Jednotka}"));
 
@@ -249,7 +245,7 @@ namespace EvidenceZOOCviceniUpraveno2
 
         public void VypisDochazejici()
         {
-            var dochazejici = zoo.Sklad.Where(p => p.JeDochazejici).ToList();
+            var dochazejici = zoo.Sklad.Sklad.Where(p => p.JeDochazejici).ToList();
 
             if (dochazejici.Count == 0)
             {
@@ -272,7 +268,7 @@ namespace EvidenceZOOCviceniUpraveno2
             Console.WriteLine("VÝPIS SKLADOVÝCH POHYBŮ (inventura)");
 
             var typFiltr = SelectHelp.VybratTypNeboVse<SkladovyTypPohybu>();
-            var vysledek = SelectHelp.VybratRozmeziData(zoo.SkladovaHistorie);
+            var vysledek = SelectHelp.VybratRozmeziData(zoo.Sklad.SkladovaHistorie);
 
             if (typFiltr != null)
                 vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];

@@ -1,17 +1,19 @@
-﻿using PohybHelper;
+﻿using EvidenceZOOCviceniUpraveno2.Enumy;
+using EvidenceZOOCviceniUpraveno2.Data;
+using PohybHelper;
 using TextHelper;
 
-namespace EvidenceZOOCviceniUpraveno2
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class Statistiky(ZOO zoo)
+    class Statistiky(Zoo zoo)
     {
-        private readonly ZOO zoo = zoo;
+        private readonly Zoo zoo = zoo;
                 
         public void MenuStatistiky()
         {
-            zoo.ZajistiData("Zaměstnanci");
-            zoo.ZajistiData("Zvířata");
-            zoo.ZajistiData("Pokladna");
+            zoo.Zamestnanci.Nacti();
+            zoo.Zvirata.Nacti();
+            zoo.Pokladna.Nacti();
             char volba;
             do
             {
@@ -74,13 +76,13 @@ namespace EvidenceZOOCviceniUpraveno2
             while (volba != '5');
         }
 
-        public int PocetZvirat() => zoo.Zvirata.Count;
-        public int PocetZamestnancu() => zoo.Zamestnanci.Count;
-        public int SoucetMezd() => zoo.Zamestnanci.Sum(z => z.Mzda);
+        public int PocetZvirat() => zoo.Zvirata.Zvirata.Count;
+        public int PocetZamestnancu() => zoo.Zamestnanci.Zamestnanci.Count;
+        public int SoucetMezd() => zoo.Zamestnanci.Zamestnanci.Sum(z => z.Mzda);
 
         public double PrumernaDenniNavstevnost(int rok, int mesic)
         {
-            var pohybyVMesici = zoo.PokladniPohyby
+            var pohybyVMesici = zoo.Pokladna.PokladniPohyby
                 .Where(p => p.DatumCas.Year == rok && p.DatumCas.Month == mesic)
                 .ToList();
 
