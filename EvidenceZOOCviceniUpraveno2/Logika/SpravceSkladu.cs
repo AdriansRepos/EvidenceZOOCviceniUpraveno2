@@ -25,11 +25,11 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine("\t5. Smazat položku");
                 Console.WriteLine("\t6. Vypsat docházející položky");
                 Console.WriteLine("\t7. Vypsat pohyby (inventura)");
-                Console.WriteLine("\t8. Návrat do hlavního menu");
+                Console.WriteLine("\tn. Návrat do hlavního menu");
                 Console.ResetColor();
                 Console.Write("Vyber možnost: ");
 
-                volba = Console.ReadKey().KeyChar;
+                volba = char.ToLower(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
                 switch (volba)
@@ -62,7 +62,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         VypisPohybyInventura(); 
                         break;
 
-                    case '8': 
+                    case 'n': 
                         break;
 
                     default:
@@ -71,7 +71,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         Console.ResetColor();
                         break;
                 }
-            } while (volba != '8');
+            } while (volba != 'n');
         }
 
         public void PridatPolozku()
