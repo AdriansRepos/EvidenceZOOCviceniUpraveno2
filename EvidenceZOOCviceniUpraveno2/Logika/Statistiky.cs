@@ -23,11 +23,11 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine("\t2. Počet zaměstnanců");
                 Console.WriteLine("\t3. Součet mezd zaměstnanců");
                 Console.WriteLine("\t4. Průměrná denní návštěvnost (za měsíc)");
-                Console.WriteLine("\t5. Návrat do hlavního menu");
+                Console.WriteLine("\tn. Návrat do hlavního menu");
                 Console.ResetColor();
                 Console.Write("Vyber možnost: ");
 
-                volba = Console.ReadKey().KeyChar;
+                volba = char.ToLower(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
                 switch (volba)
@@ -65,6 +65,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
                         Console.WriteLine($"Průměrná denní návštěvnost za {mesicNavstevnost}/{rokNavstevnost}: {navstevnost:0.##} osob/den");
                         break;
+                    
+                        case 'n':
+                            break;
 
                     default:
                         Console.ForegroundColor = ConsoleColor.Yellow;
@@ -73,7 +76,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         break;
                 }
             }
-            while (volba != '5');
+            while (volba != 'n');
         }
 
         public int PocetZvirat() => zoo.Zvirata.Zvirata.Count;
