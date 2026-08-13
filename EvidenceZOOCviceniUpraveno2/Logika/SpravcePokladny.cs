@@ -23,11 +23,11 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine("\t3. Upravit ceník");
                 Console.WriteLine("\t4. Denní uzávěrka");
                 Console.WriteLine("\t5. Vypsat pohyby (dle data)");
-                Console.WriteLine("\t6. Návrat do hlavního menu");
+                Console.WriteLine("\tn. Návrat do hlavního menu");
                 Console.ResetColor();
                 Console.Write("Vyber možnost: ");
 
-                volba = Console.ReadKey().KeyChar;
+                volba = char.ToLower(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
                 switch (volba)
@@ -52,7 +52,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         VypisPohybyDlePeriody(); 
                         break;
 
-                    case '6': 
+                    case 'n': 
                         break;
 
                     default:
@@ -61,7 +61,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         Console.ResetColor();
                         break;
                 }
-            } while (volba != '6');
+            } while (volba != 'n');
         }
 
         public void ProdatVstupenku()
