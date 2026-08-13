@@ -26,11 +26,11 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine("\t3. Smazat zvíře");
                 Console.WriteLine("\t4. Upravit zvíře");
                 Console.WriteLine("\t5. Vyhledat zvíře");
-                Console.WriteLine("\t6. Návrat do hlavního menu");
+                Console.WriteLine("\tn. Návrat do hlavního menu");
                 Console.ResetColor();
                 Console.Write("Vyber možnost: ");
 
-                volba = Console.ReadKey().KeyChar;
+                volba = char.ToLower(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
                 switch (volba)
@@ -55,7 +55,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         Vyhledat(); 
                         break;
 
-                    case '6': 
+                    case 'n': 
                         break;
 
                     default:
@@ -65,7 +65,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         break;
                 }
 
-            } while (volba != '6');
+            } while (volba != 'n');
         }
 
         public void Pridat()
