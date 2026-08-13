@@ -76,7 +76,7 @@ do
             Console.ResetColor();
             break;
 
-        case '0':
+        case 'k':
             break;
 
         default:
