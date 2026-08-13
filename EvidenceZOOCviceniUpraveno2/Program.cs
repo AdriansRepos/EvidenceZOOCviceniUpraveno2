@@ -34,11 +34,11 @@ do
     Console.WriteLine("\t5. Statistiky");
     Console.WriteLine("\t6. Zálohovat teď");
     Console.WriteLine("\t7. Nastavit cestu k externí záloze");
-    Console.WriteLine("\t0. Konec");
+    Console.WriteLine("\tk. Konec programu");
     Console.ResetColor();
     Console.Write("Vyber možnost: ");
 
-    volbaMenu = Console.ReadKey().KeyChar;
+    volbaMenu = char.ToLower(Console.ReadKey().KeyChar);
     Console.WriteLine();
 
     switch (volbaMenu)
@@ -86,4 +86,4 @@ do
             break;
     }
 }
-while (volbaMenu != '0');
+while (volbaMenu != 'k');
