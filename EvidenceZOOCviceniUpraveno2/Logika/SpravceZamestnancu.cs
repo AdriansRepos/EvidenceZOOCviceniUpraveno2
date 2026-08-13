@@ -24,11 +24,11 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine("\t4. Upravit zaměstnance");
                 Console.WriteLine("\t5. Vyhledat zaměstnance");
                 Console.WriteLine("\t6. Nastavení číslování zaměstnanců");
-                Console.WriteLine("\t7. Návrat do hlavního menu");
+                Console.WriteLine("\tn. Návrat do hlavního menu");
                 Console.ResetColor();
                 Console.Write("Vyber možnost: ");
 
-                volba = Console.ReadKey().KeyChar;
+                volba = char.ToLower(Console.ReadKey().KeyChar);
                 Console.WriteLine();
 
                 switch (volba)
@@ -57,7 +57,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         NastaveniCislovaniZamestnancu(); 
                         break;
 
-                    case '7': 
+                    case 'n': 
                         break;
 
                     default:
@@ -67,7 +67,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                         break;
                 }
 
-            } while (volba != '7');
+            } while (volba != 'n');
         }
 
         public void Pridat()
