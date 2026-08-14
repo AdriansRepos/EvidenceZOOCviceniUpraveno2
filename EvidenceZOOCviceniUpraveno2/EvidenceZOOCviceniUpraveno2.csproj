@@ -33,6 +33,7 @@
 
   <ItemGroup>
     <Folder Include="Menu\" />
+    <Folder Include="Vypisy\" />
   </ItemGroup>
 
 </Project>
