@@ -1,8 +1,9 @@
-﻿using TextHelper;
-using SelectHelper;
-using PohybHelper;
+﻿using EvidenceZOOCviceniUpraveno2.Data;
 using EvidenceZOOCviceniUpraveno2.Enumy;
-using EvidenceZOOCviceniUpraveno2.Data;
+using InputHelper;
+using PohybHelper;
+using SelectHelper;
+using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -84,6 +85,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                 DateOnly.MinValue, "datum narození", v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
 
+            string rodneCislo = UpravaVstupu.ZeptejSeAUprav(
+                "", "rodné číslo (např. 900101/1234)", v => v, s => s, jeNove: true);
+
             int mzda = UpravaVstupu.ZeptejSeAUprav(
                 0, "mzda", v => v.ToString(), s => int.Parse(s), jeNove: true);
 
@@ -113,7 +117,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             List<Dite> deti = ZadatDeti();
 
-            Zamestnanec novy = new(osobniCislo, jmeno, prijmeni, datumNarozeni, mzda, pracovniPozice,
+            Zamestnanec novy = new(osobniCislo, jmeno, prijmeni, datumNarozeni, rodneCislo, mzda, pracovniPozice,
                 mesto, ulice, psc, telefon, email, rodinnyStav, zdravotniStav, typDokladu, cisloDokladu, deti);
 
             bool uspech = Transakce.ProvedSUlozenim(
@@ -171,18 +175,18 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 DateOnly datumNarozeniDite = UpravaVstupu.ZeptejSeAUprav(
                     DateOnly.MinValue, "datum narození dítěte", v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
 
-                string adresaDite = UpravaVstupu.ZeptejSeAUprav("", "adresa dítěte", v => v, s => s, jeNove: true);
-                string skolaDite = UpravaVstupu.ZeptejSeAUprav("", "škola dítěte", v => v, s => s, jeNove: true);
+                string rodneCisloDite = UpravaVstupu.ZeptejSeAUprav(
+                    "", "rodné číslo dítěte (např. 1101011234)", v => v, s => s, jeNove: true);
 
-                bool invalidita = UpravaVstupu.ZeptejSeAUprav(
-                    false, "invalidita dítěte (ano/ne)", v => v ? "ano" : "ne",
+                bool jeDrzitelZtpP = UpravaVstupu.ZeptejSeAUprav(
+                    false, "držitel průkazu ZTP/P (ano/ne)", v => v ? "ano" : "ne",
                     s => s.Trim().Equals("ano", StringComparison.OrdinalIgnoreCase), jeNove: true);
 
                 bool uplatnenBonus = UpravaVstupu.ZeptejSeAUprav(
                     false, "uplatnit daňový bonus na dítě (ano/ne)", v => v ? "ano" : "ne",
                     s => s.Trim().Equals("ano", StringComparison.OrdinalIgnoreCase), jeNove: true);
 
-                deti.Add(new Dite(jmenoDite, prijmeniDite, datumNarozeniDite, adresaDite, skolaDite, invalidita, uplatnenBonus));
+                deti.Add(new Dite(jmenoDite, prijmeniDite, datumNarozeniDite, rodneCisloDite, jeDrzitelZtpP, uplatnenBonus));
             }
 
             return deti;
@@ -221,6 +225,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             zam.DatumNarozeni = UpravaVstupu.ZeptejSeAUprav(
                 zam.DatumNarozeni, "datum narození", v => v.ToString(), s => DateOnly.Parse(s));
+
+            zam.RodneCislo = UpravaVstupu.ZeptejSeAUprav(
+                zam.RodneCislo, "rodné číslo (např. 900101/1234)", v => v, s => RodneCislo.Zkontroluj(s));
 
             zam.Mzda = UpravaVstupu.ZeptejSeAUprav(zam.Mzda, "mzda", v => v.ToString(), s => int.Parse(s));
 
