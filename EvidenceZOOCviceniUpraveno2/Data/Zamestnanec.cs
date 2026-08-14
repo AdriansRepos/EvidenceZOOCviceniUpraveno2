@@ -78,12 +78,20 @@ namespace EvidenceZOOCviceniUpraveno2.Data
         [JsonPropertyName("cisloDokladu")]
         public string CisloDokladu { get; internal set; } = string.Empty;
 
+        private string _rodneCislo = string.Empty;
+        [JsonPropertyName("rodneCislo")]
+        public string RodneCislo
+        {
+            get => _rodneCislo;
+            internal set => _rodneCislo = InputHelper.RodneCislo.Zkontroluj(value);
+        }
+
         [JsonPropertyName("deti")]
         public List<Dite> Deti { get; internal set; } = [];
 
         [JsonConstructor]
         public Zamestnanec(string osobniCislo, string jmeno, string prijmeni, DateOnly datumNarozeni,
-            int mzda, string pracovniPozice, string mesto, string ulice, string psc,
+            string rodneCislo, int mzda, string pracovniPozice, string mesto, string ulice, string psc,
             string telefon, string email, RodinnyStav rodinnyStav, ZdravotniStav zdravotniStav,
             string typDokladu, string cisloDokladu, List<Dite> deti)
         {
@@ -91,6 +99,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data
             Jmeno = jmeno;
             Prijmeni = prijmeni;
             DatumNarozeni = datumNarozeni;
+            RodneCislo = rodneCislo;
             Mzda = mzda;
             PracovniPozice = pracovniPozice;
             Mesto = mesto;
@@ -142,8 +151,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data
                 foreach (Dite dite in Deti)
                 {
                     string bonus = dite.UplatnenBonus ? " (uplatněn bonus)" : "";
-                    string invalidita = dite.Invalidita ? " [invalidní]" : "";
-                    Console.WriteLine($"  - {dite.Jmeno} {dite.Prijmeni}, nar. {dite.DatumNarozeni:d}, {dite.Skola}{invalidita}{bonus}");
+                    string ztpP = dite.JeDrzitelZtpP ? " [ZTP/P]" : "";
+                    Console.WriteLine($"  - {dite.Jmeno} {dite.Prijmeni}, nar. {dite.DatumNarozeni:d}, RČ: {dite.RodneCislo}{ztpP}{bonus}");
                 }
             }
         }
