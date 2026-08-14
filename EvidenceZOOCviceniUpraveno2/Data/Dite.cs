@@ -3,7 +3,11 @@ using InputHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Data
 {
-    public class Dite
+    /// <summary>
+    /// Reprezentuje dítě zaměstnance – evidováno kvůli uplatnění
+    /// daňového bonusu a evidenci ZTP/P pro mzdové účely.
+    /// </summary>
+    class Dite
     {
         private string _jmeno = string.Empty;
         [JsonPropertyName("jmeno")]
@@ -24,28 +28,33 @@ namespace EvidenceZOOCviceniUpraveno2.Data
         [JsonPropertyName("datumNarozeni")]
         public DateOnly DatumNarozeni { get; internal set; }
 
-        [JsonPropertyName("adresa")]
-        public string Adresa { get; internal set; } = string.Empty;
+        private string _rodneCislo = string.Empty;
+        [JsonPropertyName("rodneCislo")]
+        public string RodneCislo
+        {
+            get => _rodneCislo;
+            internal set => _rodneCislo = InputHelper.RodneCislo.Zkontroluj(value);
+        }
 
-        [JsonPropertyName("skola")]
-        public string Skola { get; internal set; } = string.Empty;
-
-        [JsonPropertyName("invalidita")]
-        public bool Invalidita { get; internal set; }
+        /// <summary>
+        /// Držitel průkazu ZTP/P – jediná zdravotní informace relevantní
+        /// pro mzdové účely u dítěte (automaticky implikuje invaliditu).
+        /// </summary>
+        [JsonPropertyName("jeDrzitelZtpP")]
+        public bool JeDrzitelZtpP { get; internal set; }
 
         [JsonPropertyName("uplatnenBonus")]
         public bool UplatnenBonus { get; internal set; }
 
         [JsonConstructor]
         public Dite(string jmeno, string prijmeni, DateOnly datumNarozeni,
-            string adresa, string skola, bool invalidita, bool uplatnenBonus)
+            string rodneCislo, bool jeDrzitelZtpP, bool uplatnenBonus)
         {
             Jmeno = jmeno;
             Prijmeni = prijmeni;
             DatumNarozeni = datumNarozeni;
-            Adresa = adresa;
-            Skola = skola;
-            Invalidita = invalidita;
+            RodneCislo = rodneCislo;
+            JeDrzitelZtpP = jeDrzitelZtpP;
             UplatnenBonus = uplatnenBonus;
         }
     }
