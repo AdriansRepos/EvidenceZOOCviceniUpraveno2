@@ -7,7 +7,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data
     /// Reprezentuje dítě zaměstnance – evidováno kvůli uplatnění
     /// daňového bonusu a evidenci ZTP/P pro mzdové účely.
     /// </summary>
-    class Dite
+    public class Dite
     {
         private string _jmeno = string.Empty;
         [JsonPropertyName("jmeno")]
