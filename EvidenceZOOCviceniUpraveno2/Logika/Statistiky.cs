@@ -5,82 +5,21 @@ using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class Statistiky(Zoo zoo)
+    internal class Statistiky(Zoo zoo)
     {
         private readonly Zoo zoo = zoo;
-                
-        public void MenuStatistiky()
+
+        public void NactiData()
         {
             zoo.Zamestnanci.Nacti();
             zoo.Zvirata.Nacti();
             zoo.Pokladna.Nacti();
-            char volba;
-            do
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("\n=== STATISTIKY ===");
-                Console.WriteLine("\t1. Počet zvířat");
-                Console.WriteLine("\t2. Počet zaměstnanců");
-                Console.WriteLine("\t3. Součet mezd zaměstnanců");
-                Console.WriteLine("\t4. Průměrná denní návštěvnost (za měsíc)");
-                Console.WriteLine("\tn. Návrat do hlavního menu");
-                Console.ResetColor();
-                Console.Write("Vyber možnost: ");
-
-                volba = char.ToLower(Console.ReadKey().KeyChar);
-                Console.WriteLine();
-
-                switch (volba)
-                {
-                    case '1':
-                        Console.WriteLine($"Počet zvířat: {PocetZvirat()}");
-                        break;
-
-                    case '2':
-                        Console.WriteLine($"Počet zaměstnanců: {PocetZamestnancu()}");
-                        break;
-
-                    case '3':
-                        Console.WriteLine($"Součet mezd: {SoucetMezd()} Kč");
-                        break;
-
-                    case '4':
-                        int rokNavstevnost = UpravaVstupu.ZeptejSeAUprav(
-                            DateTime.Now.Year, "rok (např. 2026)",
-                            v => v.ToString(), s => int.Parse(s), jeNove: true);
-
-                        int mesicNavstevnost = UpravaVstupu.ZeptejSeAUprav(
-                            DateTime.Now.Month, "měsíc (1-12)",
-                            v => v.ToString(),
-                            s =>
-                            {
-                                int m = int.Parse(s);
-                                if (m < 1 || m > 12)
-                                    throw new ArgumentOutOfRangeException(nameof(s), "Měsíc musí být 1-12.");
-                                return m;
-                            },
-                            jeNove: true);
-
-                        double navstevnost = PrumernaDenniNavstevnost(rokNavstevnost, mesicNavstevnost);
-
-                        Console.WriteLine($"Průměrná denní návštěvnost za {mesicNavstevnost}/{rokNavstevnost}: {navstevnost:0.##} osob/den");
-                        break;
-                    
-                        case 'n':
-                            break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Neplatná volba, opakujte zadání:");
-                        Console.ResetColor();
-                        break;
-                }
-            }
-            while (volba != 'n');
         }
 
         public int PocetZvirat() => zoo.Zvirata.Zvirata.Count;
+        
         public int PocetZamestnancu() => zoo.Zamestnanci.Zamestnanci.Count;
+        
         public int SoucetMezd() => zoo.Zamestnanci.Zamestnanci.Sum(z => z.Mzda);
 
         public double PrumernaDenniNavstevnost(int rok, int mesic)
