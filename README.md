@@ -86,80 +86,62 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 ---
 
-## Struktura projektu
-
 /ZOO
-
+├── Data
+│   ├── Repozitare          
+│   │   ├── KonfiguraceRepository.cs
+│   │   ├── LogyRepository.cs
+│   │   ├── PokladnaRepository.cs
+│   │   ├── SkladRepository.cs
+│   │   ├── ZamestnanciRepository.cs
+│   │   └── ZvirataRepository.cs
+│   └── PomocneTridy             
+│       └── SouborovyPomocnik.cs
+├── Entity                   
+│   ├── AuditZaznam.cs
+│   ├── Cenik.cs
+│   ├── CisloZamestnanceKonfigurace.cs
+│   ├── CisloZvireteKonfigurace.cs
+│   ├── Dite.cs
+│   ├── PokladniPohyb.cs
+│   ├── SkladovaPolozka.cs
+│   ├── SkladovyPohyb.cs
+│   ├── TechnickyZaznam.cs
+│   ├── Zamestnanec.cs
+│   ├── ZdravotniZaznam.cs
+│   ├── Zoo.cs
+│   └── Zvire.cs
+├── Enumy
+│   ├── KategoriePolozky.cs
+│   ├── RodinnyStav.cs
+│   ├── TypAkce.cs
+│   ├── TypVstupenky.cs
+│   ├── UrovenLogu.cs    
+│   └── ZdravotniStav.cs
+├── Logika
+│   ├── SpravcePokladny.cs
+│   ├── SpravceSkladu.cs
+│   ├── SpravceZamestnancu.cs
+│   ├── SpravceZvirat.cs
+│   ├── Statistiky.cs
+│   ├── Transakce.cs    
+│   └── VypocetCenyVstupenky.cs
+├── Menu
+│   ├── HlavniMenu.cs
+│   ├── MenuPokladna.cs
+│   ├── MenuSklad.cs
+│   ├── MenuStatistiky.cs
+│   ├── MenuZamestnanci.cs    
+│   └── MenuZvirata.cs
+├── Vypisy
+│   ├──
+│   ├──
+│   ├──
+│   └──
+├── Zaloha
+│   ├── ArchivacniSluzba.cs
+│   └── ZalohovaciSluzba.cs
 ├── Program.cs
-
-├── ZOO.cs
-
-├── ZOO.Konfigurace.cs
-
-├── ZOO.Zamestnanci.cs
-
-├── ZOO.Zvirata.cs
-
-├── ZOO.Sklad.cs
-
-├── ZOO.Pokladna.cs
-
-├── ZOO.Logy.cs
-
-├── ZOO.Archivace.cs
-
-├── ZOO.Zalohovani.cs
-
-├── ZOO.Statistiky.cs
-
-├── Zamestnanec.cs
-
-├── Zamestnanec.cs
-
-├── RodinnyStav.cs
-
-├── ZdravotniStav.cs
-
-├── Dite.cs
-
-├── CisloZamestnanceKonfigurace.cs
-
-├── Zvire.cs
-
-├── ZdravotniZaznam.cs
-
-├── CisloZvireteKonfigurace.cs
-
-├── SkladovaPolozka.cs
-
-├── SkladovyPohyb.cs
-
-├── Cenik.cs
-
-├── TypVstupenky.cs
-
-├── VypocetCenyVstupenky.cs
-
-├── PokladniPohyb.cs
-
-├── AuditZaznam.cs
-
-├── TypAkce.cs
-
-├── TechnickyZaznam.cs
-
-├── UrovenLogu.cs
-
-├── Transakce.cs
-
-├── SpravceZamestnancu.cs
-
-├── SpravceZvirat.cs
-
-├── SpravceSkladu.cs
-
-├── SpravcePokladny.cs
-
 └── README.md
 
 ---
@@ -182,13 +164,18 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 - **FileNameHelper** – čištění textu pro bezpečné použití jako název souboru/složky (`NazevSouboru.OcistiProNazevSouboru`)
 
+- **BarevneVypisyHelper** - barevné rozlišení zpráv v konzoli podle stupně závažnosti, nebo určení zprávy/výpisu (`VypisInformaci`)
+- 
 ---
 
 ## Použité techniky
 
 - OOP (třídy, vlastnosti, zapouzdření)
 - Primární konstruktory
-- Rozdělení třídy `ZOO` na partial soubory podle domény (konfigurace, zaměstnanci, zvířata, sklad, pokladna, logy, archivace, zálohování, statistiky) pro přehlednost a udržovatelnost
+- Rozdělení třídy `ZOO` na samostatné soubory podle domény (konfigurace, zaměstnanci, zvířata, sklad, pokladna, logy, archivace, zálohování, statistiky) pro přehlednost a udržovatelnost
+- Další vyčlenění samostatných souborů do jejich složek s názvem podle určení (data, repozitáře, pomocné třídy, entity, enumy, logika, menu, výpisy záloha)
+- Vyčlenění menu a všech výpisů do samostatných souborů - očištění datových a logických souborů a delegování této činnosti na samostatné soubory
+- Vyčištění složky s daty, entity přesunuty do své vlastní složky
 - Partial třídy a metody se zdrojově generovaným regulárním výrazem (`GeneratedRegex`)
 - Enumy (kategorie skladových položek, typ skladového pohybu)
 - Delegáty pro lazy loading dat (`RegistrujNacitani` / `ZajistiData`)
