@@ -1,6 +1,8 @@
-﻿using System.Text.Json;
+﻿using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
+using EvidenceZOOCviceniUpraveno2.Entity;
+using System.Text.Json;
 
-namespace EvidenceZOOCviceniUpraveno2.Data
+namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
     /// Zodpovídá výhradně za perzistenci pokladních pohybů a ceníku.

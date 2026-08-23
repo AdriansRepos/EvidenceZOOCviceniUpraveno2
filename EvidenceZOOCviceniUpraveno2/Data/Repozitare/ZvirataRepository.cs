@@ -1,8 +1,10 @@
 ﻿using System.Text.Json;
 using DateConverterForJson;
+using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
+using EvidenceZOOCviceniUpraveno2.Entity;
 using FileNameHelper;
 
-namespace EvidenceZOOCviceniUpraveno2.Data
+namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
     /// Zodpovídá výhradně za perzistenci zvířat – každé zvíře je uložené

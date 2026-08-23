@@ -1,8 +1,10 @@
 ﻿using System.Text.Json;
+using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
+using EvidenceZOOCviceniUpraveno2.Entity;
 using PohybHelper;
 
 
-namespace EvidenceZOOCviceniUpraveno2.Data
+namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
     /// Zodpovídá výhradně za perzistenci skladu a historie skladových pohybů.

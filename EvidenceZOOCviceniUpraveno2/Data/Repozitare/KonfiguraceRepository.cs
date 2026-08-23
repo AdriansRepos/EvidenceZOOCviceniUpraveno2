@@ -1,4 +1,4 @@
-﻿namespace EvidenceZOOCviceniUpraveno2.Data
+﻿namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
     /// Spravuje config.ini, cestu ke kořenové datové složce, adresářovou
