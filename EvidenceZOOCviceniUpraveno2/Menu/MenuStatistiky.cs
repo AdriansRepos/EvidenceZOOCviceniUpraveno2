@@ -13,9 +13,8 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
             statistiky.NactiData();
             char volba;
 
-            do
-            {
-                // Využití nové barevné knihovny
+            do            
+            {               
                 VypisyDoKonzole.VypisHlavickuMenu("STATISTIKY");
                 VypisyDoKonzole.VypisTeloMenu(
                     "1. Počet zvířat",
@@ -51,7 +50,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
                         break;
 
                     default:
-                        VypisyDoKonzole.VypisInformaci("Neplatná volba, opakujte zadání:");
+                        VypisyDoKonzole.VypisInformaci("Neplatná volba, opakujte zadání: ");
                         break;
                 }
             }
