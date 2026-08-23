@@ -1,116 +1,32 @@
-﻿using TextHelper;
-using SelectHelper;
-using PohybHelper;
+﻿using PohybHelper;
 using EvidenceZOOCviceniUpraveno2.Enumy;
-using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.Entity;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class SpravcePokladny(Zoo zoo)
+    internal class SpravcePokladny(Zoo zoo)
     {
         private readonly Zoo zoo = zoo;
 
-        public void Menu()
+        public void NactiData()
         {
             zoo.Pokladna.Nacti();
-            char volba;
-            do
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("\n=== MENU POKLADNA ===");
-                Console.WriteLine("\t1. Prodat vstupenku");
-                Console.WriteLine("\t2. Stornovat vstupenku");
-                Console.WriteLine("\t3. Upravit ceník");
-                Console.WriteLine("\t4. Denní uzávěrka");
-                Console.WriteLine("\t5. Vypsat pohyby (dle data)");
-                Console.WriteLine("\tn. Návrat do hlavního menu");
-                Console.ResetColor();
-                Console.Write("Vyber možnost: ");
-
-                volba = char.ToLower(Console.ReadKey().KeyChar);
-                Console.WriteLine();
-
-                switch (volba)
-                {
-                    case '1': 
-                        ProdatVstupenku(); 
-                        break;
-
-                    case '2': 
-                        StornovatVstupenku(); 
-                        break;
-
-                    case '3':
-                        UpravitCenik(); 
-                        break;
-
-                    case '4': 
-                        DenniUzaverka(); 
-                        break;
-
-                    case '5': 
-                        VypisPohybyDlePeriody(); 
-                        break;
-
-                    case 'n': 
-                        break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Neplatná volba, opakujte zadání:");
-                        Console.ResetColor();
-                        break;
-                }
-            } while (volba != 'n');
         }
 
-        public void ProdatVstupenku()
+        public Cenik ZiskejCenik() => zoo.Pokladna.Cenik;
+
+        public List<PokladniPohyb> ZiskejVsechnyPohyby() => zoo.Pokladna.PokladniPohyby;
+
+        public List<PokladniPohyb> ZiskejProdejeProStorno()
         {
-            Console.WriteLine("PRODEJ VSTUPENKY");
+            return zoo.Pokladna.PokladniPohyby
+                .Where(p => p.TypPohybu == PokladniTypPohybu.Prodej)
+                .OrderByDescending(p => p.DatumCas)
+                .ToList();
+        }
 
-            Console.WriteLine("Vyber kategorii vstupenky:");
-            var typVstupenky = SelectHelp.VybratTypNeboVse<TypVstupenky>();
-
-            if (typVstupenky == null)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Musíš vybrat konkrétní typ vstupenky.");
-                Console.ResetColor();
-                return;
-            }
-
-            TypVstupenky typ = typVstupenky.Value;
-            int pocetKusu = 0;
-            int pocetDospelych = 0;
-            int pocetDeti = 0;
-
-            switch (typ)
-            {
-                case TypVstupenky.Detska:
-                case TypVstupenky.Dospela:
-                case TypVstupenky.ZTP:
-                case TypVstupenky.Duchodce:
-                    pocetKusu = UpravaVstupu.ZeptejSeAUprav(
-                        1, "počet kusů", v => v.ToString(), s => int.Parse(s), jeNove: true);
-                    break;
-
-                case TypVstupenky.RodinaUplna:
-                case TypVstupenky.RodinaNeuplna:
-                    pocetKusu = 1;
-                    pocetDospelych = typ == TypVstupenky.RodinaUplna ? 2 : 1;
-                    pocetDeti = UpravaVstupu.ZeptejSeAUprav(
-                        0, "počet dětí", v => v.ToString(), s => int.Parse(s), jeNove: true);
-                    break;
-
-                case TypVstupenky.Skupina:
-                    pocetKusu = 1;
-                    pocetDospelych = UpravaVstupu.ZeptejSeAUprav(
-                        0, "počet dospělých ve skupině", v => v.ToString(), s => int.Parse(s), jeNove: true);
-                    pocetDeti = UpravaVstupu.ZeptejSeAUprav(
-                        0, "počet dětí ve skupině", v => v.ToString(), s => int.Parse(s), jeNove: true);
-                    break;
-            }
-
+        public void ProdatVstupenku(TypVstupenky typ, int pocetKusu, int pocetDospelych, int pocetDeti)
+        {
             decimal jednotkovaCena = VypocetCenyVstupenky.Vypocitej(typ, zoo.Pokladna.Cenik, pocetDospelych, pocetDeti);
             decimal celkovaCastka = typ is TypVstupenky.Detska or TypVstupenky.Dospela or TypVstupenky.ZTP or TypVstupenky.Duchodce
                 ? jednotkovaCena * pocetKusu
@@ -138,27 +54,8 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
-        public void StornovatVstupenku()
+        public void StornovatVstupenku(PokladniPohyb vybrany)
         {
-            Console.WriteLine("STORNO VSTUPENKY");
-
-            var prodeje = zoo.Pokladna.PokladniPohyby
-                .Where(p => p.TypPohybu == PokladniTypPohybu.Prodej)
-                .OrderByDescending(p => p.DatumCas)
-                .ToList();
-
-            if (prodeje.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Žádné prodeje ke stornování.");
-                Console.ResetColor();
-                return;
-            }
-
-            var vybrany = SelectHelp.VybratPolozku(prodeje, p => p.Popis(), "prodeje ke stornování");
-            if (vybrany == null) 
-                return;
-
             var storno = new PokladniPohyb(
                 PokladniTypPohybu.Storno, vybrany.TypVstupenky,
                 vybrany.PocetKusu, vybrany.PocetDospelych, vybrany.PocetDeti,
@@ -172,7 +69,6 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             if (uspech)
             {
-                // Storno je typický vektor podvodu, auditujeme vždy
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Pokladna", TypAkce.Pridano, $"Storno: {storno.Popis()}",
                     puvodniHodnota: $"{storno.Castka:0.##} Kč"));
@@ -183,10 +79,8 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
-        public void UpravitCenik()
+        public void UpravCenik(decimal detska, decimal dospela, decimal ztp, decimal duchodce, decimal slevaRodina, decimal slevaSkupina)
         {
-            Console.WriteLine("ÚPRAVA CENÍKU");
-
             var cenik = zoo.Pokladna.Cenik;
 
             decimal puvodniDetska = cenik.CenaDetska;
@@ -196,23 +90,12 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             decimal puvodniSlevaRodina = cenik.SlevaRodinaProcenta;
             decimal puvodniSlevaSkupina = cenik.SlevaSkupinaProcenta;
 
-            cenik.CenaDetska = UpravaVstupu.ZeptejSeAUprav(
-                cenik.CenaDetska, "cena dětské vstupenky", v => v.ToString(), s => decimal.Parse(s));
-
-            cenik.CenaDospela = UpravaVstupu.ZeptejSeAUprav(
-                cenik.CenaDospela, "cena dospělé vstupenky", v => v.ToString(), s => decimal.Parse(s));
-
-            cenik.CenaZTP = UpravaVstupu.ZeptejSeAUprav(
-                cenik.CenaZTP, "cena ZTP vstupenky", v => v.ToString(), s => decimal.Parse(s));
-
-            cenik.CenaDuchodce = UpravaVstupu.ZeptejSeAUprav(
-                cenik.CenaDuchodce, "cena vstupenky pro důchodce", v => v.ToString(), s => decimal.Parse(s));
-
-            cenik.SlevaRodinaProcenta = UpravaVstupu.ZeptejSeAUprav(
-                cenik.SlevaRodinaProcenta, "sleva na rodinnou vstupenku (%)", v => v.ToString(), s => decimal.Parse(s));
-
-            cenik.SlevaSkupinaProcenta = UpravaVstupu.ZeptejSeAUprav(
-                cenik.SlevaSkupinaProcenta, "sleva na skupinovou vstupenku (%)", v => v.ToString(), s => decimal.Parse(s));
+            cenik.CenaDetska = detska;
+            cenik.CenaDospela = dospela;
+            cenik.CenaZTP = ztp;
+            cenik.CenaDuchodce = duchodce;
+            cenik.SlevaRodinaProcenta = slevaRodina;
+            cenik.SlevaSkupinaProcenta = slevaSkupina;
 
             zoo.Pokladna.UlozCenik();
 
@@ -255,6 +138,27 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
 
             VypisUzaverku(dnesniPohyby, $"Uzávěrka za {DateTime.Today:d.M.yyyy}");
+        }
+
+        public void ZobrazPohybyDlePeriody(List<PokladniPohyb> vysledek, PokladniTypPohybu? typFiltr)
+        {
+            if (typFiltr != null)
+                vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
+
+            if (vysledek.Count == 0)
+            {
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine("Žádné pohyby neodpovídají zadaným kritériím.");
+                Console.ResetColor();
+                return;
+            }
+
+            VypisUzaverku(vysledek, "Souhrn za zvolené období");
+
+            Console.WriteLine();
+            Console.WriteLine("PODROBNÝ VÝPIS:");
+            foreach (var pohyb in vysledek.OrderByDescending(p => p.DatumCas))
+                pohyb.VypisPohyb();
         }
 
         private static void VypisUzaverku(List<PokladniPohyb> pohyby, string nadpis)
@@ -327,32 +231,6 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
                 Console.WriteLine($"  {nazevKategorie,-45} {pocetOsob,4} osob   {castka,10:0.##} Kč");
             }
-        }
-
-        public void VypisPohybyDlePeriody()
-        {
-            Console.WriteLine("VÝPIS POKLADNÍCH POHYBŮ");
-
-            var typFiltr = SelectHelp.VybratTypNeboVse<PokladniTypPohybu>();
-            var vysledek = SelectHelp.VybratRozmeziData(zoo.Pokladna.PokladniPohyby);
-
-            if (typFiltr != null)
-                vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
-
-            if (vysledek.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Žádné pohyby neodpovídají zadaným kritériím.");
-                Console.ResetColor();
-                return;
-            }
-
-            VypisUzaverku(vysledek, "Souhrn za zvolené období");
-
-            Console.WriteLine();
-            Console.WriteLine("PODROBNÝ VÝPIS:");
-            foreach (var pohyb in vysledek.OrderByDescending(p => p.DatumCas))
-                pohyb.VypisPohyb();
         }
     }
 }

@@ -2,76 +2,18 @@
 using SelectHelper;
 using PohybHelper;
 using EvidenceZOOCviceniUpraveno2.Enumy;
-using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.Entity;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class SpravceSkladu(Zoo zoo)
+    class SpravceSkladu
     {
-        private readonly Zoo zoo = zoo;
+        private readonly Zoo zoo;
 
-        public void Menu()
+        public SpravceSkladu(Zoo zoo)
         {
-            zoo.Sklad.Nacti();
-            char volba;
-            do
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("\n=== MENU SKLAD ===");
-                Console.WriteLine("\t1. Přidat novou položku");
-                Console.WriteLine("\t2. Vypsat sklad");
-                Console.WriteLine("\t3. Naskladnit (přidat množství)");
-                Console.WriteLine("\t4. Vyskladnit (odebrat množství)");
-                Console.WriteLine("\t5. Smazat položku");
-                Console.WriteLine("\t6. Vypsat docházející položky");
-                Console.WriteLine("\t7. Vypsat pohyby (inventura)");
-                Console.WriteLine("\tn. Návrat do hlavního menu");
-                Console.ResetColor();
-                Console.Write("Vyber možnost: ");
-
-                volba = char.ToLower(Console.ReadKey().KeyChar);
-                Console.WriteLine();
-
-                switch (volba)
-                {
-                    case '1': 
-                        PridatPolozku(); 
-                        break;
-
-                    case '2': 
-                        Vypis(); 
-                        break;
-
-                    case '3': 
-                        Naskladnit(); 
-                        break;
-
-                    case '4': 
-                        Vyskladnit(); 
-                        break;
-
-                    case '5': 
-                        Smazat(); 
-                        break;
-
-                    case '6': 
-                        VypisDochazejici(); 
-                        break;
-
-                    case '7': 
-                        VypisPohybyInventura(); 
-                        break;
-
-                    case 'n': 
-                        break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Neplatná volba, opakujte zadání:");
-                        Console.ResetColor();
-                        break;
-                }
-            } while (volba != 'n');
+            this.zoo = zoo;
+            this.zoo.Sklad.Nacti();
         }
 
         public void PridatPolozku()
@@ -152,7 +94,6 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             if (uspech)
             {
-                // Skladové pohyby auditujeme kvůli ochraně proti úbytku majetku
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – naskladnění",
                     puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));

@@ -1,4 +1,4 @@
-﻿using EvidenceZOOCviceniUpraveno2.Data;
+﻿using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika

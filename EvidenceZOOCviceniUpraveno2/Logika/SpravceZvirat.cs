@@ -1,6 +1,6 @@
 ﻿using TextHelper;
 using SelectHelper;
-using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.Entity;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -9,63 +9,14 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
     /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="Zoo"/>.
     /// </summary>
     /// <param name="zoo">Instance třídy Zoo obsahující repository pro zvířata.</param>
-    class SpravceZvirat(Zoo zoo)
+    class SpravceZvirat
     {
-        private readonly Zoo zoo = zoo;
+        private readonly Zoo zoo;
 
-        public void Menu()
+        public SpravceZvirat(Zoo zoo)
         {
-            zoo.Zvirata.Nacti();
-            char volba;
-            do
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("\n=== MENU ZVÍŘATA ===");
-                Console.WriteLine("\t1. Přidat zvíře");
-                Console.WriteLine("\t2. Vypsat zvířata");
-                Console.WriteLine("\t3. Smazat zvíře");
-                Console.WriteLine("\t4. Upravit zvíře");
-                Console.WriteLine("\t5. Vyhledat zvíře");
-                Console.WriteLine("\tn. Návrat do hlavního menu");
-                Console.ResetColor();
-                Console.Write("Vyber možnost: ");
-
-                volba = char.ToLower(Console.ReadKey().KeyChar);
-                Console.WriteLine();
-
-                switch (volba)
-                {
-                    case '1': 
-                        Pridat(); 
-                        break;
-
-                    case '2': 
-                        Vypis(); 
-                        break;
-
-                    case '3': 
-                        Smazat(); 
-                        break;
-
-                    case '4': 
-                        Upravit(); 
-                        break;
-
-                    case '5': 
-                        Vyhledat(); 
-                        break;
-
-                    case 'n': 
-                        break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Neplatná volba, opakujte zadání:");
-                        Console.ResetColor();
-                        break;
-                }
-
-            } while (volba != 'n');
+            this.zoo = zoo;
+            this.zoo.Zvirata.Nacti();
         }
 
         public void Pridat()

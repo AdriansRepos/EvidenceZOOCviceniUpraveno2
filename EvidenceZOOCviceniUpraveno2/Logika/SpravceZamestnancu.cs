@@ -1,4 +1,5 @@
 ﻿using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using InputHelper;
 using PohybHelper;
@@ -7,68 +8,14 @@ using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
-    class SpravceZamestnancu(Zoo zoo)
+    class SpravceZamestnancu
     {
-        private readonly Zoo zoo = zoo;
+        private readonly Zoo zoo;
 
-        public void Menu()
+        public SpravceZamestnancu(Zoo zoo)
         {
-            zoo.Zamestnanci.Nacti();
-            char volba;
-            do
-            {
-                Console.ForegroundColor = ConsoleColor.Blue;
-                Console.WriteLine("\n=== MENU ZAMĚSTNANCI ===");
-                Console.WriteLine("\t1. Přidat zaměstnance");
-                Console.WriteLine("\t2. Vypsat zaměstnance");
-                Console.WriteLine("\t3. Smazat zaměstnance");
-                Console.WriteLine("\t4. Upravit zaměstnance");
-                Console.WriteLine("\t5. Vyhledat zaměstnance");
-                Console.WriteLine("\t6. Nastavení číslování zaměstnanců");
-                Console.WriteLine("\tn. Návrat do hlavního menu");
-                Console.ResetColor();
-                Console.Write("Vyber možnost: ");
-
-                volba = char.ToLower(Console.ReadKey().KeyChar);
-                Console.WriteLine();
-
-                switch (volba)
-                {
-                    case '1': 
-                        Pridat(); 
-                        break;
-
-                    case '2': 
-                        Vypis(); 
-                        break;
-
-                    case '3': 
-                        Smazat(); 
-                        break;
-
-                    case '4': 
-                        Upravit(); 
-                        break;
-
-                    case '5': 
-                        Vyhledat(); 
-                        break;
-
-                    case '6': 
-                        NastaveniCislovaniZamestnancu(); 
-                        break;
-
-                    case 'n': 
-                        break;
-
-                    default:
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine("Neplatná volba, opakujte zadání:");
-                        Console.ResetColor();
-                        break;
-                }
-
-            } while (volba != 'n');
+            this.zoo = zoo;
+            this.zoo.Zamestnanci.Nacti();
         }
 
         public void Pridat()
