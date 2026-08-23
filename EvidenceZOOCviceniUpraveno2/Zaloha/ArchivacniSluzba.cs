@@ -1,4 +1,5 @@
-﻿using EvidenceZOOCviceniUpraveno2.Data;
+﻿using EvidenceZOOCviceniUpraveno2.Data.Repozitare;
+using EvidenceZOOCviceniUpraveno2.Entity;
 
 namespace EvidenceZOOCviceniUpraveno2.Zaloha
 {
