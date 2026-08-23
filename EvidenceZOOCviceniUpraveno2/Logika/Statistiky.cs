@@ -1,7 +1,6 @@
 ﻿using EvidenceZOOCviceniUpraveno2.Enumy;
 using EvidenceZOOCviceniUpraveno2.Data;
 using PohybHelper;
-using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
