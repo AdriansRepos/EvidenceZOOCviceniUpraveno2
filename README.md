@@ -86,18 +86,21 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 ---
 
-/ZOO
-├── Data
-│   ├── Repozitare          
+## Struktura projektu
+
+```text
+ZOO/
+├── Data/
+│   ├── Repozitare/
 │   │   ├── KonfiguraceRepository.cs
 │   │   ├── LogyRepository.cs
 │   │   ├── PokladnaRepository.cs
 │   │   ├── SkladRepository.cs
 │   │   ├── ZamestnanciRepository.cs
 │   │   └── ZvirataRepository.cs
-│   └── PomocneTridy             
+│   └── PomocneTridy/
 │       └── SouborovyPomocnik.cs
-├── Entity                   
+├── Entity/
 │   ├── AuditZaznam.cs
 │   ├── Cenik.cs
 │   ├── CisloZamestnanceKonfigurace.cs
@@ -111,38 +114,35 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 │   ├── ZdravotniZaznam.cs
 │   ├── Zoo.cs
 │   └── Zvire.cs
-├── Enumy
+├── Enumy/
 │   ├── KategoriePolozky.cs
 │   ├── RodinnyStav.cs
 │   ├── TypAkce.cs
 │   ├── TypVstupenky.cs
-│   ├── UrovenLogu.cs    
+│   ├── UrovenLogu.cs
 │   └── ZdravotniStav.cs
-├── Logika
+├── Logika/
 │   ├── SpravcePokladny.cs
 │   ├── SpravceSkladu.cs
 │   ├── SpravceZamestnancu.cs
 │   ├── SpravceZvirat.cs
 │   ├── Statistiky.cs
-│   ├── Transakce.cs    
+│   ├── Transakce.cs
 │   └── VypocetCenyVstupenky.cs
-├── Menu
+├── Menu/
 │   ├── HlavniMenu.cs
 │   ├── MenuPokladna.cs
 │   ├── MenuSklad.cs
 │   ├── MenuStatistiky.cs
-│   ├── MenuZamestnanci.cs    
+│   ├── MenuZamestnanci.cs
 │   └── MenuZvirata.cs
-├── Vypisy
-│   ├──
-│   ├──
-│   ├──
-│   └──
-├── Zaloha
+├── Vypisy/
+├── Zaloha/
 │   ├── ArchivacniSluzba.cs
 │   └── ZalohovaciSluzba.cs
 ├── Program.cs
 └── README.md
+```
 
 ---
 
