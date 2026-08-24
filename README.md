@@ -106,6 +106,7 @@ ZOO/
 │   ├── CisloZamestnanceKonfigurace.cs
 │   ├── CisloZvireteKonfigurace.cs
 │   ├── Dite.cs
+│   ├── Partner.cs
 │   ├── PokladniPohyb.cs
 │   ├── SkladovaPolozka.cs
 │   ├── SkladovyPohyb.cs
