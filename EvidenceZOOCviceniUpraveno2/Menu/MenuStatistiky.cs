@@ -32,15 +32,15 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
                 switch (volba)
                 {
                     case '1':
-                        StatistikyVypis.VypisPocetZvirat(statistiky.PocetZvirat());
+                        StatistikyVypisy.VypisPocetZvirat(statistiky.PocetZvirat());
                         break;
 
                     case '2':
-                        StatistikyVypis.VypisPocetZamestnancu(statistiky.PocetZamestnancu());
+                        StatistikyVypisy.VypisPocetZamestnancu(statistiky.PocetZamestnancu());
                         break;
 
                     case '3':
-                        StatistikyVypis.VypisSoucetMezd(statistiky.SoucetMezd());
+                        StatistikyVypisy.VypisSoucetMezd(statistiky.SoucetMezd());
                         break;
 
                     case '4':
@@ -78,7 +78,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
 
             double navstevnost = statistiky.PrumernaDenniNavstevnost(rokNavstevnost, mesicNavstevnost);
 
-            StatistikyVypis.VypisNavstevnost(mesicNavstevnost, rokNavstevnost, navstevnost);
+            StatistikyVypisy.VypisNavstevnost(mesicNavstevnost, rokNavstevnost, navstevnost);
         }
     }
 }
