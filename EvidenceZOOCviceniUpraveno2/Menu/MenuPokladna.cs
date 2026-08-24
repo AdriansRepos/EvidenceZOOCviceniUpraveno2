@@ -5,6 +5,8 @@ using EvidenceZOOCviceniUpraveno2.Logika;
 using PohybHelper;
 using SelectHelper;
 using TextHelper;
+using EvidenceZOOCviceniUpraveno2.Logika;
+using EvidenceZOOCviceniUpraveno2.Enumy;
 
 namespace EvidenceZOOCviceniUpraveno2.Menu
 {
@@ -18,15 +20,14 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
             char volba;
             do
             {
-                
                 VypisyDoKonzole.VypisHlavickuMenu("MENU POKLADNA");
                 VypisyDoKonzole.VypisTeloMenu(
-                "1. Prodat vstupenku",
-                "2. Stornovat vstupenku",
-                "3. Upravit ceník",
-                "4. Denní uzávěrka",
-                "5. Vypsat pohyby (dle data)",
-                "n. Návrat do hlavního menu"
+                    "1. Prodat vstupenku",
+                    "2. Stornovat vstupenku",
+                    "3. Upravit ceník",
+                    "4. Denní uzávěrka",
+                    "5. Vypsat pohyby (dle data)",
+                    "n. Návrat do hlavního menu"
                 );
                 
                 VypisyDoKonzole.VypisVyzvuKZadani();
