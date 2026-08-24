@@ -1,6 +1,8 @@
-﻿using TextHelper;
-using SelectHelper;
+﻿using BarevneVypisyHelper;
 using EvidenceZOOCviceniUpraveno2.Entity;
+using EvidenceZOOCviceniUpraveno2.Vypisy.Zvirata;
+using SelectHelper;
+using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -8,7 +10,6 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
     /// Třída zodpovědná za správu zvířat – přidávání, mazání, úpravy,
     /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="Zoo"/>.
     /// </summary>
-    /// <param name="zoo">Instance třídy Zoo obsahující repository pro zvířata.</param>
     class SpravceZvirat
     {
         private readonly Zoo zoo;
@@ -49,23 +50,15 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             zoo.Zvirata.Zvirata.Add(nove);
             zoo.Zvirata.UlozZvire(nove);
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Zvíře bylo úspěšně přidáno.");
-            Console.ResetColor();
+            VypisyDoKonzole.VypisUspech("Zvíře bylo úspěšně přidáno.");
         }
 
         public void Vypis()
         {
-            Console.WriteLine("VÝPIS ZVÍŘAT");
-            Console.WriteLine();
+            ZvirataVypisy.VypisHlavicku();
 
-            Console.WriteLine(
-                $"{"Název",-20} {"Věk",-15} {"Váha",-10}"
-            );
-
-            Console.WriteLine(new string('-', 45));
             foreach (var zvire in zoo.Zvirata.Zvirata)
-                zvire.VypisZvire();
+                ZvirataVypisy.VypisZvire(zvire);
         }
 
         public void Smazat()
@@ -78,9 +71,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 zoo.Zvirata.Zvirata.Remove(zvire);
                 zoo.Zvirata.SmazatZvireSoubor(zvire);
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Zvíře {zvire.Nazev} bylo smazáno.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisInformaci($"Zvíře {zvire.Nazev} bylo smazáno.");
             }
         }
 
@@ -104,9 +95,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
                 zoo.Zvirata.UlozZvire(zvire, puvodniSoubor);
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Úprava dokončena.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisUspech("Úprava dokončena.");
             }
         }
 
@@ -121,20 +110,14 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             {
                 if (zvire.Nazev.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    Console.WriteLine(
-                        $"Nalezeno:\t{zvire.Nazev}" +
-                        $"\tVěk: {zvire.Vek}" +
-                        $"\tVáha: {zvire.Vaha}"
-                    );
+                    ZvirataVypisy.VypisVyhledaneZvire(zvire);
                     nalezeno = true;
                 }
             }
 
             if (!nalezeno)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Zvíře nenalezeno.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisVarovani("Zvíře nenalezeno.");
             }
         }
     }
