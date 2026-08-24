@@ -1,7 +1,7 @@
 ﻿using PohybHelper;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using EvidenceZOOCviceniUpraveno2.Entity;
-using EvidenceZOOCviceniUpraveno2.Vypisy;
+using EvidenceZOOCviceniUpraveno2.Vypisy.Pokladna;
 using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
