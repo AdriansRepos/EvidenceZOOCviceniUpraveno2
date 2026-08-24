@@ -90,11 +90,14 @@ namespace EvidenceZOOCviceniUpraveno2.Data
         [JsonPropertyName("deti")]
         public List<Dite> Deti { get; internal set; } = [];
 
+        [JsonPropertyName("partner")]
+        public Partner? Partner { get; internal set; }
+
         [JsonConstructor]
         public Zamestnanec(string osobniCislo, string jmeno, string prijmeni, DateOnly datumNarozeni,
             string rodneCislo, int mzda, string pracovniPozice, string mesto, string ulice, string psc,
             string telefon, string email, RodinnyStav rodinnyStav, ZdravotniStav zdravotniStav,
-            string typDokladu, string cisloDokladu, List<Dite> deti)
+            string typDokladu, string cisloDokladu, List<Dite> deti, Partner? partner)
         {
             OsobniCislo = osobniCislo;
             Jmeno = jmeno;
@@ -113,6 +116,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data
             TypDokladu = typDokladu;
             CisloDokladu = cisloDokladu;
             Deti = deti;
+            Partner = partner;
         }
 
         private static string NormalizujPsc(string vstup)
@@ -155,6 +159,14 @@ namespace EvidenceZOOCviceniUpraveno2.Data
                     string ztpP = dite.JeDrzitelZtpP ? " [ZTP/P]" : "";
                     Console.WriteLine($"  - {dite.Jmeno} {dite.Prijmeni}, nar. {dite.DatumNarozeni:d}, RČ: {dite.RodneCislo}{ztpP}{bonus}");
                 }
+            }
+
+            if (Partner != null)
+            {
+                Console.WriteLine("Partner / Manžel(ka):");
+                string ztp = Partner.JeDrzitelZtpP ? " [ZTP/P]" : "";
+                string sleva = Partner.UplatnitSlevu ? " (uplatněna sleva)" : "";
+                Console.WriteLine($"  - {Partner.Jmeno} {Partner.Prijmeni}, RČ: {Partner.RodneCislo}{ztp}{sleva}");
             }
         }
 
