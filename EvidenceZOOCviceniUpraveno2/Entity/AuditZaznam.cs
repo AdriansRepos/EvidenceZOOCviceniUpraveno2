@@ -1,5 +1,5 @@
-﻿using EvidenceZOOCviceniUpraveno2.Enumy;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using EvidenceZOOCviceniUpraveno2.Enumy;
 
 namespace EvidenceZOOCviceniUpraveno2.Entity
 {
@@ -53,24 +53,6 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         {
             return new AuditZaznam(modul, akce, popis, puvodniHodnota, novaHodnota,
                 DateTime.Now, Environment.UserName);
-        }
-
-        public void VypisZaznam()
-        {
-            Console.ForegroundColor = Akce 
-            switch
-            {
-                TypAkce.Smazano => ConsoleColor.Red,
-                TypAkce.Upraveno => ConsoleColor.Yellow,
-                _ => ConsoleColor.Green
-            };
-
-            string zmena = PuvodniHodnota != null || NovaHodnota != null
-                ? $" ({PuvodniHodnota ?? "-"} → {NovaHodnota ?? "-"})"
-                : "";
-
-            Console.WriteLine($"{Cas,-20:g} [{Modul}] {Akce}: {Popis}{zmena} – {Uzivatel}");
-            Console.ResetColor();
         }
     }
 }
