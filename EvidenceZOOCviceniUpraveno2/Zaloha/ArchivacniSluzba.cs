@@ -1,5 +1,6 @@
 ﻿using EvidenceZOOCviceniUpraveno2.Data.Repozitare;
 using EvidenceZOOCviceniUpraveno2.Entity;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Zaloha
 {
@@ -59,9 +60,7 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             ArchivujSoubor(zoo.Logy.SouborAuditLogu, "audit", rok);
             ArchivujSoubor(zoo.Logy.SouborTechnickehoLogu, "technicky_log", rok);
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Data za rok {rok} byla archivována do složky: {zoo.Konfigurace.ArchivSlozka}");
-            Console.ResetColor();
+            VypisyDoKonzole.VypisUspech($"Data za rok {rok} byla archivována do složky: {zoo.Konfigurace.ArchivSlozka}");            
         }
 
         private void ArchivujSoubor(string zdrojovySoubor, string nazevBaze, int rok)
@@ -76,10 +75,8 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 File.Copy(zdrojovySoubor, cil, overwrite: true);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při archivaci souboru '{nazevBaze}' za rok {rok}: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při archivaci souboru '{nazevBaze}' za rok {rok}: {ex.Message}");                
             }
         }
 
@@ -100,10 +97,8 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 }
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při archivaci složky '{nazevPodslozky}' za rok {rok}: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při archivaci složky '{nazevPodslozky}' za rok {rok}: {ex.Message}");                
             }
         }
 
@@ -134,16 +129,12 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 {
                     try
                     {
-                        File.Delete(soubor);
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"Starý archivní soubor smazán: {Path.GetFileName(soubor)}");
-                        Console.ResetColor();
+                        File.Delete(soubor);                        
+                        VypisyDoKonzole.VypisInformaci($"Starý archivní soubor smazán: {Path.GetFileName(soubor)}");                        
                     }
                     catch (Exception ex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"Nepodařilo se smazat archivní soubor {Path.GetFileName(soubor)}: {ex.Message}");
-                        Console.ResetColor();
+                    {                        
+                        VypisyDoKonzole.VypisVarovani($"Nepodařilo se smazat archivní soubor {Path.GetFileName(soubor)}: {ex.Message}");                        
                     }
                 }
             }
@@ -162,16 +153,12 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 {
                     try
                     {
-                        Directory.Delete(slozka, recursive: true);
-                        Console.ForegroundColor = ConsoleColor.Yellow;
-                        Console.WriteLine($"Stará archivní složka smazána: {nazevSlozky}");
-                        Console.ResetColor();
+                        Directory.Delete(slozka, recursive: true);                        
+                        VypisyDoKonzole.VypisInformaci($"Stará archivní složka smazána: {nazevSlozky}");                        
                     }
                     catch (Exception ex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"Nepodařilo se smazat archivní složku {nazevSlozky}: {ex.Message}");
-                        Console.ResetColor();
+                    {                        
+                        VypisyDoKonzole.VypisVarovani($"Nepodařilo se smazat archivní složku {nazevSlozky}: {ex.Message}");                        
                     }
                 }
             }

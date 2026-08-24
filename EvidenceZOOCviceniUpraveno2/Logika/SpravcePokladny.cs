@@ -2,6 +2,7 @@
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Vypisy;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -48,9 +49,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     "Pokladna", TypAkce.Pridano, pohyb.Popis(),
                     novaHodnota: $"{celkovaCastka:0.##} Kč"));
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Prodáno. Celková částka: {celkovaCastka:0.##} Kč");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisUspech($"Prodáno. Celková částka: {celkovaCastka:0.##} Kč");                
             }
         }
 
@@ -73,9 +72,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     "Pokladna", TypAkce.Pridano, $"Storno: {storno.Popis()}",
                     puvodniHodnota: $"{storno.Castka:0.##} Kč"));
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Stornováno: {storno.Popis()}");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisInformaci($"Stornováno: {storno.Popis()}");                
             }
         }
 
@@ -106,9 +103,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             ZapisZmenuCeniku("sleva rodina %", puvodniSlevaRodina, cenik.SlevaRodinaProcenta);
             ZapisZmenuCeniku("sleva skupina %", puvodniSlevaSkupina, cenik.SlevaSkupinaProcenta);
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Ceník byl upraven.");
-            Console.ResetColor();
+            VypisyDoKonzole.VypisUspech("Ceník byl upraven.");            
         }
 
         private void ZapisZmenuCeniku(string popisPolozky, decimal puvodni, decimal nova)
@@ -130,33 +125,29 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 .ToList();
 
             if (dnesniPohyby.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Dnes zatím neproběhly žádné pokladní pohyby.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci("Dnes zatím neproběhly žádné pokladní pohyby.");                
                 return;
             }
 
             PokladnaVypisy.VypisUzaverku(dnesniPohyby, $"Uzávěrka za {DateTime.Today:d.M.yyyy}");
         }
 
-        public void ZobrazPohybyDlePeriody(List<PokladniPohyb> vysledek, PokladniTypPohybu? typFiltr)
+        public static void ZobrazPohybyDlePeriody(List<PokladniPohyb> vysledek, PokladniTypPohybu? typFiltr)
         {
             if (typFiltr != null)
                 vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
 
             if (vysledek.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Žádné pohyby neodpovídají zadaným kritériím.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci("Žádné pohyby neodpovídají zadaným kritériím.");                
                 return;
             }
 
             PokladnaVypisy.VypisUzaverku(vysledek, "Souhrn za zvolené období");
 
             Console.WriteLine();
-            Console.WriteLine("PODROBNÝ VÝPIS:");
+            VypisyDoKonzole.VypisZvyrazneni("PODROBNÝ VÝPIS:");
             foreach (var pohyb in vysledek.OrderByDescending(p => p.DatumCas))
             {
                 PokladnaVypisy.VypisJedenPohyb(pohyb);

@@ -1,4 +1,5 @@
 ﻿using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
+using BarevneVypisyHelper;
 using EvidenceZOOCviceniUpraveno2.Entity;
 using System.Text.Json;
 
@@ -47,10 +48,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             if (!File.Exists(SouborCeniku) && File.Exists(ZalohaCeniku))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(SouborCeniku)!);
-                File.Copy(ZalohaCeniku, SouborCeniku);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Ceník obnoven ze zálohy.");
-                Console.ResetColor();
+                File.Copy(ZalohaCeniku, SouborCeniku);                
+                VypisyDoKonzole.VypisUspech("Ceník obnoven ze zálohy.");                
             }
 
             if (!File.Exists(SouborCeniku))
@@ -62,26 +61,20 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 Cenik = JsonSerializer.Deserialize<Cenik>(json) ?? new Cenik();
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání ceníku: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při načítání ceníku: {ex.Message}");                
 
                 if (File.Exists(ZalohaCeniku))
                 {
                     try
                     {
                         string json = File.ReadAllText(ZalohaCeniku);
-                        Cenik = JsonSerializer.Deserialize<Cenik>(json) ?? new Cenik();
-                        Console.ForegroundColor = ConsoleColor.Green;
-                        Console.WriteLine("Ceník úspěšně obnoven ze zálohy.");
-                        Console.ResetColor();
+                        Cenik = JsonSerializer.Deserialize<Cenik>(json) ?? new Cenik();                        
+                        VypisyDoKonzole.VypisUspech("Ceník úspěšně obnoven ze zálohy.");                       
                     }
                     catch
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine("Záloha ceníku je také poškozená, používám výchozí hodnoty.");
-                        Console.ResetColor();
+                    {                        
+                        VypisyDoKonzole.VypisVarovani("Záloha ceníku je také poškozená, používám výchozí hodnoty.");                        
                     }
                 }
             }
@@ -101,10 +94,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 SouborovyPomocnik.ZapisSouborSeZalohou(SouborCeniku, ZalohaCeniku, json);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání ceníku: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při ukládání ceníku: {ex.Message}");                
             }
         }
     }

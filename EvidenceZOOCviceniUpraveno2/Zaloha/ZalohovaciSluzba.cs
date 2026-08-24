@@ -1,5 +1,6 @@
 ﻿using EvidenceZOOCviceniUpraveno2.Data.Repozitare;
 using EvidenceZOOCviceniUpraveno2.Entity;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Zaloha
 {
@@ -22,10 +23,8 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             string zdroj = Path.Combine(zoo.Konfigurace.KorenovaSlozka, "Data");
 
             if (!Directory.Exists(zdroj))
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Datová složka neexistuje, není co zálohovat.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci("Datová složka neexistuje, není co zálohovat.");                
                 return;
             }
 
@@ -34,10 +33,8 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             if (!string.IsNullOrWhiteSpace(zoo.Konfigurace.ExterniZalohaSlozka))
                 ZalohujDoSlozky(zdroj, zoo.Konfigurace.ExterniZalohaSlozka, "externí zálohy");
             else
-            {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine("Externí záloha není nastavena (menu → Nastavit cestu k externí záloze).");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci("Externí záloha není nastavena (menu → Nastavit cestu k externí záloze).");                
             }
         }
 
@@ -47,16 +44,12 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             {
                 Directory.CreateDirectory(cil);
                 KopirovatSlozkuRekurzivne(zdroj, cil);
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Vytvořena kopie ({popis}) do: {cil}");
-                Console.ResetColor();
+                                
+                VypisyDoKonzole.VypisUspech($"Vytvořena kopie ({popis}) do: {cil}");                
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při vytváření {popis}: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při vytváření {popis}: {ex.Message}");                
             }
         }
 

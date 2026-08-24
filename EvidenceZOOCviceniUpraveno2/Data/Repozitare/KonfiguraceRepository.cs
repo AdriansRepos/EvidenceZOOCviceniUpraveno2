@@ -1,4 +1,6 @@
-﻿namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
+﻿using BarevneVypisyHelper;
+
+namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
     /// Spravuje config.ini, cestu ke kořenové datové složce, adresářovou
@@ -36,27 +38,21 @@
                 if (hodnoty.TryGetValue("korenovaSlozka", out var ulozena)
                     && !string.IsNullOrWhiteSpace(ulozena))
                 {
-                    Console.ForegroundColor = ConsoleColor.Green;
-                    Console.WriteLine($"Načtena uložená složka dat z: {KonfigSoubor}");
-                    Console.ResetColor();
+                    VypisyDoKonzole.VypisUspech($"Načtena uložená složka dat z: {KonfigSoubor}");                    
                     return ulozena;
                 }
             }
-
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine("=== NASTAVENÍ SLOŽKY PRO DATA ===");
-            Console.ResetColor();
-            Console.Write("Zadej cestu ke složce pro ukládání dat: ");
+                        
+            VypisyDoKonzole.VypisHlavickuMenu("NASTAVENÍ SLOŽKY PRO DATA");             
+            Console.Write("\nZadej cestu ke složce pro ukládání dat: ");
             string slozka = Console.ReadLine()!.Trim();
 
             string zalohaKonfigu = ZalohaKonfigu(slozka);
 
             if (File.Exists(zalohaKonfigu))
             {
-                File.Copy(zalohaKonfigu, KonfigSoubor, overwrite: true);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("V zadané složce byla nalezena záloha nastavení – config.ini obnoven, nic nebylo ztraceno.");
-                Console.ResetColor();
+                File.Copy(zalohaKonfigu, KonfigSoubor, overwrite: true);                
+                VypisyDoKonzole.VypisUspech("V zadané složce byla nalezena záloha nastavení – config.ini obnoven, nic nebylo ztraceno.");                
 
                 VytvorStrukturuSlozek(slozka);
                 return slozka;
@@ -64,10 +60,8 @@
 
             VytvorStrukturuSlozek(slozka);
             ZapisKonfigSoubor([$"korenovaSlozka={slozka}"], slozka);
-
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Nastaveno. Data budou ukládána do: {slozka}");
-            Console.ResetColor();
+                        
+            VypisyDoKonzole.VypisUspech($"Nastaveno. Data budou ukládána do: {slozka}");            
             return slozka;
         }
 

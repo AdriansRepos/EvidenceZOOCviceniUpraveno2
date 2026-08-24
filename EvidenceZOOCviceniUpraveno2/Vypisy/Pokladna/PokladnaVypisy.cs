@@ -1,8 +1,9 @@
-﻿using EvidenceZOOCviceniUpraveno2.Entity;
+﻿using BarevneVypisyHelper;
+using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using PohybHelper;
 
-namespace EvidenceZOOCviceniUpraveno2.Vypisy
+namespace EvidenceZOOCviceniUpraveno2.Vypisy.Pokladna
 {
     internal static class PokladnaVypisy
     {
@@ -10,18 +11,15 @@ namespace EvidenceZOOCviceniUpraveno2.Vypisy
         {
             Console.ForegroundColor = pohyb.TypPohybu == PokladniTypPohybu.Prodej
                 ? ConsoleColor.Green
-                : ConsoleColor.DarkYellow;
+                : ConsoleColor.Yellow;
 
             Console.WriteLine(pohyb.ToString());
             Console.ResetColor();
         }
 
         public static void VypisUzaverku(List<PokladniPohyb> pohyby, string nadpis)
-        {
-            Console.WriteLine();
-            Console.ForegroundColor = ConsoleColor.Blue;
-            Console.WriteLine($"=== {nadpis} ===");
-            Console.ResetColor();
+        {                       
+            VypisyDoKonzole.VypisHlavickuMenu(nadpis);            
 
             var prodeje = pohyby.Where(p => p.TypPohybu == PokladniTypPohybu.Prodej).ToList();
             var storna = pohyby.Where(p => p.TypPohybu == PokladniTypPohybu.Storno).ToList();
@@ -47,22 +45,16 @@ namespace EvidenceZOOCviceniUpraveno2.Vypisy
             Console.WriteLine();
 
             if (prodeje.Count > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Celkový příjem z prodejů: {celkovyPrijemZProdeju:0.##} Kč");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisUspech($"Celkový příjem z prodejů: {celkovyPrijemZProdeju:0.##} Kč");                
             }
 
             if (storna.Count > 0)
-            {
-                Console.ForegroundColor = ConsoleColor.DarkYellow;
-                Console.WriteLine($"Celkové storno:           {celkoveStorno:0.##} Kč");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Celkové storno:           {celkoveStorno:0.##} Kč");               
             }
-
-            Console.ForegroundColor = ConsoleColor.Cyan;
-            Console.WriteLine($"Čistý příjem:             {cistyPrijem:0.##} Kč");
-            Console.ResetColor();
+                        
+            VypisyDoKonzole.VypisZvyrazneni($"Čistý příjem:             {cistyPrijem:0.##} Kč");            
         }
 
         private static void VypisRozpadPodleKategorie(List<PokladniPohyb> pohyby)

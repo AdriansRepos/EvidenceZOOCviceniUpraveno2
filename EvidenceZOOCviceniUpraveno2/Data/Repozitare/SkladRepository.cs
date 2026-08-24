@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
 using EvidenceZOOCviceniUpraveno2.Entity;
-using PohybHelper;
+using BarevneVypisyHelper;
 
 
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
@@ -80,10 +80,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 SouborovyPomocnik.ZapisSouborSeZalohou(SouborHistorie, ZalohaHistorie, jsonHistorie);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání skladu/historie: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při ukládání skladu/historie: {ex.Message}");                
 
                 if (skladUlozen && File.Exists(ZalohaSkladu))
                     File.Copy(ZalohaSkladu, SouborSkladu, overwrite: true);

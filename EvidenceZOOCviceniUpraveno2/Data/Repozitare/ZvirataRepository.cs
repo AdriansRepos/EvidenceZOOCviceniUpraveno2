@@ -3,6 +3,7 @@ using DateConverterForJson;
 using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
 using EvidenceZOOCviceniUpraveno2.Entity;
 using FileNameHelper;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
@@ -64,10 +65,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                             Zvirata.Add(zvire);
                     }
                     catch (Exception ex)
-                    {
-                        Console.ForegroundColor = ConsoleColor.Red;
-                        Console.WriteLine($"Chyba při načítání souboru zvířete '{Path.GetFileName(soubor)}': {ex.Message}");
-                        Console.ResetColor();
+                    {                        
+                        VypisyDoKonzole.VypisVarovani($"Chyba při načítání souboru zvířete '{Path.GetFileName(soubor)}': {ex.Message}");                        
                     }
                 }
             }
@@ -92,10 +91,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 CisloKonfigurace = JsonSerializer.Deserialize<CisloZvireteKonfigurace>(json) ?? new();
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání číslování zvířat: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při načítání číslování zvířat: {ex.Message}");                
             }
         }
 
@@ -129,10 +126,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 SouborovyPomocnik.ZapisSouborSeZalohou(SouborCisla, ZalohaCisla, json);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání číslování zvířat: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při ukládání číslování zvířat: {ex.Message}");                
             }
         }
     }

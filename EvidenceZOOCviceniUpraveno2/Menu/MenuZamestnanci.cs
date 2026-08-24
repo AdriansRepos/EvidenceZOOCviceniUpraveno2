@@ -7,7 +7,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
     {
         private readonly SpravceZamestnancu spravceZamestnancu = spravceZamestnancu;
 
-        public void ZobrazMenu()
+        public void Zobraz()
         {
             char volba;
             do

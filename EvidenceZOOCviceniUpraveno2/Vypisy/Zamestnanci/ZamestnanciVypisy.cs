@@ -8,10 +8,9 @@ namespace EvidenceZOOCviceniUpraveno2.Vypisy.Zamestnanci
     {
         public static void VypisHlavicku()
         {
-            Console.WriteLine("VÝPIS ZAMĚSTNANCŮ");
-            Console.WriteLine();
+            Console.WriteLine("VÝPIS ZAMĚSTNANCŮ");            
             Console.WriteLine(
-                $"{"Číslo",-12} {"Jméno",-15} {"Příjmení",-15} {"Datum narození",-15} {"Mzda",-10} {"Pozice",-20}"
+                $"\n{"Číslo",-12} {"Jméno",-15} {"Příjmení",-15} {"Datum narození",-15} {"Mzda",-10} {"Pozice",-20}"
             );
             Console.WriteLine(new string('-', 90));
         }

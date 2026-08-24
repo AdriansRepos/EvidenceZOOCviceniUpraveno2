@@ -6,9 +6,8 @@ namespace EvidenceZOOCviceniUpraveno2.Vypisy.Zvirata
     {
         public static void VypisHlavicku()
         {
-            Console.WriteLine("VÝPIS ZVÍŘAT");
-            Console.WriteLine();
-            Console.WriteLine($"{"Název",-20} {"Věk",-15} {"Váha",-10}");
+            Console.WriteLine("VÝPIS ZVÍŘAT");            
+            Console.WriteLine($"\n{"Název",-20} {"Věk",-15} {"Váha",-10}");
             Console.WriteLine(new string('-', 45));
         }
 

@@ -1,4 +1,5 @@
 ﻿using System.Text.Json;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
 {
@@ -15,10 +16,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
             if (!File.Exists(hlavniSoubor) && File.Exists(zalohaSoubor))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(hlavniSoubor)!);
-                File.Copy(zalohaSoubor, hlavniSoubor);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Soubor {popisProHlasky} obnoven ze zálohy.");
-                Console.ResetColor();
+                File.Copy(zalohaSoubor, hlavniSoubor);                ;
+                VypisyDoKonzole.VypisUspech($"Soubor {popisProHlasky} obnoven ze zálohy.");                
             }
 
             if (!File.Exists(hlavniSoubor))
@@ -30,10 +29,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
                 return deserializace(json);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání {popisProHlasky}: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při načítání {popisProHlasky}: {ex.Message}");                
                 return NactiZeZalohy(zalohaSoubor, deserializace, popisProHlasky);
             }
         }
@@ -42,27 +39,21 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
             Func<string, List<T>> deserializace, string popisProHlasky)
         {
             if (!File.Exists(zalohaSoubor))
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"!!! POZOR: Data ({popisProHlasky}) se nepodařilo načíst ani ze zálohy !!!");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"!!! POZOR: Data ({popisProHlasky}) se nepodařilo načíst ani ze zálohy !!!");                
                 return [];
             }
 
             try
             {
                 string json = File.ReadAllText(zalohaSoubor);
-                var data = deserializace(json);
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Data ({popisProHlasky}) úspěšně obnovena ze zálohy.");
-                Console.ResetColor();
+                var data = deserializace(json);                
+                VypisyDoKonzole.VypisUspech($"Data ({popisProHlasky}) úspěšně obnovena ze zálohy.");                
                 return data;
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Záloha ({popisProHlasky}) je také poškozená: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Záloha ({popisProHlasky}) je také poškozená: {ex.Message}");                
                 return [];
             }
         }
@@ -76,10 +67,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
                 ZapisSouborSeZalohou(cilovySoubor, zalohovySoubor, json);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání ({popisProHlasky}): {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při ukládání ({popisProHlasky}): {ex.Message}");                
             }
         }
 

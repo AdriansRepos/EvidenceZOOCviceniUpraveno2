@@ -3,6 +3,7 @@ using SelectHelper;
 using PohybHelper;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using EvidenceZOOCviceniUpraveno2.Entity;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -53,17 +54,14 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     "Sklad", TypAkce.Pridano, novaPolozka.Nazev,
                     novaHodnota: $"{novaPolozka.Mnozstvi:0.##} {novaPolozka.Jednotka}"));
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Položka byla úspěšně přidána.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisUspech("Položka byla úspěšně přidána.");                
             }
         }
 
         public void Vypis()
         {
-            Console.WriteLine("STAV SKLADU");
-            Console.WriteLine();
-            Console.WriteLine($"{"Název",-20} {"Kategorie",-25} {"Množství",8} {"Jednotka",-8}");
+            Console.WriteLine("STAV SKLADU");            
+            Console.WriteLine($"\n{"Název",-20} {"Kategorie",-25} {"Množství",8} {"Jednotka",-8}");
             Console.WriteLine(new string('-', 70));
 
             foreach (var polozka in zoo.Sklad.Sklad)
@@ -80,10 +78,8 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 0.0, "množství k naskladnění", v => v.ToString(), s => double.TryParse(s, out double d) ? d : 0.0, jeNove: true);
 
             if (pridat <= 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Množství k naskladnění musí být větší než 0.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani("Množství k naskladnění musí být větší než 0.");                
                 return;
             }
 
@@ -109,10 +105,8 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – naskladnění",
                     puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
-
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine($"Naskladněno {pridat} {polozka.Jednotka} položky {polozka.Nazev}.");
-                Console.ResetColor();
+                                
+                VypisyDoKonzole.VypisUspech($"Naskladněno {pridat} {polozka.Jednotka} položky {polozka.Nazev}.");                
             }
         }
 
@@ -126,18 +120,14 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 0.0, "množství k vyskladnění", v => v.ToString(), s => double.TryParse(s, out double d) ? d : 0.0, jeNove: true);
 
             if (odebrat <= 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Množství k vyskladnění musí být větší než 0.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci("Množství k vyskladnění musí být větší než 0.");                
                 return;
             }
 
             if (odebrat > polozka.Mnozstvi)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Nelze vyskladnit více, než je aktuálně na skladě.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani("Nelze vyskladnit více, než je aktuálně na skladě.");                
                 return;
             }
 
@@ -165,17 +155,13 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – vyskladnění",
                 puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
 
-            // Informujeme vždy o úspěšném vyskladnění
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Vyskladněno {odebrat} {polozka.Jednotka} položky {polozka.Nazev}.");
-            Console.ResetColor();
-
+            // Informujeme vždy o úspěšném vyskladnění            
+            VypisyDoKonzole.VypisUspech($"Vyskladněno {odebrat} {polozka.Jednotka} položky {polozka.Nazev}.");
+            
             // A navíc zobrazíme varování, pokud klesla pod minimum
             if (polozka.JeDochazejici)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Pozor: položka {polozka.Nazev} dosáhla minimálního stavu ({polozka.Mnozstvi:0.##} / min. {polozka.MinimalniStav:0.##}).");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci($"Pozor: položka {polozka.Nazev} dosáhla minimálního stavu ({polozka.Mnozstvi:0.##} / min. {polozka.MinimalniStav:0.##}).");                
             }
         }
 
@@ -197,9 +183,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     "Sklad", TypAkce.Smazano, polozka.Nazev,
                     puvodniHodnota: $"{polozka.Mnozstvi:0.##} {polozka.Jednotka}"));
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Položka {polozka.Nazev} byla smazána.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisInformaci($"Položka {polozka.Nazev} byla smazána.");                
             }
         }
 
@@ -208,17 +192,13 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             var dochazejici = zoo.Sklad.Sklad.Where(p => p.JeDochazejici).ToList();
 
             if (dochazejici.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Žádné položky momentálně nedochází.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisUspech("Žádné položky momentálně nedochází.");                
                 return;
             }
-
-            Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine("DOCHÁZEJÍCÍ POLOŽKY:");
-            Console.ResetColor();
-
+                        
+            VypisyDoKonzole.VypisVarovani("DOCHÁZEJÍCÍ POLOŽKY:");
+            
             foreach (var polozka in dochazejici)
                 Console.WriteLine(polozka.VypisPolozku());
         }
@@ -234,10 +214,8 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 vysledek = [.. vysledek.Where(p => p.TypPohybu == typFiltr)];
 
             if (vysledek.Count == 0)
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Žádné pohyby neodpovídají zadaným kritériím.");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisInformaci("Žádné pohyby neodpovídají zadaným kritériím.");                
                 return;
             }
 

@@ -3,6 +3,7 @@ using DateConverterForJson;
 using EvidenceZOOCviceniUpraveno2.Data.PomocneTridy;
 using EvidenceZOOCviceniUpraveno2.Entity;
 using FileNameHelper;
+using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
@@ -72,10 +73,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 CisloKonfigurace = JsonSerializer.Deserialize<CisloZamestnanceKonfigurace>(json) ?? new();
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při načítání číslování zaměstnanců: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při načítání číslování zaměstnanců: {ex.Message}");                
             }
         }
 
@@ -93,10 +92,8 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 SouborovyPomocnik.ZapisSouborSeZalohou(SouborCisla, ZalohaCisla, json);
             }
             catch (Exception ex)
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Chyba při ukládání číslování zaměstnanců: {ex.Message}");
-                Console.ResetColor();
+            {                
+                VypisyDoKonzole.VypisVarovani($"Chyba při ukládání číslování zaměstnanců: {ex.Message}");                
             }
         }
 

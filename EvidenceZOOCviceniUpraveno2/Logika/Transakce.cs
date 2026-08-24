@@ -1,4 +1,6 @@
-﻿namespace EvidenceZOOCviceniUpraveno2.Logika
+﻿using BarevneVypisyHelper;
+
+namespace EvidenceZOOCviceniUpraveno2.Logika
 {
     /// <summary>
     /// Provede operaci nad daty drženými v paměti a jejich uložení jako
@@ -27,10 +29,8 @@
             }
             catch (Exception ex)
             {
-                rollback.Invoke();
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"Operace '{popisOperace}' se nezdařila a byla vrácena zpět: {ex.Message}");
-                Console.ResetColor();
+                rollback.Invoke();                
+                VypisyDoKonzole.VypisVarovani($"Operace '{popisOperace}' se nezdařila a byla vrácena zpět: {ex.Message}");                
                 return false;
             }
         }
