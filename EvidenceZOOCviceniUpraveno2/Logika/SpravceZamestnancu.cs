@@ -63,9 +63,10 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             string cisloDokladu = UpravaVstupu.ZeptejSeAUprav("", "číslo dokladu", v => v, s => s, jeNove: true);
 
             List<Dite> deti = ZadatDeti();
+            Partner? partner = ZadatPartnera();
 
             Zamestnanec novy = new(osobniCislo, jmeno, prijmeni, datumNarozeni, rodneCislo, mzda, pracovniPozice,
-                mesto, ulice, psc, telefon, email, rodinnyStav, zdravotniStav, typDokladu, cisloDokladu, deti);
+                mesto, ulice, psc, telefon, email, rodinnyStav, zdravotniStav, typDokladu, cisloDokladu, deti, partner);
 
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Zamestnanci.Add(novy),
@@ -135,8 +136,32 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
                 deti.Add(new Dite(jmenoDite, prijmeniDite, datumNarozeniDite, rodneCisloDite, jeDrzitelZtpP, uplatnenBonus));
             }
-
             return deti;
+        }
+
+        private static Partner? ZadatPartnera()
+        {
+            Console.WriteLine("Má zaměstnanec partnera/manžela/manželku pro uplatnění slevy? A/N");
+            if (!Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
+                return null;
+        
+            string jmeno = UpravaVstupu.ZeptejSeAUprav("", "jméno partnera", v => v, s => s, jeNove: true);
+            string prijmeni = UpravaVstupu.ZeptejSeAUprav("", "příjmení partnera", v => v, s => s, jeNove: true);
+            string rc = UpravaVstupu.ZeptejSeAUprav("", "rodné číslo partnera", v => v, s => InputHelper.RodneCislo.Zkontroluj(s), jeNove: true);
+            
+            Console.WriteLine("Je partner držitelem průkazu ZTP/P? A/N");
+            bool ztp = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
+        
+            Console.WriteLine("Pečuje partner o společné dítě do 3 let? A/N");
+            bool diteDo3 = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
+        
+            Console.WriteLine("Jsou vlastní příjmy partnera do 68 000 Kč / rok? A/N");
+            bool prijemDo68 = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
+        
+            Console.WriteLine("Uplatnit slevu na partnera v ročním zúčtování? A/N");
+            bool uplatnit = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
+        
+            return new Partner(jmeno, prijmeni, rc, ztp, diteDo3, prijemDo68, uplatnit);
         }
 
         public void Vypis()
@@ -206,6 +231,10 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             Console.WriteLine("Upravit údaje o dětech (kompletně přepsat seznam)? A/N");
             if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
                 zam.Deti = ZadatDeti();
+
+            Console.WriteLine("Upravit údaje o partnerovi/manželovi? A/N");
+            if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
+                zam.Partner = ZadatPartnera();
 
             zoo.Zamestnanci.Uloz();
 
