@@ -1,7 +1,7 @@
 ﻿using BarevneVypisyHelper;
 using EvidenceZOOCviceniUpraveno2.Logika;
     
-    namespace EvidenceZOOCviceniUpraveno2.Menu
+namespace EvidenceZOOCviceniUpraveno2.Menu
 {
     class MenuZvirata(SpravceZvirat spravceZvirat)
     {
