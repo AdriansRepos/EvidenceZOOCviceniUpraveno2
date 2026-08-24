@@ -166,7 +166,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
             var vsechnyPohyby = spravcePokladny.ZiskejVsechnyPohyby();
             var vysledek = SelectHelp.VybratRozmeziData(vsechnyPohyby);
 
-            spravcePokladny.ZobrazPohybyDlePeriody(vysledek, typFiltr);
+            SpravcePokladny.ZobrazPohybyDlePeriody(vysledek, typFiltr);
         }
     }
 }
