@@ -1,6 +1,8 @@
-﻿using EvidenceZOOCviceniUpraveno2.Data;
+﻿using BarevneVypisyHelper;
+using EvidenceZOOCviceniUpraveno2.Data;
 using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
+using EvidenceZOOCviceniUpraveno2.Vypisy.Zamestnanci;
 using InputHelper;
 using PohybHelper;
 using SelectHelper;
@@ -82,9 +84,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     "Zaměstnanci", TypAkce.Pridano, $"{jmeno} {prijmeni} ({osobniCislo})",
                     novaHodnota: $"mzda {mzda} Kč"));
 
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.WriteLine("Zaměstnanec byl úspěšně přidán.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisUspech("Zaměstnanec byl úspěšně přidán.");
             }
         }
 
@@ -101,9 +101,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 if (int.TryParse(Console.ReadLine(), out int volba) && volba >= 1 && volba <= hodnoty.Length)
                     return hodnoty[volba - 1];
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine("Neplatná volba, zkus to znovu.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisInformaci("Neplatná volba, zkus to znovu.");
             }
         }
 
@@ -166,17 +164,12 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
         public void Vypis()
         {
-            Console.WriteLine("VÝPIS ZAMĚSTNANCŮ");
-            Console.WriteLine();
-            Console.WriteLine(
-                $"{"Číslo",-12} {"Jméno",-15} {"Příjmení",-15} {"Datum narození",-15} {"Mzda",-10} {"Pozice",-20}"
-            );
-            Console.WriteLine(new string('-', 90));
+            ZamestnanciVypisy.VypisHlavicku();
 
             foreach (var zam in zoo.Zamestnanci.Zamestnanci)
             {
-                zam.VypisZamestnance();
-                zam.VypisKontaktniUdaje();
+                ZamestnanciVypisy.VypisZamestnance(zam);
+                ZamestnanciVypisy.VypisKontaktniUdaje(zam);
                 Console.WriteLine();
             }
         }
@@ -248,9 +241,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     puvodniMzda.ToString(), zam.Mzda.ToString()));
             }
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine("Úprava dokončena.");
-            Console.ResetColor();
+            VypisyDoKonzole.VypisUspech("Úprava dokončena.");
         }
 
         public void Smazat()
@@ -272,9 +263,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                     "Zaměstnanci", TypAkce.Smazano, $"{zam.Jmeno} {zam.Prijmeni}",
                     puvodniHodnota: $"mzda {zam.Mzda} Kč"));
 
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                Console.WriteLine($"Zaměstnanec {zam.Prijmeni} byl smazán.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisInformaci($"Zaměstnanec {zam.Prijmeni} byl smazán.");
             }
         }
 
@@ -289,15 +278,13 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             {
                 if (zam.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 {
-                    zam.VypisZamestnance();
+                    ZamestnanciVypisy.VypisZamestnance(zam);
                     nalezeno = true;
                 }
             }
             if (!nalezeno)
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine("Zaměstnanec nenalezen.");
-                Console.ResetColor();
+                VypisyDoKonzole.VypisVarovani("Zaměstnanec nenalezen.");
             }
         }
 
@@ -321,9 +308,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             zoo.Zamestnanci.UlozCisloKonfiguraci();
 
-            Console.ForegroundColor = ConsoleColor.Green;
-            Console.WriteLine($"Nastavení uloženo. Další vydané číslo bude: {konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}");
-            Console.ResetColor();
+            VypisyDoKonzole.VypisUspech($"Nastavení uloženo. Další vydané číslo bude: {konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}");
         }
     }
 }
