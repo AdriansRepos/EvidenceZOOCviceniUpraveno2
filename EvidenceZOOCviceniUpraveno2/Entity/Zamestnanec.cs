@@ -1,7 +1,6 @@
 ﻿using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using InputHelper;
-using PohybHelper;
 using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 
@@ -132,42 +131,6 @@ namespace EvidenceZOOCviceniUpraveno2.Data
         public static bool JePlatnyEmail(string email)
         {
             return EmailRegex().IsMatch(email);
-        }
-
-        public void VypisZamestnance()
-        {
-            Console.WriteLine(
-                $"{OsobniCislo,-12} {Jmeno,-15} {Prijmeni,-15} {DatumNarozeni,-15} {Mzda,-10} {PracovniPozice,-20}"
-            );
-        }
-
-        public void VypisKontaktniUdaje()
-        {
-            Console.WriteLine($"Adresa:            {Ulice}, {PSC} {Mesto}");
-            Console.WriteLine($"Telefon:           {Telefon}");
-            Console.WriteLine($"E-mail:            {Email}");
-            Console.WriteLine($"Rodinný stav:      {PopiskyHelper.ZiskejPopisek(RodinnyStav)}");
-            Console.WriteLine($"Zdravotní stav:    {PopiskyHelper.ZiskejPopisek(ZdravotniStav)}");
-            Console.WriteLine($"Doklad totožnosti: {TypDokladu} {CisloDokladu}");
-
-            if (Deti.Count > 0)
-            {
-                Console.WriteLine("Děti:");
-                foreach (Dite dite in Deti)
-                {
-                    string bonus = dite.UplatnenBonus ? " (uplatněn bonus)" : "";
-                    string ztpP = dite.JeDrzitelZtpP ? " [ZTP/P]" : "";
-                    Console.WriteLine($"  - {dite.Jmeno} {dite.Prijmeni}, nar. {dite.DatumNarozeni:d}, RČ: {dite.RodneCislo}{ztpP}{bonus}");
-                }
-            }
-
-            if (Partner != null)
-            {
-                Console.WriteLine("Partner / Manžel(ka):");
-                string ztp = Partner.JeDrzitelZtpP ? " [ZTP/P]" : "";
-                string sleva = Partner.UplatnitSlevu ? " (uplatněna sleva)" : "";
-                Console.WriteLine($"  - {Partner.Jmeno} {Partner.Prijmeni}, RČ: {Partner.RodneCislo}{ztp}{sleva}");
-            }
         }
 
         [GeneratedRegex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$")]
