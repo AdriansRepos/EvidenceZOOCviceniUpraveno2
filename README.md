@@ -88,6 +88,8 @@ Datové soubory jsou platné vždy jen do konce kalendářního roku. Při každ
 
 ## Struktura projektu
 
+## Struktura projektu
+
 ```text
 ZOO/
 ├── Data/
@@ -138,6 +140,20 @@ ZOO/
 │   ├── MenuZamestnanci.cs
 │   └── MenuZvirata.cs
 ├── Vypisy/
+│   ├── Audity/
+│   │   └── AuditVypisy.cs
+│   ├── Pokladna/
+│   │   └── PokladnaVypisy.cs
+│   ├── Sklad/
+│   │   └── SkladVypisy.cs
+│   ├── Statistiky/
+│   │   └── StatistikyVypisy.cs
+│   ├── System/
+│   │   └── TechnickyZaznamVypisy.cs
+│   ├── Zamestnanci/
+│   │   └── ZamestnanciVypisy.cs
+│   └── Zvirata/
+│       └── ZvirataVypisy.cs
 ├── Zaloha/
 │   ├── ArchivacniSluzba.cs
 │   └── ZalohovaciSluzba.cs
@@ -171,12 +187,11 @@ ZOO/
 
 ## Použité techniky
 
+## Použité techniky
+
 - OOP (třídy, vlastnosti, zapouzdření)
 - Primární konstruktory
-- Rozdělení třídy `ZOO` na samostatné soubory podle domény (konfigurace, zaměstnanci, zvířata, sklad, pokladna, logy, archivace, zálohování, statistiky) pro přehlednost a udržovatelnost
-- Další vyčlenění samostatných souborů do jejich složek s názvem podle určení (data, repozitáře, pomocné třídy, entity, enumy, logika, menu, výpisy záloha)
-- Vyčlenění menu a všech výpisů do samostatných souborů - očištění datových a logických souborů a delegování této činnosti na samostatné soubory
-- Vyčištění složky s daty, entity přesunuty do své vlastní složky
+- **Čistá architektura a modulární struktura** – Důsledné oddělení odpovědností (SoC) rozdělením projektu do samostatných složek a vrstev (Entity, Repozitáře, Logika, Menu, Výpisy) a využití `partial` tříd pro doménové rozsekání hlavní třídy `ZOO`.
 - Partial třídy a metody se zdrojově generovaným regulárním výrazem (`GeneratedRegex`)
 - Enumy (kategorie skladových položek, typ skladového pohybu)
 - Delegáty pro lazy loading dat (`RegistrujNacitani` / `ZajistiData`)
@@ -194,7 +209,6 @@ ZOO/
 - Kolekce (`List<T>`)
 - Serializace/deserializace do JSON souborů (`System.Text.Json`)
 - Zadání cest k adresáři a souborům jenom při prvním spuštění aplikace – nastavení a jejich uložení do konfiguračního souboru
-- Lazy loading pro načtení souborů až když je potřeba
 - Barevný konzolový výstup pro přehlednost (úspěch/chyba/varování/menu)
 - Úprava formátování výpisů do tabulek
 
@@ -321,5 +335,8 @@ public void Pridat()
 **v1.9.1** – Oprava formátování zdrojového kódu.
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.1)
 
-**v1.9.2** – Refaktoring: třída `ZOO` rozdělena na partial soubory podle domény (`ZOO.Konfigurace.cs`, `ZOO.Zamestnanci.cs`, `ZOO.Zvirata.cs`, `ZOO.Sklad.cs`, `ZOO.Pokladna.cs`, `ZOO.Logy.cs`, `ZOO.Archivace.cs`, `ZOO.Zalohovani.cs`, `ZOO.Statistiky.cs`) pro lepší čitelnost a snazší budoucí rozšiřování. Žádná změna funkčnosti pro uživatele.  
+**v1.9.2** – Začátek velkého refaktoringu celé aplikace: třída `ZOO` rozdělena na partial soubory podle domény (`ZOO.Konfigurace.cs`, `ZOO.Zamestnanci.cs`, `ZOO.Zvirata.cs`, `ZOO.Sklad.cs`, `ZOO.Pokladna.cs`, `ZOO.Logy.cs`, `ZOO.Archivace.cs`, `ZOO.Zalohovani.cs`, `ZOO.Statistiky.cs`) pro lepší čitelnost a snazší budoucí rozšiřování. Žádná změna funkčnosti pro uživatele.  
 [Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.2)
+
+**v2.0.0** - Dokončení velkého refaktoringu celé aplikace: Rozšíření evidence zaměstnanců o rodné číslo a úprava údajů o dětech (odebrány přebytečné údaje jako škola či adresa, zjednodušeno zadávání invalidity přes výběr ano/ne). Přidána možnost uplatnění daňového bonusu na manžela/manželku. Dokončení ozsáhlého refaktoringu a reorganizace projektu – vytvořena čistá architektura s oddělením odpovědností (SoC). Všechny třídy roztříděny do odpovídajících vrstev a složek (Entity, Data/Repozitare, Logika, Menu, Vypisy, Zaloha). Vyčlenění všech konzolových výpisů z datových entit i logiky do samostatných statických tříd ve složce Vypisy, čímž došlo k úplnému očištění biznis logiky i datových modelů.
+[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v2.0.0)
