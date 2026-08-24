@@ -1,5 +1,6 @@
 ﻿using BarevneVypisyHelper;
 using EvidenceZOOCviceniUpraveno2.Logika;
+using EvidenceZOOCviceniUpraveno2.Vypisy.Statistiky;
 using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Menu
@@ -14,7 +15,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
             char volba;
 
             do            
-            {               
+            {                
                 VypisyDoKonzole.VypisHlavickuMenu("STATISTIKY");
                 VypisyDoKonzole.VypisTeloMenu(
                     "1. Počet zvířat",
@@ -31,15 +32,15 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
                 switch (volba)
                 {
                     case '1':
-                        Console.WriteLine($"Počet zvířat: {statistiky.PocetZvirat()}");
+                        StatistikyVypis.VypisPocetZvirat(statistiky.PocetZvirat());
                         break;
 
                     case '2':
-                        Console.WriteLine($"Počet zaměstnanců: {statistiky.PocetZamestnancu()}");
+                        StatistikyVypis.VypisPocetZamestnancu(statistiky.PocetZamestnancu());
                         break;
 
                     case '3':
-                        Console.WriteLine($"Součet mezd: {statistiky.SoucetMezd()} Kč");
+                        StatistikyVypis.VypisSoucetMezd(statistiky.SoucetMezd());
                         break;
 
                     case '4':
@@ -77,7 +78,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
 
             double navstevnost = statistiky.PrumernaDenniNavstevnost(rokNavstevnost, mesicNavstevnost);
 
-            Console.WriteLine($"Průměrná denní návštěvnost za {mesicNavstevnost}/{rokNavstevnost}: {navstevnost:0.##} osob/den");
+            StatistikyVypis.VypisNavstevnost(mesicNavstevnost, rokNavstevnost, navstevnost);
         }
     }
 }
