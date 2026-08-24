@@ -30,14 +30,14 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
             return $"{typText}: {NazevPolozky} ({Mnozstvi:0.##})";
         }
 
-        public void VypisPohyb()
+        public override string ToString()
         {
-            Console.ForegroundColor = TypPohybu == SkladovyTypPohybu.Naskladneni
-                ? ConsoleColor.Green
-                : ConsoleColor.Yellow;
-
-            Console.WriteLine($"{DatumCas,-20:g} {Popis(),-45}");
-            Console.ResetColor();
+            return $"{DatumCas,-20:g} {TypPohybu} – {NazevPolozky}: {Mnozstvi:0.##}";
+        }
+        
+        public string VypisPohyb()
+        {
+            return ToString();
         }
     }
 }
