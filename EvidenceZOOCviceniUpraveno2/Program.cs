@@ -1,7 +1,8 @@
-﻿using EvidenceZOOCviceniUpraveno2.Logika;
-using EvidenceZOOCviceniUpraveno2.Zaloha;
-using EvidenceZOOCviceniUpraveno2.Data.Repozitare;
+﻿using EvidenceZOOCviceniUpraveno2.Data.Repozitare;
 using EvidenceZOOCviceniUpraveno2.Entity;
+using EvidenceZOOCviceniUpraveno2.Logika;
+using EvidenceZOOCviceniUpraveno2.Menu;
+using EvidenceZOOCviceniUpraveno2.Zaloha;
 
 string korenovaSlozka = KonfiguraceRepository.NactiNeboSeZeptejNaCesty();
 Zoo zoo = new(korenovaSlozka);
@@ -23,5 +24,12 @@ SpravceSkladu spravceSkladu = new(zoo);
 SpravcePokladny spravcePokladny = new(zoo);
 Statistiky statistiky = new(zoo);
 
-// není ukončený a doladěný - dokončení a odladění proběhne na konci refaktoringu,
-// kdy budu kontrolovat i jednotlivá provázání namespace detailněji
+MenuZamestnanci menuZamestnanci = new(spravceZamestnancu);
+MenuZvirata menuZvirata = new(spravceZvirat);
+MenuSklad menuSklad = new(spravceSkladu);
+MenuPokladna menuPokladna = new(spravcePokladny);
+MenuStatistiky menuStatistiky = new(statistiky);
+
+// === SPUŠTĚNÍ APLIKACE ===
+HlavniMenu hlavniMenu = new(zoo, menuZamestnanci, menuZvirata, menuSklad, menuPokladna, menuStatistiky);
+hlavniMenu.Zobraz();
