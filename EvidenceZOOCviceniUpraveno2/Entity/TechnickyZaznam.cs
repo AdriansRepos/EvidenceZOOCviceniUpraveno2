@@ -1,5 +1,5 @@
-﻿using EvidenceZOOCviceniUpraveno2.Enumy;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
+using EvidenceZOOCviceniUpraveno2.Enumy;
 
 namespace EvidenceZOOCviceniUpraveno2.Entity
 {
@@ -18,19 +18,5 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
 
         [JsonPropertyName("cas")]
         public DateTime Cas { get; internal set; } = cas;
-
-        public void VypisZaznam()
-        {
-            Console.ForegroundColor = Uroven 
-            switch
-            {
-                UrovenLogu.Chyba => ConsoleColor.Red,
-                UrovenLogu.Varovani => ConsoleColor.Yellow,
-                _ => ConsoleColor.Gray
-            };
-
-            Console.WriteLine($"{Cas,-20:g} [{Uroven}] {Zprava}");
-            Console.ResetColor();
-        }
     }
 }
