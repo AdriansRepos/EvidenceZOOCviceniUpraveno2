@@ -1,12 +1,9 @@
 ﻿using BarevneVypisyHelper;
-using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
 using EvidenceZOOCviceniUpraveno2.Logika;
 using PohybHelper;
 using SelectHelper;
 using TextHelper;
-using EvidenceZOOCviceniUpraveno2.Logika;
-using EvidenceZOOCviceniUpraveno2.Enumy;
 
 namespace EvidenceZOOCviceniUpraveno2.Menu
 {

@@ -1,6 +1,5 @@
 ﻿using BarevneVypisyHelper;
 using EvidenceZOOCviceniUpraveno2.Entity;
-using EvidenceZOOCviceniUpraveno2.Logika;
 using EvidenceZOOCviceniUpraveno2.Zaloha;
 
 namespace EvidenceZOOCviceniUpraveno2.Menu

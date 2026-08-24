@@ -1,5 +1,4 @@
-﻿using System;
-namespace EvidenceZOOCviceniUpraveno2.Vypisy.Statistiky
+﻿namespace EvidenceZOOCviceniUpraveno2.Vypisy.Statistiky
 {
     internal static class StatistikyVypisy
     {
