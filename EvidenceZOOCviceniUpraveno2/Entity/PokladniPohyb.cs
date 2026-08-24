@@ -54,14 +54,9 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
             return $"{typText}: {vstupenkaText} ({mnozstviText}) – {Castka:0.##} Kč";
         }
 
-        public void VypisPohyb()
+        public override string ToString()
         {
-            Console.ForegroundColor = TypPohybu == PokladniTypPohybu.Prodej
-                ? ConsoleColor.Green
-                : ConsoleColor.DarkYellow;
-
-            Console.WriteLine($"{DatumCas,-20:g} {Popis()}");
-            Console.ResetColor();
+            return $"{DatumCas,-20:g} {Popis()}";
         }
     }
 }
