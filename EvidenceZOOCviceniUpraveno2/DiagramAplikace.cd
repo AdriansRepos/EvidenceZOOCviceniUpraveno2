@@ -1,0 +1,349 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.PomocneTridy.SouborovyPomocnik" Collapsed="true">
+    <Position X="4.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAEAAAAAAAAAgIAAAAAAAAAAAAAAAABAAAAAAAA=</HashCode>
+      <FileName>Data\PomocneTridy\SouborovyPomocnik.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Repozitare.KonfiguraceRepository" Collapsed="true">
+    <Position X="2.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAEBYUAAAAAAQABAAAAIAQAAAgAAAAAAAAAEAAAAACA=</HashCode>
+      <FileName>Data\Repozitare\KonfiguraceRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Repozitare.LogyRepository" Collapsed="true">
+    <Position X="4.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQAAAAIgAEAAAgAAAAACAAAEAAAAAAABAIAAARBAAAA=</HashCode>
+      <FileName>Data\Repozitare\LogyRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Repozitare.PokladnaRepository" Collapsed="true">
+    <Position X="4.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQgQAAMAAAAAAAAAAAACEAAAgAAAIAAEAAAAAAVAAAI=</HashCode>
+      <FileName>Data\Repozitare\PokladnaRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Repozitare.SkladRepository" Collapsed="true">
+    <Position X="0.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQEDQAACAAAAEAAAAAACAAAAAAAiAgABYCAAAAAAAAA=</HashCode>
+      <FileName>Data\Repozitare\SkladRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Repozitare.ZamestnanciRepository" Collapsed="true">
+    <Position X="0.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQIJAApiAJAAAAAAEAACAAAABAAEAAABAABAABBABAA=</HashCode>
+      <FileName>Data\Repozitare\ZamestnanciRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Repozitare.ZvirataRepository" Collapsed="true">
+    <Position X="9.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQIIAIJgABAAAAABAAACAEAIAAAAAAAAAABAAABBACA=</HashCode>
+      <FileName>Data\Repozitare\ZvirataRepository.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.AuditZaznam" Collapsed="true">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAACAAAASQAAAADAAAAAAAAAAAAAACAAAACAAAAAA=</HashCode>
+      <FileName>Entity\AuditZaznam.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.Cenik" Collapsed="true">
+    <Position X="6" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAgIAAAAAAgAAAAAAAAAABCAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\Ceník.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.CisloZamestnanceKonfigurace" Collapsed="true">
+    <Position X="7.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAEAAAABAAEAAAAAAACAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\CisloZamestnanceKonfigurace.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.CisloZvireteKonfigurace" Collapsed="true">
+    <Position X="9.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAEAAIAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\CisloZvireteKonfigurace.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.Dite" Collapsed="true">
+    <Position X="11.25" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAABAAAQAAAAAAAAAAAIEFAIAAAAAAAAAAAAAAAAIAA=</HashCode>
+      <FileName>Entity\Dite.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.Partner" Collapsed="true">
+    <Position X="2.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAADAAAwAAAAAAAAAAAAAFAIAAAAAAEAAAAAAAAAIAA=</HashCode>
+      <FileName>Entity\Partner.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.PokladniPohyb" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="7.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAABAAAAAKAAAAEAAAABAECAAAIAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Entity\PokladniPohyb.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.SkladovaPolozka" Collapsed="true">
+    <Position X="9.5" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>wICAAQAAAAAAACAEAAABAAAAAAAAAAAAAEAAAAAAAAA=</HashCode>
+      <FileName>Entity\SkladovaPolozka.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.SkladovyPohyb" Collapsed="true" BaseTypeListCollapsed="true">
+    <Position X="11.25" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gAAAAAAAAACQAAAEAAAABAACAAAAAAAAAAAIAAAAAAA=</HashCode>
+      <FileName>Entity\SkladovyPohyb.cs</FileName>
+    </TypeIdentifier>
+    <Lollipop Position="0.2" Collapsed="true" />
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.TechnickyZaznam" Collapsed="true">
+    <Position X="4.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAQAAAAAAAAAAAAAAAABAAAAAAAAAAAgAAA=</HashCode>
+      <FileName>Entity\TechnickyZaznam.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.ZdravotniZaznam" Collapsed="true">
+    <Position X="6" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAACAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Entity\ZdravotniZaznam.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.Zoo" Collapsed="true">
+    <Position X="7.75" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAQCAAAEAAAAAACAAEAAAAAAAAAAAAAAAAAABAA=</HashCode>
+      <FileName>Entity\Zoo.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Entity.Zvire" Collapsed="true">
+    <Position X="0.75" Y="6.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAACAQAAAAAAIAAQAAAAEEAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>Entity\Zvire.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Data.Zamestnanec" Collapsed="true">
+    <Position X="4.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>CAABAAAQAiAACKAiDQAgEBAIAABAAQEEAAAAAQABIAg=</HashCode>
+      <FileName>Entity\Zamestnanec.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.SpravcePokladny" Collapsed="true">
+    <Position X="6" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAgBIAAAAAAAAAAACAACgABAAAAAAAhAAEAAAA=</HashCode>
+      <FileName>Logika\SpravcePokladny.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.SpravceSkladu" Collapsed="true">
+    <Position X="7.75" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAQAgEQAAAAABAAgBAAgAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Logika\SpravceSkladu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.SpravceZamestnancu" Collapsed="true">
+    <Position X="9.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AiACAAAAAAgAAACAAAAAAgAAAgAAAACAAgAAAAAAEAA=</HashCode>
+      <FileName>Logika\SpravceZamestnancu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.SpravceZvirat" Collapsed="true">
+    <Position X="11.25" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAgAAACAAAAAAgAAAgAAAAAAAgAAAAAAEAA=</HashCode>
+      <FileName>Logika\SpravceZvirat.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.Statistiky" Collapsed="true">
+    <Position X="0.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAEAAIAAAAAAAAAAAAAACAAQgAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>Logika\Statistiky.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.Transakce" Collapsed="true">
+    <Position X="7.75" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Logika\Transakce.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Logika.VypocetCenyVstupenky" Collapsed="true">
+    <Position X="9.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAEAAA=</HashCode>
+      <FileName>Logika\VypocetCenyVstupenky.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Menu.HlavniMenu" Collapsed="true">
+    <Position X="0.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>ACAAEAAAIAAAABAQAAAAAAAAAgAAAEAAAAAAAAAAAAA=</HashCode>
+      <FileName>Menu\HlavniMenu.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Menu.MenuPokladna" Collapsed="true">
+    <Position X="6" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAABBAAAAAQAAAAAAAAACAAAAAQAAAAAAAAAAAA=</HashCode>
+      <FileName>Menu\MenuPokladna.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Menu.MenuSklad" Collapsed="true">
+    <Position X="7.75" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Menu\MenuSklad.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Menu.MenuStatistiky" Collapsed="true">
+    <Position X="9.5" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAABAAAAAAAAAAAACAAAAAAAA=</HashCode>
+      <FileName>Menu\MenuStatistiky.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Menu.MenuZamestnanci" Collapsed="true">
+    <Position X="11.25" Y="1.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Menu\MenuZamestnanci.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Menu.MenuZvirata" Collapsed="true">
+    <Position X="0.75" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAEAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Menu\MenuZvirata.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.Audity.AuditVypisy" Collapsed="true">
+    <Position X="2.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Vypisy\Audity\AuditVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.Pokladna.PokladnaVypisy" Collapsed="true">
+    <Position X="6" Y="2.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAgAAAAQAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Vypisy\Pokladna\PokladnaVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.Sklad.SkladVypisy" Collapsed="true">
+    <Position X="2.5" Y="3.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AACAAAAAAAAAAAQAAAAABAAAAAAAAAAAAAAgAAAAAAA=</HashCode>
+      <FileName>Vypisy\Sklad\SkladVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.Statistiky.StatistikyVypisy" Collapsed="true">
+    <Position X="2.5" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAQAAEAAAAAAAAAAAAAI=</HashCode>
+      <FileName>Vypisy\Statistiky\StatistikyVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.System.TechnickyZaznamVypisy" Collapsed="true">
+    <Position X="6" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Vypisy\System\TechnickyZaznamVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.Zamestnanci.ZamestnanciVypisy" Collapsed="true">
+    <Position X="2.5" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAgCAAAAAAAAAAAAAAAAAAAEAAAAAAAAAA=</HashCode>
+      <FileName>Vypisy\Zamestnanci\ZamestnanciVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Vypisy.Zvirata.ZvirataVypisy" Collapsed="true">
+    <Position X="11.25" Y="5.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAACAAEAAAAAAAAAAAAAAAAAAAAAgAAAAA=</HashCode>
+      <FileName>Vypisy\Zvirata\ZvirataVypisy.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Zaloha.ArchivacniSluzba" Collapsed="true">
+    <Position X="0.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAACAAgAAAAAAAIgAAAAIAAAAAAAABABA=</HashCode>
+      <FileName>Zaloha\ArchivacniSluzba.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="EvidenceZOOCviceniUpraveno2.Zaloha.ZalohovaciSluzba" Collapsed="true">
+    <Position X="11.25" Y="4.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAgAAQgAAAAAAQAAAAAA=</HashCode>
+      <FileName>Zaloha\ZalohovaciSluzba.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="EvidenceZOOCviceniUpraveno2.Enumy.KategoriePolozky" Collapsed="true">
+    <Position X="0.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>QAAQAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumy\KategoriePolozky.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EvidenceZOOCviceniUpraveno2.Enumy.RodinnyStav" Collapsed="true">
+    <Position X="2.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAIAAAAAIAAAAAAAAAAAIgAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumy\RodinnyStav.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EvidenceZOOCviceniUpraveno2.Enumy.TypAkce" Collapsed="true">
+    <Position X="4.25" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAABAAAQAAA=</HashCode>
+      <FileName>Enumy\TypAkce.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EvidenceZOOCviceniUpraveno2.Enumy.TypVstupenky" Collapsed="true">
+    <Position X="6" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>BESAAAAAAAAAAAAAAAAQAAAAAAAAAAAIAAAAAAAQAAA=</HashCode>
+      <FileName>Enumy\TypVstupenky.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EvidenceZOOCviceniUpraveno2.Enumy.UrovenLogu" Collapsed="true">
+    <Position X="7.75" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAAAAAAAAAIEAAAAAAAAAAAAAAEAAAAA=</HashCode>
+      <FileName>Enumy\UrovenLogu.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="EvidenceZOOCviceniUpraveno2.Enumy.ZdravotniStav" Collapsed="true">
+    <Position X="9.5" Y="7.75" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AAAAAABAEAAAAAAAiAAAAAAAQAAAAAAAAAAAAAAAAAA=</HashCode>
+      <FileName>Enumy\ZdravotniStav.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>
