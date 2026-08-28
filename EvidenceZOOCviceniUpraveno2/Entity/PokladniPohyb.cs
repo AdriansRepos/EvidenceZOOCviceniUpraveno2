@@ -14,9 +14,11 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         int pocetKusu, int pocetDospelych, int pocetDeti,
         decimal castka, DateTime datumCas) : IPohyb
     {
+        /// <summary> Typ operace (příjem za prodej / výdaj za storno). </summary>
         [JsonPropertyName("typPohybu")]
         public PokladniTypPohybu TypPohybu { get; internal set; } = typPohybu;
 
+        /// <summary> Kategórie zakoupené vstupenky. </summary>
         [JsonPropertyName("typVstupenky")]
         public TypVstupenky TypVstupenky { get; internal set; } = typVstupenky;
 
@@ -27,9 +29,11 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         [JsonPropertyName("pocetKusu")]
         public int PocetKusu { get; internal set; } = pocetKusu;
 
+        /// <summary> Počet dospělých osob v rámci kombinované vstupenky. </summary>
         [JsonPropertyName("pocetDospelych")]
         public int PocetDospelych { get; internal set; } = pocetDospelych;
 
+        /// <summary> Počet dětí v rámci kombinované vstupenky. </summary>
         [JsonPropertyName("pocetDeti")]
         public int PocetDeti { get; internal set; } = pocetDeti;
 
@@ -40,13 +44,19 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         [JsonPropertyName("castka")]
         public decimal Castka { get; internal set; } = castka;
 
+        /// <summary> Čas razítka prodeje/storna. </summary>
         [JsonPropertyName("datumCas")]
         public DateTime DatumCas { get; internal set; } = datumCas;
 
+        /// <summary>
+        /// Vrátí formátovaný přehlední řetězec pohybu včetně popisků a výpočtu kusů.
+        /// </summary>
         public string Popis()
         {
             string typText = PopiskyHelper.ZiskejPopisek(TypPohybu);
             string vstupenkaText = PopiskyHelper.ZiskejPopisek(TypVstupenky);
+            
+            // Diferenciace zobrazení počtu podle typu vstupenky
             string mnozstviText = TypVstupenky is TypVstupenky.RodinaUplna or TypVstupenky.RodinaNeuplna or TypVstupenky.Skupina
                 ? $"{PocetDospelych} dosp. + {PocetDeti} dětí"
                 : $"{PocetKusu}×";
@@ -54,6 +64,7 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
             return $"{typText}: {vstupenkaText} ({mnozstviText}) – {Castka:0.##} Kč";
         }
 
+        /// <summary> Vrátí datum a čas s popisem transakce zarovnaným do bloku. </summary>
         public override string ToString()
         {
             return $"{DatumCas,-20:g} {Popis()}";

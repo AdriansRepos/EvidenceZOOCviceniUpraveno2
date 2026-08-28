@@ -4,15 +4,19 @@ using BarevneVypisyHelper;
 namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
 {
     /// <summary>
-    /// Sdílené, bezstavové pomocné metody pro čtení a zápis JSON souborů
-    /// s automatickou obnovou ze zálohy a crash-safe zápisem.
-    /// Používají ji všechny repository třídy.
+    /// Statická pomocná třída poskytující bezpečné metody pro manipulaci se soubory.
+    /// Zajišťuje odolnost vůči haváriím (crash-safety) a automatickou obnovu ze záloh.
     /// </summary>
     static class SouborovyPomocnik
     {
+        /// <summary>
+        /// Pokusí se načíst data z primárního souboru. Pokud soubor chybí nebo je poškozený,
+        /// automaticky zahájí obnovu ze záložního souboru.
+        /// </summary>
         public static List<T> NactiZeSouboru<T>(string hlavniSoubor, string zalohaSoubor,
             Func<string, List<T>> deserializace, string popisProHlasky)
         {
+            // Pokud chybí hlavní soubor, ale záloha existuje, provede její kopii
             if (!File.Exists(hlavniSoubor) && File.Exists(zalohaSoubor))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(hlavniSoubor)!);
@@ -31,10 +35,14 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
             catch (Exception ex)
             {                
                 VypisyDoKonzole.VypisVarovani($"Chyba při načítání {popisProHlasky}: {ex.Message}");                
+                // Přechod na záložní plan – načtení ze zálohy
                 return NactiZeZalohy(zalohaSoubor, deserializace, popisProHlasky);
             }
         }
 
+        /// <summary>
+        /// Zajišťuje záložní načtení dat, pokud se selhalo čtení z primárního souboru.
+        /// </summary>
         public static List<T> NactiZeZalohy<T>(string zalohaSoubor,
             Func<string, List<T>> deserializace, string popisProHlasky)
         {
@@ -58,6 +66,9 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
             }
         }
 
+        /// <summary>
+        /// Serializuje objekt do JSON a zapíše jej do souboru včetně zálohování.
+        /// </summary>
         public static void UlozDoSouboru<T>(T data, JsonSerializerOptions options,
             string cilovySoubor, string zalohovySoubor, string popisProHlasky)
         {
@@ -72,14 +83,20 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
             }
         }
 
+        /// <summary>
+        /// Provede zápis dat do dočasného souboru (.tmp) a následně atomicky nahradí cílový soubor,
+        /// přičemž původní verzi přesune do záložního souboru.
+        /// </summary>
         public static void ZapisSouborSeZalohou(string cilovySoubor, string zalohovySoubor, string obsah)
         {
             Directory.CreateDirectory(Path.GetDirectoryName(cilovySoubor)!);
             Directory.CreateDirectory(Path.GetDirectoryName(zalohovySoubor)!);
 
+            // Zápis do dočasného souboru zamezuje poškození souboru v případě přerušení procesu
             string docasny = cilovySoubor + ".tmp";
             File.WriteAllText(docasny, obsah);
 
+            // Výměna dočasného souboru za cílový se zachováním zálohy
             if (File.Exists(cilovySoubor))
                 File.Replace(docasny, cilovySoubor, zalohovySoubor);
             else

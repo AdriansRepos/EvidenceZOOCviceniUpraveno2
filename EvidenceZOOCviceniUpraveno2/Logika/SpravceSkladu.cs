@@ -7,6 +7,9 @@ using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
+    /// <summary>
+    /// Spravuje skladové zásoby, naskladnění, vyskladnění a sledování minimálních stavů.
+    /// </summary>
     class SpravceSkladu
     {
         private readonly Zoo zoo;
@@ -14,13 +17,17 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         public SpravceSkladu(Zoo zoo)
         {
             this.zoo = zoo;
-            this.zoo.Sklad.Nacti();
+            this.zoo.Sklad.Nacti(); // Načtení existujících zásoby ze souborů při vytvoření správce
         }
 
+        /// <summary>
+        /// Zadá do systému novou skladovou položku.
+        /// </summary>
         public void PridatPolozku()
         {
             Console.WriteLine("PŘIDÁNÍ NOVÉ SKLADOVÉ POLOŽKY");
 
+            // Interaktivní načtení dat od uživatele s validací přes UpravaVstupu
             string nazev = UpravaVstupu.ZeptejSeAUprav("", "název položky", v => v, s => s, jeNove: true);
 
             Console.WriteLine("Kategorie: 1 = Krmivo, 2 = Pomůcky, 3 = Léky/veterinární materiál");
@@ -41,6 +48,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             var novaPolozka = new SkladovaPolozka(nazev, kategorie, mnozstvi, jednotka, minimalniStav);
 
+            // Bezpečné přidání do seznamu a uložení na disk
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Sklad.Sklad.Add(novaPolozka),
                 rollback: () => zoo.Sklad.Sklad.Remove(novaPolozka),
@@ -49,7 +57,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             if (uspech)
             {
-                // Přidán chybějící audit log
+                // Auditní záznam o vytvoření položky
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Sklad", TypAkce.Pridano, novaPolozka.Nazev,
                     novaHodnota: $"{novaPolozka.Mnozstvi:0.##} {novaPolozka.Jednotka}"));
@@ -58,6 +66,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Vypíše kompletní přehled aktuálních položek na skladě.
+        /// </summary>
         public void Vypis()
         {
             Console.WriteLine("STAV SKLADU");            
@@ -68,6 +79,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine(polozka.VypisPolozku());
         }
 
+        /// <summary>
+        /// Zvýší stav vybrané položky a vytvoří záznam do historie skladových pohybů.
+        /// </summary>
         public void Naskladnit()
         {
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad.Sklad, p => p.Nazev, "položky k naskladnění");
@@ -86,6 +100,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             double puvodniMnozstvi = polozka.Mnozstvi;
             var pohyb = new SkladovyPohyb(polozka.Nazev, SkladovyTypPohybu.Naskladneni, pridat, DateTime.Now);
 
+            // Úprava množství i vytvoření pohybové historie v rámci transakce
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () =>
                 {
@@ -110,6 +125,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Snižuje skladovou zásobu a kontroluje pokles pod minimální požadovaný stav.
+        /// </summary>
         public void Vyskladnit()
         {
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad.Sklad, p => p.Nazev, "položky k vyskladnění");
@@ -125,6 +143,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 return;
             }
 
+            // Validace dostatečného stavu na skladě
             if (odebrat > polozka.Mnozstvi)
             {                
                 VypisyDoKonzole.VypisVarovani("Nelze vyskladnit více, než je aktuálně na skladě.");                
@@ -155,16 +174,18 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 "Sklad", TypAkce.Upraveno, $"{polozka.Nazev} – vyskladnění",
                 puvodniMnozstvi.ToString("0.##"), polozka.Mnozstvi.ToString("0.##")));
 
-            // Informujeme vždy o úspěšném vyskladnění            
             VypisyDoKonzole.VypisUspech($"Vyskladněno {odebrat} {polozka.Jednotka} položky {polozka.Nazev}.");
             
-            // A navíc zobrazíme varování, pokud klesla pod minimum
+            // Upozornění na nízký stav po odebrání
             if (polozka.JeDochazejici)
             {                
                 VypisyDoKonzole.VypisInformaci($"Pozor: položka {polozka.Nazev} dosáhla minimálního stavu ({polozka.Mnozstvi:0.##} / min. {polozka.MinimalniStav:0.##}).");                
             }
         }
 
+        /// <summary>
+        /// Odstraní položku ze skladu.
+        /// </summary>
         public void Smazat()
         {
             var polozka = SelectHelp.VybratPolozku(zoo.Sklad.Sklad, p => p.Nazev, "položky ke smazání");
@@ -187,6 +208,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Zobrazí pouze ty položky, jejichž aktuální množství je nižší nebo rovno minimálnímu stavu.
+        /// </summary>
         public void VypisDochazejici()
         {
             var dochazejici = zoo.Sklad.Sklad.Where(p => p.JeDochazejici).ToList();
@@ -203,6 +227,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 Console.WriteLine(polozka.VypisPolozku());
         }
 
+        /// <summary>
+        /// Vyhledá a vypíše historii pohybů podle uživatelem zvolených kritérií (typ pohybu, časové rozmezí).
+        /// </summary>
         public void VypisPohybyInventura()
         {
             Console.WriteLine("VÝPIS SKLADOVÝCH POHYBŮ (inventura)");

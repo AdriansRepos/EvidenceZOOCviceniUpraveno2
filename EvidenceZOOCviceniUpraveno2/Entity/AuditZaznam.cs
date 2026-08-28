@@ -20,6 +20,9 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         [JsonPropertyName("modul")]
         public string Modul { get; internal set; } = modul;
 
+        /// <summary>
+        /// Typ prováděné operace (např. Přidání, Úprava, Smazání).
+        /// </summary>
         [JsonPropertyName("akce")]
         public TypAkce Akce { get; internal set; } = akce;
 
@@ -29,12 +32,21 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         [JsonPropertyName("popis")]
         public string Popis { get; internal set; } = popis;
 
+        /// <summary>
+        /// Původní hodnota před úpravou (pro auditní porovnání).
+        /// </summary>
         [JsonPropertyName("puvodniHodnota")]
         public string? PuvodniHodnota { get; internal set; } = puvodniHodnota;
 
+        /// <summary>
+        /// Nová hodnota po provedení úpravy.
+        /// </summary>
         [JsonPropertyName("novaHodnota")]
         public string? NovaHodnota { get; internal set; } = novaHodnota;
 
+        /// <summary>
+        /// Exact časové razítko vzniku události.
+        /// </summary>
         [JsonPropertyName("cas")]
         public DateTime Cas { get; internal set; } = cas;
 
@@ -51,6 +63,7 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
         public static AuditZaznam Vytvor(string modul, TypAkce akce, string popis,
             string? puvodniHodnota = null, string? novaHodnota = null)
         {
+            // Zachycení aktuálního času systému a uživatelského účtu Windows
             return new AuditZaznam(modul, akce, popis, puvodniHodnota, novaHodnota,
                 DateTime.Now, Environment.UserName);
         }

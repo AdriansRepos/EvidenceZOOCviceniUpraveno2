@@ -8,19 +8,22 @@ using BarevneVypisyHelper;
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
-    /// Zodpovídá výhradně za perzistenci zvířat – každé zvíře je uložené
-    /// ve vlastním souboru.
+    /// Repozitář určený pro správu zvířat. Každé zvíře ukládá do samostatného JSON souboru.
     /// </summary>
     class ZvirataRepository(string korenovaSlozka)
     {
         private readonly string korenovaSlozka = korenovaSlozka;
 
+        /// <summary> Seznam evidovaných zvířat. </summary>
         public List<Zvire> Zvirata { get; internal set; } = [];
+
+        /// <summary> Konfigurace generování unikátních ID pro zvířata. </summary>
         public CisloZvireteKonfigurace CisloKonfigurace { get; internal set; } = new();
 
         internal string SlozkaZvirat => Path.Combine(korenovaSlozka, "Data", "Zvirata");
         private string SouborCisla => Path.Combine(SlozkaZvirat, "cislovani.json");
 
+        /// <summary> Sestaví cestu k JSON souboru konkrétního zvířete. </summary>
         public string SouborZvirete(Zvire zvire) =>
             Path.Combine(SlozkaZvirat, $"{NazevSouboru.OcistiProNazevSouboru(zvire.Nazev)}_{zvire.Id}.json");
 
@@ -46,12 +49,16 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             WriteIndented = true
         };
 
+        /// <summary>
+        /// Prohledá adresář zvířat a načte všechna jednotlivá zvířata z jejich samostatných JSON souborů.
+        /// </summary>
         public void Nacti()
         {
             Zvirata = [];
 
             if (Directory.Exists(SlozkaZvirat))
             {
+                // Načtení každého souboru .json kromě konfiguračního souboru číslování
                 foreach (string soubor in Directory.GetFiles(SlozkaZvirat, "*.json"))
                 {
                     if (Path.GetFileName(soubor) == "cislovani.json")
@@ -74,6 +81,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             NactiCisloKonfiguraci();
         }
 
+        /// <summary> Načte číselnou řadu pro generování nových ID zvířat. </summary>
         private void NactiCisloKonfiguraci()
         {
             if (!File.Exists(SouborCisla) && File.Exists(ZalohaCisla))
@@ -96,11 +104,13 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             }
         }
 
+        /// <summary> Uloží nebo aktualizuje soubor konkrétního zvířete a smaže případný starý soubor při přejmenování. </summary>
         public void UlozZvire(Zvire zvire, string? puvodniNazevSouboru = null)
         {
             Directory.CreateDirectory(SlozkaZvirat);
             Directory.CreateDirectory(ZalohaSlozkaZvirat);
 
+            // Odstranění původního souboru, pokud došlo ke změně názvu zvířete
             if (puvodniNazevSouboru != null && puvodniNazevSouboru != SouborZvirete(zvire))
             {
                 if (File.Exists(puvodniNazevSouboru))
@@ -111,6 +121,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             SouborovyPomocnik.ZapisSouborSeZalohou(SouborZvirete(zvire), ZalohaZvirete(zvire), json);
         }
 
+        /// <summary> Smaže soubor daného zvířete z disku. </summary>
         public void SmazatZvireSoubor(Zvire zvire)
         {
             string soubor = SouborZvirete(zvire);
@@ -118,6 +129,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 File.Delete(soubor);
         }
 
+        /// <summary> Uloží aktuální stav konfigurace číslování zvířat. </summary>
         public void UlozCisloKonfiguraci()
         {
             try

@@ -20,15 +20,18 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         /// <returns>True, pokud operace i uložení proběhly úspěšně; jinak false.</returns>
         public static bool ProvedSUlozenim(Action akce, Action rollback, Action ulozeni, string popisOperace)
         {
+            // 1. Krok: Aplikace změny v operační paměti
             akce.Invoke();
 
             try
             {
+                // 2. Krok: Pokus o zapsání dat na pevný disk
                 ulozeni.Invoke();
                 return true;
             }
             catch (Exception ex)
             {
+                // Pokud zápis selže, vrátí paměťový stav zpět do původního stavu
                 rollback.Invoke();                
                 VypisyDoKonzole.VypisVarovani($"Operace '{popisOperace}' se nezdařila a byla vrácena zpět: {ex.Message}");                
                 return false;

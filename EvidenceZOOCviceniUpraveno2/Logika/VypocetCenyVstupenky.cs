@@ -11,6 +11,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
     /// </summary>
     static class VypocetCenyVstupenky
     {
+        /// <summary>
+        /// Hlavní kalkulační metoda přijímající typ vstupenky, ceník a počty osob.
+        /// </summary>
         public static decimal Vypocitej(TypVstupenky typ, Cenik cenik,
             int pocetDospelych = 0, int pocetDeti = 0)
         {
@@ -21,12 +24,15 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 TypVstupenky.ZTP => cenik.CenaZTP,
                 TypVstupenky.Duchodce => cenik.CenaDuchodce,
 
+                // Úplná rodina: 2 dospělí + volitelný počet dětí se slevou
                 TypVstupenky.RodinaUplna =>
                     SeSlevou(2 * cenik.CenaDospela + pocetDeti * cenik.CenaDetska, cenik.SlevaRodinaProcenta),
 
+                // Neúplná rodina: 1 dospělý + volitelný počet dětí se slevou
                 TypVstupenky.RodinaNeuplna =>
                     SeSlevou(cenik.CenaDospela + pocetDeti * cenik.CenaDetska, cenik.SlevaRodinaProcenta),
 
+                // Skupinové vstupné: na základě zadaného počtu dospělých a dětí se slevou
                 TypVstupenky.Skupina =>
                     SeSlevou(pocetDospelych * cenik.CenaDospela + pocetDeti * cenik.CenaDetska, cenik.SlevaSkupinaProcenta),
 
@@ -34,6 +40,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             };
         }
 
+        /// <summary>
+        /// Pomocná metoda pro uplatnění procentuální slevy z základní ceny.
+        /// </summary>
         private static decimal SeSlevou(decimal zakladniCena, decimal slevaProcenta)
             => zakladniCena * (1 - slevaProcenta / 100m);
     }

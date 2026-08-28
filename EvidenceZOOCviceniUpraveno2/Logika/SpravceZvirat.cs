@@ -17,13 +17,17 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         public SpravceZvirat(Zoo zoo)
         {
             this.zoo = zoo;
-            this.zoo.Zvirata.Nacti();
+            this.zoo.Zvirata.Nacti(); // Načtení evidence zvířat
         }
 
+        /// <summary>
+        /// Zadá nové zvíře, vytvoří pro něj ID a uloží samostatný soubor zvířete.
+        /// </summary>
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
 
+            // Vygenerování nového ID zvířete podle konfigurace
             string id = zoo.Zvirata.CisloKonfigurace.DalsiId();
             zoo.Zvirata.UlozCisloKonfiguraci();
 
@@ -47,12 +51,16 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             Zvire nove = new(nazev, datumNarozeni, vaha, datumPrijetiZJineZoo, zdravotniZaznamy, id);
 
+            // Uložení objektu v paměti a vytvoření dedikovaného souboru
             zoo.Zvirata.Zvirata.Add(nove);
             zoo.Zvirata.UlozZvire(nove);
 
             VypisyDoKonzole.VypisUspech("Zvíře bylo úspěšně přidáno.");
         }
 
+        /// <summary>
+        /// Zobrazí tabulkový výpis všech zvířat.
+        /// </summary>
         public void Vypis()
         {
             ZvirataVypisy.VypisHlavicku();
@@ -61,6 +69,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 ZvirataVypisy.VypisZvire(zvire);
         }
 
+        /// <summary>
+        /// Odstraní zvíře z evidence a smaže jeho soubor na disku.
+        /// </summary>
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZVÍŘETE");
@@ -75,12 +86,16 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Umožňuje úpravu základních údajů o zvířeti (název, narození, váha).
+        /// </summary>
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZVÍŘETE");
             var zvire = SelectHelp.VybratPolozku(zoo.Zvirata.Zvirata, z => z.Nazev, "zvířete");
             if (zvire != null)
             {
+                // Uložení starého názvu souboru pro případ, že dojde k přejmenování zvířete
                 string puvodniSoubor = zoo.Zvirata.SouborZvirete(zvire);
 
                 zvire.Nazev = UpravaVstupu.ZeptejSeAUprav(
@@ -93,12 +108,16 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 zvire.Vaha = UpravaVstupu.ZeptejSeAUprav(
                     zvire.Vaha, "váha", v => v.ToString(), s => double.Parse(s));
 
+                // Aktualizace souboru s případným přejmenováním
                 zoo.Zvirata.UlozZvire(zvire, puvodniSoubor);
 
                 VypisyDoKonzole.VypisUspech("Úprava dokončena.");
             }
         }
 
+        /// <summary>
+        /// Vyhledává zvíře dle zadání textového řetězce v názvu.
+        /// </summary>
         public void Vyhledat()
         {
             Console.Write("Zadejte hledaný výraz: ");

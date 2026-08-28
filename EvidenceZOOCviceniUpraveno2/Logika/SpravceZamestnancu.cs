@@ -10,6 +10,9 @@ using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
+    /// <summary>
+    /// Zajišťuje správu evidovaných zaměstnanců, vytváření personalistiky a nastavení číselníku.
+    /// </summary>
     class SpravceZamestnancu
     {
         private readonly Zoo zoo;
@@ -17,16 +20,21 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         public SpravceZamestnancu(Zoo zoo)
         {
             this.zoo = zoo;
-            this.zoo.Zamestnanci.Nacti();
+            this.zoo.Zamestnanci.Nacti(); // Načtení dat zaměstnanců
         }
 
+        /// <summary>
+        /// Zadá nového zaměstnance včetně jeho rodinných příslušníků (děti, partner) a vytvoří mu osobní složku.
+        /// </summary>
         public void Pridat()
         {
             Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
 
+            // Vygenerování nového osobního čísla dle konfigurace číselníku
             string osobniCislo = zoo.Zamestnanci.CisloKonfigurace.DalsiCislo();
             zoo.Zamestnanci.UlozCisloKonfiguraci();
 
+            // Načtení osobních a kontaktních údajů z konzole
             string jmeno = UpravaVstupu.ZeptejSeAUprav("", "jméno", v => v, s => s, jeNove: true);
             string prijmeni = UpravaVstupu.ZeptejSeAUprav("", "příjmení", v => v, s => s, jeNove: true);
             string pracovniPozice = UpravaVstupu.ZeptejSeAUprav("", "pracovní pozice", v => v, s => s, jeNove: true);
@@ -45,6 +53,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             string psc = UpravaVstupu.ZeptejSeAUprav("", "PSČ", v => v, s => s, jeNove: true);
             string telefon = UpravaVstupu.ZeptejSeAUprav("", "telefonní číslo", v => v, s => s, jeNove: true);
 
+            // Načtení e-mailu s ověřením platného formátu
             string email = UpravaVstupu.ZeptejSeAUprav(
                 "", "e-mail", v => v,
                 s =>
@@ -64,12 +73,14 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             string typDokladu = UpravaVstupu.ZeptejSeAUprav("", "typ dokladu (OP, pas...)", v => v, s => s, jeNove: true);
             string cisloDokladu = UpravaVstupu.ZeptejSeAUprav("", "číslo dokladu", v => v, s => s, jeNove: true);
 
+            // Zadaní vedlejších entit (děti, partner) pro daňové účely
             List<Dite> deti = ZadatDeti();
             Partner? partner = ZadatPartnera();
 
             Zamestnanec novy = new(osobniCislo, jmeno, prijmeni, datumNarozeni, rodneCislo, mzda, pracovniPozice,
                 mesto, ulice, psc, telefon, email, rodinnyStav, zdravotniStav, typDokladu, cisloDokladu, deti, partner);
 
+            // Transakční uložení záznamu
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Zamestnanci.Add(novy),
                 rollback: () => zoo.Zamestnanci.Zamestnanci.Remove(novy),
@@ -78,6 +89,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             if (uspech)
             {
+                // Vytvoření podřízené fyzické složky na disku pro dokumenty zaměstnance
                 zoo.Zamestnanci.VytvorSlozkuZamestnance(novy);
 
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
@@ -88,6 +100,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Generická pomocná metoda pro výběr hodnoty výčtového typu ze seznamu v konzoli.
+        /// </summary>
         private static TEnum VyberEnum<TEnum>() where TEnum : struct, Enum
         {
             var hodnoty = Enum.GetValues<TEnum>();
@@ -105,6 +120,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Pomocný dialog pro zadání seznamu dětí daného zaměstnance.
+        /// </summary>
         private static List<Dite> ZadatDeti()
         {
             List<Dite> deti = [];
@@ -137,6 +155,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             return deti;
         }
 
+        /// <summary>
+        /// Pomocný dialog pro zadání údajů o partnerovi a daňových slevách.
+        /// </summary>
         private static Partner? ZadatPartnera()
         {
             Console.WriteLine("Má zaměstnanec partnera/manžela/manželku pro uplatnění slevy? A/N");
@@ -162,6 +183,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             return new Partner(jmeno, prijmeni, rc, ztp, diteDo3, prijemDo68, uplatnit);
         }
 
+        /// <summary>
+        /// Vypíše seznam všech zaměstnanců včetně kontaktních údajů.
+        /// </summary>
         public void Vypis()
         {
             ZamestnanciVypisy.VypisHlavicku();
@@ -174,6 +198,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Umožňuje modifikaci libovolných osobních a mzdových údajů vybraného zaměstnance.
+        /// </summary>
         public void Upravit()
         {
             Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
@@ -184,6 +211,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             int puvodniMzda = zam.Mzda;
             string puvodniPrijmeni = zam.Prijmeni;
 
+            // Úprava vlastností
             zam.Jmeno = UpravaVstupu.ZeptejSeAUprav(zam.Jmeno, "jméno", v => v, s => s);
             zam.Prijmeni = UpravaVstupu.ZeptejSeAUprav(zam.Prijmeni, "příjmení", v => v, s => s);
             zam.PracovniPozice = UpravaVstupu.ZeptejSeAUprav(zam.PracovniPozice, "pracovní pozice", v => v, s => s);
@@ -231,9 +259,11 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
 
             zoo.Zamestnanci.Uloz();
 
+            // Při změně příjmení přejmenuje i jeho fyzickou složku na disku
             if (zam.Prijmeni != puvodniPrijmeni)
                 zoo.Zamestnanci.PrejmenovatSlozkuZamestnance(zam, puvodniPrijmeni);
 
+            // Auditování změn platu
             if (zam.Mzda != puvodniMzda)
             {
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
@@ -244,6 +274,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             VypisyDoKonzole.VypisUspech("Úprava dokončena.");
         }
 
+        /// <summary>
+        /// Odstraní zaměstnance z evidence v paměti i z disku.
+        /// </summary>
         public void Smazat()
         {
             Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
@@ -267,6 +300,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Vyhledává zaměstnance podle shody v příjmení bez ohledu na velikost písmen.
+        /// </summary>
         public void Vyhledat()
         {
             Console.Write("Zadejte hledané příjmení: ");
@@ -288,6 +324,9 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             }
         }
 
+        /// <summary>
+        /// Umožňuje nastavit formát osobního čísla (prefix, počáteční číslo, počet číslic).
+        /// </summary>
         public void NastaveniCislovaniZamestnancu()
         {
             Console.WriteLine("NASTAVENÍ ČÍSLOVÁNÍ ZAMĚSTNANCŮ");

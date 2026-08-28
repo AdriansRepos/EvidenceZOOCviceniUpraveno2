@@ -4,6 +4,10 @@ using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Zaloha
 {
+    /// <summary>
+    /// Zajišťuje kompletní manuální/defenzivní zálohování datového adresáře ZOO
+    /// do místního úložiště AppData a na volitelné externí médium.
+    /// </summary>
     class ZalohovaciSluzba(Zoo zoo)
     {
         private readonly Zoo zoo = zoo;
@@ -28,8 +32,10 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 return;
             }
 
+            // 1. Záloha do systémového LocalAppData
             ZalohujDoSlozky(zdroj, KonfiguraceRepository.NouzovaZalohaSlozka, "nouzové zálohy (LOCALAPPDATA)");
 
+            // 2. Záloha na uživatelsky definované externí úložiště (USB, síťový disk atd.)
             if (!string.IsNullOrWhiteSpace(zoo.Konfigurace.ExterniZalohaSlozka))
                 ZalohujDoSlozky(zdroj, zoo.Konfigurace.ExterniZalohaSlozka, "externí zálohy");
             else
@@ -38,6 +44,9 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             }
         }
 
+        /// <summary>
+        /// Obalovací metoda pro bezpečné vytvoření složky a spuštění rekurze zálohování.
+        /// </summary>
         private static void ZalohujDoSlozky(string zdroj, string cil, string popis)
         {
             try
@@ -61,12 +70,14 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
         {
             Directory.CreateDirectory(cil);
 
+            // Zkopírování všech souborů v aktuálním adresáři
             foreach (string soubor in Directory.GetFiles(zdroj))
             {
                 string cilovySoubor = Path.Combine(cil, Path.GetFileName(soubor));
                 File.Copy(soubor, cilovySoubor, overwrite: true);
             }
 
+            // Rekurzivní prochod všemi podadresáři
             foreach (string podslozka in Directory.GetDirectories(zdroj))
             {
                 string cilovaPodslozka = Path.Combine(cil, Path.GetFileName(podslozka));

@@ -19,14 +19,16 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
 
         /// <summary>Poslední vydané pořadové číslo (bez prefixu/nul).</summary>
         [JsonPropertyName("posledniCislo")]
-        public long PosledniCislo { get; set; } = 00000001; // další vydané bude 00000002
+        public long PosledniCislo { get; set; } = 00000001; // Další vydané bude 00000002
 
         /// <summary>
         /// Vygeneruje další unikátní číslo a zvýší interní počítadlo.
         /// </summary>
         public string DalsiCislo()
         {
+            // Inkrementace číselníku před vystavením
             PosledniCislo++;
+            // Formátování řetězce s doplněním úvodních nul podle zvoleného počtu číslic
             return $"{Prefix}{PosledniCislo.ToString().PadLeft(PocetCislic, '0')}";
         }
     }

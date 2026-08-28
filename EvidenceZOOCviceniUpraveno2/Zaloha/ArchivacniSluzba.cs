@@ -4,6 +4,10 @@ using BarevneVypisyHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Zaloha
 {
+    /// <summary>
+    /// Zajišťuje automatickou roční archivaci historických dat ZOO 
+    /// a aplikuje retenční pravidla pro promazávání starých souborů.
+    /// </summary>
     class ArchivacniSluzba(Zoo zoo)
     {
         private readonly Zoo zoo = zoo;
@@ -18,17 +22,20 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
         /// </summary>
         public void ZkontrolujRocniArchivaci()
         {
+            // Zajištění existence cílové složky pro archiv
             Directory.CreateDirectory(zoo.Konfigurace.ArchivSlozka);
 
             int aktualniRok = DateTime.Now.Year;
             int posledniArchivovanyRok = NactiPosledniArchivovanyRok();
 
+            // Pokud systém běží poprvé, nastaví se jako výchozí bod minulý rok a ukončí se
             if (posledniArchivovanyRok == 0)
             {
                 zoo.Konfigurace.UlozKlic("posledniArchivovanyRok", (aktualniRok - 1).ToString());
                 return;
             }
 
+            // Postupná archivace všech nearchivovaných let až do předchozího roku
             while (posledniArchivovanyRok < aktualniRok - 1)
             {
                 int rokKArchivaci = posledniArchivovanyRok + 1;
@@ -37,9 +44,13 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 zoo.Konfigurace.UlozKlic("posledniArchivovanyRok", posledniArchivovanyRok.ToString());
             }
 
+            // Aplikace skartace starých dat dle zákonných a interních lhůt
             VycistiStareArchivy(aktualniRok);
         }
 
+        /// <summary>
+        /// Načte z konfigurace rok, kdy proběhla poslední úspěšná archivace.
+        /// </summary>
         private static int NactiPosledniArchivovanyRok()
         {
             var hodnoty = KonfiguraceRepository.NactiKlicoveHodnoty();
@@ -50,6 +61,9 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             return 0;
         }
 
+        /// <summary>
+        /// Provede odzálohování všech klíčových datových modulů pro zadaný rok.
+        /// </summary>
         private void ArchivujRok(int rok)
         {
             ArchivujSoubor(zoo.Zamestnanci.SouborZamestnanci, "zamestnanci", rok);
@@ -63,6 +77,9 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             VypisyDoKonzole.VypisUspech($"Data za rok {rok} byla archivována do složky: {zoo.Konfigurace.ArchivSlozka}");            
         }
 
+        /// <summary>
+        /// Zkopíruje konkrétní JSON soubor do archivní složky s ročním razítkem.
+        /// </summary>
         private void ArchivujSoubor(string zdrojovySoubor, string nazevBaze, int rok)
         {
             if (!File.Exists(zdrojovySoubor))
@@ -80,6 +97,9 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             }
         }
 
+        /// <summary>
+        /// Zkopíruje celou složku (např. zvířata) do archivního adresáře.
+        /// </summary>
         private void ArchivujSlozku(string zdrojovaSlozka, string nazevPodslozky, int rok)
         {
             if (!Directory.Exists(zdrojovaSlozka))
@@ -102,11 +122,16 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
             }
         }
 
+        /// <summary>
+        /// Prochází archivní složku a promazává data po uplynutí retenční lhůty.
+        /// HR/Mzdy = 30 let, Audit = trvale, Ostatní = 5 let.
+        /// </summary>
         private void VycistiStareArchivy(int aktualniRok)
         {
             if (!Directory.Exists(zoo.Konfigurace.ArchivSlozka))
                 return;
 
+            // 1. Čištění jednotlivých archivních JSON souborů
             foreach (string soubor in Directory.GetFiles(zoo.Konfigurace.ArchivSlozka, "*_*.json"))
             {
                 string jmenoSouboru = Path.GetFileNameWithoutExtension(soubor);
@@ -139,7 +164,7 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 }
             }
 
-            // Složky (zvirata_2026/)
+            // 2. Čištění starých archivních složek (např. zvirata_2026/)
             foreach (string slozka in Directory.GetDirectories(zoo.Konfigurace.ArchivSlozka, "zvirata_*"))
             {
                 string nazevSlozky = Path.GetFileName(slozka);
@@ -149,6 +174,7 @@ namespace EvidenceZOOCviceniUpraveno2.Zaloha
                 if (!int.TryParse(nazevSlozky[(podtrzitko + 1)..], out int rokSlozky))
                     continue;
 
+                // Složky zvířat držíme 5 let
                 if (aktualniRok - rokSlozky > 5)
                 {
                     try

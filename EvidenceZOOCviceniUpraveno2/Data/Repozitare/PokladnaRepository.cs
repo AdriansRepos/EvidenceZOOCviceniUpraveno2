@@ -6,16 +6,22 @@ using System.Text.Json;
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
-    /// Zodpovídá výhradně za perzistenci pokladních pohybů a ceníku.
+    /// Zodpovídá za perzistenci a správu pokladních pohybů a ceníku služeb/vstupného v ZOO.
     /// </summary>
     class PokladnaRepository(string korenovaSlozka)
     {
         private readonly string korenovaSlozka = korenovaSlozka;
 
+        /// <summary> Seznam všech evidovaných pokladních transakcí. </summary>
         public List<PokladniPohyb> PokladniPohyby { get; internal set; } = [];
+
+        /// <summary> Aktuální ceník ZOO. </summary>
         public Cenik Cenik { get; internal set; } = new();
 
+        /// <summary> Cesta k JSON souboru pokladních pohybů. </summary>
         public string SouborPokladny => Path.Combine(korenovaSlozka, "Data", "Ucetnictvi", "Pokladna", "pokladna.json");
+
+        /// <summary> Cesta k JSON souboru ceníku. </summary>
         public string SouborCeniku => Path.Combine(korenovaSlozka, "Data", "Ucetnictvi", "Pokladna", "cenik.json");
 
         private string ZalohaPokladny => Path.Combine(korenovaSlozka, "Zalohy", "Ucetnictvi", "Pokladna", "pokladna.json.bak");
@@ -33,6 +39,9 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             WriteIndented = true
         };
 
+        /// <summary>
+        /// Načte data pokladny i ceníku ze souborů na disku.
+        /// </summary>
         public void Nacti()
         {
             PokladniPohyby = SouborovyPomocnik.NactiZeSouboru(
@@ -43,8 +52,12 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             NactiCenik();
         }
 
+        /// <summary>
+        /// Načte ceník ze souboru. Pokud primární soubor chybí nebo je poškozený, pokusí se obnovit data ze zálohy.
+        /// </summary>
         private void NactiCenik()
         {
+            // Obnova ze zálohy, pokud primární soubor neexistuje
             if (!File.Exists(SouborCeniku) && File.Exists(ZalohaCeniku))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(SouborCeniku)!);
@@ -64,6 +77,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             {                
                 VypisyDoKonzole.VypisVarovani($"Chyba při načítání ceníku: {ex.Message}");                
 
+                // Pokus o záchranu načtením ze záložního souboru při selhání deserializace
                 if (File.Exists(ZalohaCeniku))
                 {
                     try
@@ -80,12 +94,14 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             }
         }
 
+        /// <summary> Uloží seznam pokladních pohybů do souboru se současným zálohováním. </summary>
         public void UlozPokladnu()
         {
             SouborovyPomocnik.UlozDoSouboru(PokladniPohyby, OptionsIndented,
                 SouborPokladny, ZalohaPokladny, "pokladny");
         }
 
+        /// <summary> Uloží aktuální ceník do souboru a vytvoří jeho záložní kopii. </summary>
         public void UlozCenik()
         {
             try

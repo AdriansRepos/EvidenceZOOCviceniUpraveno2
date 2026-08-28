@@ -8,19 +8,25 @@ using BarevneVypisyHelper;
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
-    /// Zodpovídá výhradně za perzistenci zaměstnanců – čtení, zápis,
-    /// dokumentové složky, číslování.
+    /// Repozitář zodpovědný za správy zaměstnanců, číselné konfigurační řady a generování jejich dokumentových složek.
     /// </summary>
     class ZamestnanciRepository(string korenovaSlozka)
     {
         private readonly string korenovaSlozka = korenovaSlozka;
 
+        /// <summary> Seznam zaměstnanců ZOO. </summary>
         public List<Zamestnanec> Zamestnanci { get; internal set; } = [];
+
+        /// <summary> Konfigurace pro generování osobních čísel zaměstnanců. </summary>
         public CisloZamestnanceKonfigurace CisloKonfigurace { get; internal set; } = new();
 
+        /// <summary> Cesta k hlavnímu souboru zaměstnanců. </summary>
         public string SouborZamestnanci => Path.Combine(korenovaSlozka, "Data", "Zamestnanci", "zamestnanci.json");
+
+        /// <summary> Cesta k nastavení číselné řady zaměstnanců. </summary>
         public string SouborCisla => Path.Combine(korenovaSlozka, "Data", "Zamestnanci", "cislovani.json");
 
+        /// <summary> Vrátí cestu ke složce určené pro doklady a dokumenty konkrétního zaměstnance. </summary>
         public string SlozkaZamestnance(Zamestnanec zam) => Path.Combine(korenovaSlozka, "Data", "Zamestnanci",
             $"{NazevSouboru.OcistiProNazevSouboru(zam.Prijmeni)}_{zam.OsobniCislo}");
 
@@ -30,6 +36,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
         private string ZalohaSlozkaZamestnance(Zamestnanec zam) => Path.Combine(korenovaSlozka, "Zalohy", "Zamestnanci",
             $"{NazevSouboru.OcistiProNazevSouboru(zam.Prijmeni)}_{zam.OsobniCislo}");
 
+        // Konfigurace serializace s podporou typu DateOnly
         private static readonly JsonSerializerOptions Options = new()
         {
             Converters = { new DateOnlyConverter() }
@@ -46,6 +53,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             WriteIndented = true
         };
 
+        /// <summary> Načte seznam zaměstnanců a číselnou řadu ze souborů. </summary>
         public void Nacti()
         {
             Zamestnanci = SouborovyPomocnik.NactiZeSouboru(
@@ -56,6 +64,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             NactiCisloKonfiguraci();
         }
 
+        /// <summary> Načte konfiguraci číslování zaměstnanců. </summary>
         private void NactiCisloKonfiguraci()
         {
             if (!File.Exists(SouborCisla) && File.Exists(ZalohaCisla))
@@ -78,12 +87,14 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             }
         }
 
+        /// <summary> Uloží aktuální seznam zaměstnanců na disk. </summary>
         public void Uloz()
         {
             SouborovyPomocnik.UlozDoSouboru(Zamestnanci, OptionsIndented,
                 SouborZamestnanci, ZalohaZamestnanci, "zaměstnanců");
         }
 
+        /// <summary> Uloží stav číselné řady zaměstnanců. </summary>
         public void UlozCisloKonfiguraci()
         {
             try
@@ -97,25 +108,30 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             }
         }
 
+        /// <summary> Vytvoří osobní složku zaměstnance i její odpovídající záložní strukturu. </summary>
         public void VytvorSlozkuZamestnance(Zamestnanec zam)
         {
             Directory.CreateDirectory(SlozkaZamestnance(zam));
             Directory.CreateDirectory(ZalohaSlozkaZamestnance(zam));
         }
 
+        /// <summary> Přejmenuje složku zaměstnance na základě změny jeho příjmení. </summary>
         public void PrejmenovatSlozkuZamestnance(Zamestnanec zam, string puvodniPrijmeni)
         {
             string stareJmeno = $"{NazevSouboru.OcistiProNazevSouboru(puvodniPrijmeni)}_{zam.OsobniCislo}";
             string staraCestaData = Path.Combine(korenovaSlozka, "Data", "Zamestnanci", stareJmeno);
             string staraCestaZaloha = Path.Combine(korenovaSlozka, "Zalohy", "Zamestnanci", stareJmeno);
 
+            // Přejmenování složky v Data
             if (Directory.Exists(staraCestaData) && staraCestaData != SlozkaZamestnance(zam))
                 Directory.Move(staraCestaData, SlozkaZamestnance(zam));
 
+            // Přejmenování složky v Zalohy
             if (Directory.Exists(staraCestaZaloha) && staraCestaZaloha != ZalohaSlozkaZamestnance(zam))
                 Directory.Move(staraCestaZaloha, ZalohaSlozkaZamestnance(zam));
         }
 
+        /// <summary> Uloží specifický JSON dokument do osobní složky zaměstnance. </summary>
         public void UlozDokument<T>(Zamestnanec zam, string nazevDokumentu, T data)
         {
             VytvorSlozkuZamestnance(zam);
@@ -127,6 +143,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             SouborovyPomocnik.ZapisSouborSeZalohou(soubor, zaloha, json);
         }
 
+        /// <summary> Vrátí seznam názvů všech dokumentů uložených ve složce daného zaměstnance. </summary>
         public List<string> VypisDokumenty(Zamestnanec zam)
         {
             string slozka = SlozkaZamestnance(zam);

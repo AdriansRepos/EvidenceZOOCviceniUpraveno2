@@ -3,35 +3,51 @@
 namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
 {
     /// <summary>
-    /// Spravuje config.ini, cestu ke kořenové datové složce, adresářovou
-    /// strukturu a volitelnou cestu k externí záloze. Ostatní repository
-    /// třídy dostávají KorenovaSlozka jako parametr konstruktoru.
+    /// Spravuje konfiguraci aplikace (config.ini), určuje kořenovou datovou složku,
+    /// zajišťuje inicializaci adresářové struktury a správu externích záloh.
     /// </summary>
     class KonfiguraceRepository(string korenovaSlozka)
     {
+        /// <summary>
+        /// Cesta ke kořenové složce, ve které jsou uložena veškerá data aplikace.
+        /// </summary>
         public string KorenovaSlozka { get; private set; } = korenovaSlozka;
 
+        /// <summary>
+        /// Absolutní cesta k adresáři určenému pro archivaci.
+        /// </summary>
         public string ArchivSlozka => Path.Combine(KorenovaSlozka, "Archiv");
 
+        /// <summary>
+        /// Volitelná cesta k externímu adresáři pro provádění záloh.
+        /// </summary>
         public string? ExterniZalohaSlozka { get; private set; }
 
+        /// <summary>
+        /// Cesta k nouzovému adresáři záloh umístěnému v LocalAppData uživatele.
+        /// </summary>
         public static string NouzovaZalohaSlozka =>
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "EvidenceZOOCviceniUpraveno2", "NouzovaZaloha");
 
+        /// <summary>
+        /// Cesta k hlavnímu konfiguračnímu souboru config.ini v AppData.
+        /// </summary>
         private static readonly string KonfigSoubor =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
                 "EvidenceZOOCviceniUpraveno2", "config.ini");
 
         /// <summary>
-        /// Zjistí kořenovou složku pro data. Při prvním spuštění (chybí
-        /// config.ini v AppData) se zeptá na cestu; pokud v ní najde
-        /// zálohu config.ini, obnoví nastavení automaticky.
+        /// Načte cestu ke kořenové datové složce z config.ini. 
+        /// Pokud soubor neexistuje, vyzve uživatele k zadání cesty a pokusí se obnovit konfiguraci ze zálohy.
         /// </summary>
+
         public static string NactiNeboSeZeptejNaCesty()
         {
+            // Zajištění existence adresáře pro uložení konfiguračního souboru
             Directory.CreateDirectory(Path.GetDirectoryName(KonfigSoubor)!);
 
+            // Pokud konfigurační soubor existuje, pokusíme se načíst uloženou cestu
             if (File.Exists(KonfigSoubor))
             {
                 var hodnoty = NactiKlicoveHodnoty();
@@ -43,14 +59,17 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 }
             }
                         
+            // První spuštění – výzva uživateli k zadání cesty k datům
             VypisyDoKonzole.VypisHlavickuMenu("NASTAVENÍ SLOŽKY PRO DATA");             
             Console.Write("\nZadej cestu ke složce pro ukládání dat: ");
             string slozka = Console.ReadLine()!.Trim();
 
+            // Kontrola, zda v zadané složce neexistuje záloha konfigurace
             string zalohaKonfigu = ZalohaKonfigu(slozka);
 
             if (File.Exists(zalohaKonfigu))
             {
+                // Obnovení konfigurace ze zálohy v datové složce
                 File.Copy(zalohaKonfigu, KonfigSoubor, overwrite: true);                
                 VypisyDoKonzole.VypisUspech("V zadané složce byla nalezena záloha nastavení – config.ini obnoven, nic nebylo ztraceno.");                
 
@@ -58,6 +77,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 return slozka;
             }
 
+            // Vytvoření adresářové struktury a zápis nové konfigurace
             VytvorStrukturuSlozek(slozka);
             ZapisKonfigSoubor([$"korenovaSlozka={slozka}"], slozka);
                         
@@ -71,6 +91,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
         /// </summary>
         public static void VytvorStrukturuSlozek(string korenovaSlozka)
         {
+            // Názvy základních podsložek pro moduly aplikace
             string[] podslozky =
             [
                 "Zamestnanci",
@@ -80,12 +101,19 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 Path.Combine("Ucetnictvi", "Pokladna")
             ];
 
+            // Vytvoření adresářové struktury pro data i zálohy
             foreach (string zaklad in new[] { "Data", "Zalohy" })
                 foreach (string podslozka in podslozky)
                     Directory.CreateDirectory(Path.Combine(korenovaSlozka, zaklad, podslozka));
 
+            // Vytvoření samostatné složky pro archiv
             Directory.CreateDirectory(Path.Combine(korenovaSlozka, "Archiv"));
         }
+
+        /// <summary>
+        /// Přečte konfigurační soubor config.ini a vrátí obsažené klíče a hodnoty jako slovník.
+        /// Během čtení ignoruje prázdné řádky a komentáře.
+        /// </summary>
 
         public static Dictionary<string, string> NactiKlicoveHodnoty()
         {
@@ -94,15 +122,18 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             if (!File.Exists(KonfigSoubor))
                 return hodnoty;
 
+            // Procházení konfiguračního souboru řádek po řádku
             foreach (string radek in File.ReadAllLines(KonfigSoubor))
             {
                 string upraven = radek.Trim();
+                // Přeskakování prázdných řádků a komentářů začínajících # nebo ;
                 if (upraven.Length == 0 || upraven.StartsWith("#") || upraven.StartsWith(";"))
                     continue;
 
                 int idx = upraven.IndexOf('=');
                 if (idx <= 0) continue;
 
+                // Rozdělení řádku na klíč a hodnotu podle prvního znaku '='
                 string klic = upraven[..idx].Trim();
                 string hodnota = upraven[(idx + 1)..].Trim();
                 hodnoty[klic] = hodnota;
@@ -111,16 +142,23 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
             return hodnoty;
         }
 
+        /// <summary>
+        /// Bezpečně zapíše řádky do souboru config.ini pomocí dočasného souboru a vytvoří jeho zálohu v datové složce.
+        /// </summary>
+
         public static void ZapisKonfigSoubor(IEnumerable<string> radky, string korenovaSlozka)
         {
+            // Zápis do dočasného souboru pro prevenci poškození dat při výpadku
             string docasny = KonfigSoubor + ".tmp";
             File.WriteAllLines(docasny, radky);
 
+            // Nahrazení původního souboru novým dočasným souborem
             if (File.Exists(KonfigSoubor))
                 File.Replace(docasny, KonfigSoubor, null);
             else
                 File.Move(docasny, KonfigSoubor);
 
+            // Synchronizace záložní kopie v datovém adresáři
             if (!string.IsNullOrWhiteSpace(korenovaSlozka))
             {
                 string cestaKZaloze = ZalohaKonfigu(korenovaSlozka);
@@ -130,8 +168,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
         }
 
         /// <summary>
-        /// Zapíše nebo aktualizuje jeden klíč v config.ini, aniž by
-        /// smazal ostatní existující klíče.
+        /// Zapíše nebo aktualizuje jeden klíč v config.ini, aniž by smazal ostatní existující klíče.
         /// </summary>
         public void UlozKlic(string klic, string hodnota)
         {
@@ -140,6 +177,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 : [];
 
             bool nalezeno = false;
+            // Hledání existujícího klíče a jeho aktualizace
             for (int i = 0; i < radky.Count; i++)
             {
                 if (radky[i].TrimStart().StartsWith(klic + "="))
@@ -150,6 +188,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 }
             }
 
+            // Pokud klíč neexistoval, přidáme jej na konec
             if (!nalezeno)
                 radky.Add($"{klic}={hodnota}");
 
@@ -157,12 +196,14 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
         }
 
         /// <summary>
-        /// Vrátí cestu k záloze config.ini uložené v datové složce
-        /// uživatele (přežije reinstalaci aplikace/systému).
+        /// Vrátí cestu k záloze config.ini uložené v datové složce uživatele.
         /// </summary>
         public static string ZalohaKonfigu(string korenovaSlozka)
             => Path.Combine(korenovaSlozka, "Zalohy", "config.ini.bak");
 
+        /// <summary>
+        /// Načte nastavenou cestu k externí záloze z konfiguračního souboru.
+        /// </summary>
         public void NactiExterniZalohuCestu()
         {
             var hodnoty = NactiKlicoveHodnoty();
@@ -170,6 +211,9 @@ namespace EvidenceZOOCviceniUpraveno2.Data.Repozitare
                 ExterniZalohaSlozka = cesta;
         }
 
+        /// <summary>
+        /// Nastaví novou cestu pro externí zálohu a uloží ji do konfiguračního souboru.
+        /// </summary>
         public void NastavitExterniZalohuCestu(string cesta)
         {
             ExterniZalohaSlozka = string.IsNullOrWhiteSpace(cesta) ? null : cesta;

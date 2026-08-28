@@ -2,6 +2,9 @@
 
 namespace EvidenceZOOCviceniUpraveno2.Enumy
 {
+    /// <summary>
+    /// Zdravotní stav zaměstnance (zaměstnávání invalidů a jejich úlevy na daních)
+    /// </summary>
     public enum ZdravotniStav
     {
         [Description("Dobrý")]

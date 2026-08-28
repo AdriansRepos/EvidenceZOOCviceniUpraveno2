@@ -9,15 +9,19 @@ namespace EvidenceZOOCviceniUpraveno2.Entity
     /// </summary>
     class Cenik
     {
+        /// <summary> Cena dětské vstupenky v Kč. </summary>
         [JsonPropertyName("cenaDetska")]
         public decimal CenaDetska { get; set; } = 80;
 
+        /// <summary> Cena dospělé vstupenky v Kč. </summary>
         [JsonPropertyName("cenaDospela")]
         public decimal CenaDospela { get; set; } = 150;
 
+        /// <summary> Cena vstupenky pro držitele ZTP v Kč. </summary>
         [JsonPropertyName("cenaZTP")]
         public decimal CenaZTP { get; set; } = 50;
 
+        /// <summary> Cena důchodcovské vstupenky v Kč. </summary>
         [JsonPropertyName("cenaDuchodce")]
         public decimal CenaDuchodce { get; set; } = 100;
         
