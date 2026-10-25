@@ -20,7 +20,7 @@ namespace EvidenceZOOCviceniUpraveno2.Data.PomocneTridy
             if (!File.Exists(hlavniSoubor) && File.Exists(zalohaSoubor))
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(hlavniSoubor)!);
-                File.Copy(zalohaSoubor, hlavniSoubor);                ;
+                File.Copy(zalohaSoubor, hlavniSoubor);
                 VypisyDoKonzole.VypisUspech($"Soubor {popisProHlasky} obnoven ze zálohy.");                
             }
 
