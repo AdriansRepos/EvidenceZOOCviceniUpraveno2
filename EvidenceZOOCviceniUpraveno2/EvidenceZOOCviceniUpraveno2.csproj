@@ -8,30 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Reference Include="BarevneVypisyHelper">
-      <HintPath>..\..\BarevneVypisyHelper\BarevneVypisyHelper\bin\Release\net8.0\BarevneVypisyHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="DateConverterForJson">
-      <HintPath>..\..\DateConverterForJson\DateConverterForJson\bin\Release\net8.0\DateConverterForJson.dll</HintPath>
-    </Reference>
-    <Reference Include="FileNameHelper">
-      <HintPath>..\..\FileNameHelper\FileNameHelper\bin\Release\net8.0\FileNameHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="InputHelper">
-      <HintPath>..\..\InputHelper\InputHelper\bin\Release\net8.0\InputHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="PohybHelper">
-      <HintPath>..\..\PohybHelper\PohybHelper\bin\Release\net8.0\PohybHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="SelectHelper">
-      <HintPath>..\..\SelectHelper\SelectHelper\bin\Release\net8.0\SelectHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="TextHelper">
-      <HintPath>..\..\TextHelper\TextHelper\bin\Release\net8.0\TextHelper.dll</HintPath>
-    </Reference>
-    <Reference Include="VekZviratHelper">
-      <HintPath>..\..\VekZviratHelper\VekZviratHelper\bin\Release\net8.0\VekZviratHelper.dll</HintPath>
-    </Reference>
+    <PackageReference Include="BarevneVypisyHelper" Version="1.0.0" />
+    <PackageReference Include="DateConverterForJson" Version="1.0.0" />
+    <PackageReference Include="FileNameHelper" Version="1.0.0" />
+    <PackageReference Include="InputHelper" Version="1.4.0" />
+    <PackageReference Include="PohybHelper" Version="1.1.0" />
+    <PackageReference Include="SelectHelper" Version="1.1.0" />
+    <PackageReference Include="TextHelper" Version="1.2.0" />
+    <PackageReference Include="VekZviratHelper" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
