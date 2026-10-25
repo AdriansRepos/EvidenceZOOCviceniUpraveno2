@@ -13,6 +13,3 @@
 # Výstupy testů a balíčky
 *.nupkg
 *.suo
-
-# Soubory nuget.config
-[Nn]u[Gg]et.[Cc]onfig
