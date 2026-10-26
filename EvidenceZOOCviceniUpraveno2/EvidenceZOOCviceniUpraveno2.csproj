@@ -9,13 +9,13 @@
 
   <ItemGroup>
     <PackageReference Include="BarevneVypisyHelper" Version="1.0.0" />
-    <PackageReference Include="DateConverterForJson" Version="1.0.0" />
-    <PackageReference Include="FileNameHelper" Version="1.0.0" />
-    <PackageReference Include="InputHelper" Version="1.4.0" />
-    <PackageReference Include="PohybHelper" Version="1.1.0" />
-    <PackageReference Include="SelectHelper" Version="1.1.0" />
-    <PackageReference Include="TextHelper" Version="1.2.0" />
-    <PackageReference Include="VekZviratHelper" Version="1.0.0" />
+    <PackageReference Include="DateConverterForJson" Version="1.0.1" />
+    <PackageReference Include="FileNameHelper" Version="1.0.1" />
+    <PackageReference Include="InputHelper" Version="1.4.1" />
+    <PackageReference Include="PohybHelper" Version="1.1.1" />
+    <PackageReference Include="SelectHelper" Version="1.1.1" />
+    <PackageReference Include="TextHelper" Version="1.2.1" />
+    <PackageReference Include="VekZviratHelper" Version="1.0.1" />
   </ItemGroup>
 
 </Project>
