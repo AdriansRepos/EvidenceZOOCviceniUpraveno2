@@ -1,3 +1,13 @@
+## 🌐 Jazyk / Language Selection
+
+*Klikněte na sekci níže pro zobrazení v češtině nebo angličtině.*
+*Click on a section below to toggle between Czech and English.*
+
+---
+
+<details open>
+<summary>🇨🇿 <strong>ČEŠTINA (Czech Version)</strong></summary>
+
 # ZOO – Konzolová aplikace v C#
 
 Tento projekt je jednoduchá, ale plně funkční konzolová aplikace pro správu ZOO.  
@@ -188,8 +198,6 @@ ZOO/
 
 ## Použité techniky
 
-## Použité techniky
-
 - OOP (třídy, vlastnosti, zapouzdření)
 - Primární konstruktory
 - **Čistá architektura a modulární struktura** – Důsledné oddělení odpovědností (SoC) rozdělením projektu do samostatných složek a vrstev (Entity, Repozitáře, Logika, Menu, Výpisy) a využití `partial` tříd pro doménové rozsekání hlavní třídy `ZOO`.
@@ -301,43 +309,221 @@ public void Pridat()
 ## Release
 
 **v1.0.0** – První vydaná spustitelná verze  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases)
 
 **v1.1.0** – Spustitelná verze se zapracovanými novými features  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.1.0)
 
 **v1.2.0** – Úprava kódu, odebrání tříd `Vstupy` a `DataConverterJson`; funkce přesunuty do samostatných knihoven a zapracovány zpět do aplikace  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.2.0)
 
 **v1.3.0** – Barevné odlišení výstupů v konzoli – zelená pro úspěšné akce, červená pro chyby a varování, modrá pro menu, žlutá pro neplatné volby. Oprava chyby ve vyhledávání (chybějící složené závorky u podmínky) způsobující nesprávné zobrazení hlášky "nenalezeno".  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.3.0)
 
 **v1.4.0** – Přidána nová knihovna `VekZviratHelper` pro automatický výpočet věku zvířat. Třída `Zvire` nahrazuje ruční zadávání věku (`int Vek`) datem narození (`DateOnly DatumNarozeni`) – věk se nyní počítá dynamicky při každém zobrazení a je vždy aktuální bez nutnosti ruční aktualizace.  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.4.0)
 
 **v1.5.0** – Přidán modul Sklad (krmivo, pomůcky, léky/veterinární materiál) včetně naskladnění, vyskladnění, upozornění na docházející položky a historie pohybů. Přidána automatizovaná roční archivace všech datových souborů do složky `Archiv` s retenční politikou 5 let.  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.5.0)
 
 **v1.6.0** – Rozšířena evidence zaměstnanců o adresní a kontaktní údaje (město, ulice s číslem, PSČ, telefon, e-mail). Přidána nová třída `MestoTitleCase` v knihovně `InputHelper` pro správné velké písmena v názvech měst s předložkami (např. "Ústí nad Labem", ne "Ústí Nad Labem"). Validace e-mailu přes zdrojově generovaný regulární výraz (`GeneratedRegex`). Vylepšena knihovna `TextHelper` – při neplatném vstupu se nyní zobrazí konkrétní chybová zpráva a výzva k zadání se opakuje.  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.6.0)
 
 **v1.7.0** – Přidán modul Pokladna s prodejem a stornem vstupenek (dětská, dospělá, ZTP, důchodce, rodinná úplná/neúplná, skupinová), konfigurovatelným ceníkem včetně rodinných a skupinových slev, denní uzávěrkou s rozpadem podle kategorií a filtrovaným výpisem pohybů podle typu a rozmezí data (měsíční/roční uzávěrky). Přidána nová knihovna `PohybHelper` sjednocující typy pohybů (sklad, pokladna) přes společné rozhraní `IPohyb`. Rozšířeny Statistiky o průměrnou denní návštěvnost počítanou z prodaných vstupenek za zvolený měsíc. Kompletně přepracována struktura ukládání dat – oddělené složky `Data/` a `Zalohy/` s podsložkami po modulech, záloha `config.ini` uložená v datové složce uživatele (přežije reinstalaci aplikace i systému).  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.7.0)
 
 **v1.8.0** – Přidáno transakční ukládání s rollbackem v paměti při selhání zápisu na disk (`Transakce.ProvedSUlozenim`), zajišťující konzistenci mezi daty v paměti a na disku napříč zaměstnanci, skladem a pokladnou. Přidán auditní log (`AuditZaznam`) zaznamenávající důležité změny – mzdy, ceník, skladové a pokladní pohyby, smazání záznamů – včetně původní a nové hodnoty, času a přihlášeného uživatele; log je koncipován jako append-only a vyjmutý z retenční politiky archivace. Přidán technický log (`TechnickyZaznam`) pro diagnostiku na úrovni IT podpory. Ošetřena konzistence mezi souborem skladu a historií skladových pohybů při selhání dílčího zápisu.  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.8.0)
 
 **v1.8.1** – Odstranění duplicitního kódu a sjednocení metod pro práci s konfiguračním souborem a jeho zálohou.
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.8.1)
 
 **v1.9.0** – Rozšířena evidence zaměstnanců o rodinný a zdravotní stav, evidenci dětí (včetně uplatnění daňového bonusu) a doklad totožnosti. Rozšířena evidence zvířat o datum přijetí z jiné zoo a zdravotní záznamy (nemoci, léčba). Kompletně přepracována struktura ukládání dat – zvířata se nyní ukládají po jednom do vlastního souboru (`Zvirata/Nazev_Id.json`), zaměstnanci mají vlastní dokumentovou složku (`Zamestnanci/Prijmeni_OsobniCislo/`) připravenou pro budoucí mzdové dokumenty (výplatní pásky, roční zúčtování, srážky). Přidáno konfigurovatelné číslování zaměstnanců a zvířat s možností upravit formát za běhu. Retenční politika archivace nyní rozlišuje 30 let u zaměstnaneckých/mzdových dat (zákonná lhůta) a 5 let u ostatních dat. Přidáno třívrstvé zálohování – crash-safe zápis, běžná záloha a nová ruční nouzová záloha (LOCALAPPDATA + volitelná externí/síťová cesta), chránící proti ztrátě nebo poškození celé datové složky.  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.0)
 
 **v1.9.1** – Oprava formátování zdrojového kódu.
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.1)
 
 **v1.9.2** – Začátek velkého refaktoringu celé aplikace: třída `ZOO` rozdělena na partial soubory podle domény (`ZOO.Konfigurace.cs`, `ZOO.Zamestnanci.cs`, `ZOO.Zvirata.cs`, `ZOO.Sklad.cs`, `ZOO.Pokladna.cs`, `ZOO.Logy.cs`, `ZOO.Archivace.cs`, `ZOO.Zalohovani.cs`, `ZOO.Statistiky.cs`) pro lepší čitelnost a snazší budoucí rozšiřování. Žádná změna funkčnosti pro uživatele.  
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v1.9.2)
 
 **v2.0.0** - Dokončení velkého refaktoringu celé aplikace: Rozšíření evidence zaměstnanců o rodné číslo a úprava údajů o dětech (odebrány přebytečné údaje jako škola či adresa, zjednodušeno zadávání invalidity přes výběr ano/ne). Přidána možnost uplatnění daňového bonusu na manžela/manželku. Dokončení ozsáhlého refaktoringu a reorganizace projektu – vytvořena čistá architektura s oddělením odpovědností (SoC). Všechny třídy roztříděny do odpovídajících vrstev a složek (Entity, Data/Repozitare, Logika, Menu, Vypisy, Zaloha). Vyčlenění všech konzolových výpisů z datových entit i logiky do samostatných statických tříd ve složce Vypisy, čímž došlo k úplnému očištění biznis logiky i datových modelů.
-[Stáhnout zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases/tag/v2.0.0)
+
+[Aktuální verze ke stažení zde](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases)
+
+</details>
+
+---
+
+<details>
+<summary>🇺🇸 <strong>ENGLISH (English Version)</strong></summary>
+
+# ZOO Management System (C# Console Application)
+
+A robust, feature-rich console application built in **C# (.NET)** for comprehensive ZOO management. It handles **animals**, **employees**, **warehouse inventory**, **cash register/ticketing**, **statistics**, crash-safe file persistence, and robust input validation.
+
+---
+
+## Features
+
+### Animals
+- Add, list, update, and delete animal records.
+- Search animals by name.
+- Automatic age calculation (years and months) derived dynamically from birth dates (`DateOnly`).
+- Tracking acquisition dates from other zoos and comprehensive medical records (illnesses, treatments).
+- Configurable animal numbering system.
+
+### Employees
+- Add, update, and delete employee records.
+- Detailed listing including address and contact info (city, street, postal code, phone, email).
+- Search by surname.
+- Automated TitleCase formatting for city names considering Czech prepositions (e.g., "Ústí nad Labem").
+- Formatted email validation using source-generated regular expressions (`GeneratedRegex`).
+- Family and health status tracking, ID document records, and dependent children management (including school, disability, and tax bonus applications).
+- Configurable employee numbering and dedicated document directories for future payroll files.
+
+### Warehouse (Sklad)
+- Inventory management across three categories: feed, supplies, and veterinary medicine/materials.
+- Restocking and dispensing with negative inventory prevention.
+- Low-stock alerts (dropping to or below minimum threshold).
+- Full history of all warehouse movements with timestamps and quantities.
+
+### Cash Register (Pokladna)
+- Ticketing system: child, adult, ZTP (disabled), senior (65+), family (full/single-parent), and group tickets.
+- Manual entry for child/adult counts on family and group tickets, with ticket cancellation (storno) support.
+- Configurable pricing model with percentage-based family and group discounts adjustable at runtime.
+- Daily revenue closing reports broken down by ticket categories, plus filtered movement queries for monthly/yearly closings.
+
+### Statistics
+- Total animal and employee counts.
+- Total payroll sum.
+- Average daily attendance for selected months.
+
+---
+
+## Data Security & Persistence
+
+Data is isolated into dedicated root folders inside the user's chosen directory:
+- `Data/` – Active working files segregated by module.
+- `Zalohy/` – Corresponding file backups with matching folder structures.
+- `Archiv/` – Yearly historical data archives.
+
+The `config.ini` file stores the root directory path in `AppData`, while its backup (`config.ini.bak`) resides safely inside the user's data folder (`Zalohy/`), allowing seamless environment restoration after OS reinstalls or hardware changes.
+
+- **Crash-Safe Persistence:** Writes are executed via temporary `.tmp` files followed by atomic replacement (`File.Replace`) to prevent data corruption during power outages or application crashes.
+- **Defensive Backups & Recovery:** Automatic restoration from backups if primary files are missing or corrupted. Supports emergency local/network backups in `LOCALAPPDATA`.
+- **Year-End Archiving & Retention:** Automatically freezes past year data into `Archive/`. Enforces a retention policy (e.g., 5 years for general records, up to 30 years for employee/payroll records complying with statutory laws).
+
+---
+
+## Project Structure
+
+```text
+ZOO/
+├── Data/
+│   ├── Repozitare/
+│   │   ├── KonfiguraceRepository.cs
+│   │   ├── LogyRepository.cs
+│   │   ├── PokladnaRepository.cs
+│   │   ├── SkladRepository.cs
+│   │   ├── ZamestnanciRepository.cs
+│   │   └── ZvirataRepository.cs
+│   └── PomocneTridy/
+│       └── SouborovyPomocnik.cs
+├── Entity/ (Modular entity classes for Zoo, Employees, Animals, Warehouse, Finance)
+│   ├── AuditZaznam.cs
+│   ├── Cenik.cs
+│   ├── CisloZamestnanceKonfigurace.cs
+│   ├── CisloZvireteKonfigurace.cs
+│   ├── Dite.cs
+│   ├── Partner.cs
+│   ├── PokladniPohyb.cs
+│   ├── SkladovaPolozka.cs
+│   ├── SkladovyPohyb.cs
+│   ├── TechnickyZaznam.cs
+│   ├── Zamestnanec.cs
+│   ├── ZdravotniZaznam.cs
+│   ├── Zoo.cs
+│   └── Zvire.cs
+├── Enumy/
+│   ├── KategoriePolozky.cs
+│   ├── RodinnyStav.cs
+│   ├── TypAkce.cs
+│   ├── TypVstupenky.cs
+│   ├── UrovenLogu.cs
+│   └── ZdravotniStav.cs
+├── Logika/ (Business logic and managers)
+│   ├── SpravcePokladny.cs
+│   ├── SpravceSkladu.cs
+│   ├── SpravceZamestnancu.cs
+│   ├── SpravceZvirat.cs
+│   ├── Statistiky.cs
+│   ├── Transakce.cs
+│   └── VypocetCenyVstupenky.cs
+├── Menu/ (Interactive console submenus)
+│   ├── HlavniMenu.cs
+│   ├── MenuPokladna.cs
+│   ├── MenuSklad.cs
+│   ├── MenuStatistiky.cs
+│   ├── MenuZamestnanci.cs
+│   └── MenuZvirata.cs
+├── Vypisy/ (Dedicated presentation and rendering classes)
+│   ├── Audity/
+│   │   └── AuditVypisy.cs
+│   ├── Pokladna/
+│   │   └── PokladnaVypisy.cs
+│   ├── Sklad/
+│   │   └── SkladVypisy.cs
+│   ├── Statistiky/
+│   │   └── StatistikyVypisy.cs
+│   ├── System/
+│   │   └── TechnickyZaznamVypisy.cs
+│   ├── Zamestnanci/
+│   │   └── ZamestnanciVypisy.cs
+│   └── Zvirata/
+│       └── ZvirataVypisy.cs
+├── Zaloha/ (Backups and archivings)
+│   ├── ArchivacniSluzba.cs
+│   └── ZalohovaciSluzba.cs
+├── Program.cs
+├── DiagramAplikace.cd
+└── README.md
+```
+
+---
+
+## External Shared Libraries
+- **TextHelper** – User input validation and prompting (UpravaVstupu.ZeptejSeAUprav).
+
+- **SelectHelper** – Interactive list item selection component.
+
+- **InputHelper** – TitleCase text conversion, preposition-aware city formatting, and name parsing.
+
+- **DateConverterForJson** – Custom JSON converter for DateOnly.
+
+- **VekZviratHelper** – Dynamic animal age calculation and string formatting.
+
+- **PohybHelper** – Unified IPohyb interface and movement types for warehouse and cash register.
+
+- **FileNameHelper** – Secure string sanitation for file/folder names.
+
+- **BarevneVypisyHelper** – Color-coded console severity logging and output rendering.
+
+---
+
+## Core Techniques & Patterns
+- OOP Principles, Primary Constructors, and Enums.
+- **Clean Architecture & SoC:** Strict separation of concerns across Entity, Repository, Logic, Menu, and Presentation layers, empowered by partial classes on the main ZOO class.
+- Crash-Safe & Transactional Updates: In-memory rollbacks on write failures (Transakce.ProvedSUlozenim).
+- Append-Only Audit Logging: Immutable tracking of critical domain changes exempt from standard archiving retention purging.
+- Modern C# features: GeneratedRegex, Delegates for lazy loading, LINQ, and System.Text.Json serialization.
+
+---
+
+## Planned Features
+
+- Basic & Payroll Accounting module
+- Statistical data exports
+- Automated Unit Tests
+- Graphical User Interface (WPF / MAUI)
+
+---
+
+## Release History
+
+**v1.0.0 – v1.5.0:** Core domain foundation, external shared libraries, colored console formatting, animal age calculations, and Warehouse module with yearly archiving.
+
+**v1.6.0 – v1.8.1:** Extended employee data, regex email validation, Ticketing Cash Register module, transactional rollbacks, and append-only audit logging.
+
+**v1.9.0 – v2.0.0:** Comprehensive refactoring into partial domain files, segmented single-file entity persistence, statutory retention policies, and complete separation of UI rendering into dedicated presentation classes (Vypisy).
+
+[Downolad latest release here](https://github.com/AdriansRepos/EvidenceZOOCviceniUpraveno2/releases)
+
+</details>
