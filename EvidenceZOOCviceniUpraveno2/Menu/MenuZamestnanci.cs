@@ -73,6 +73,8 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
                 "t1. Přidat dítě",
                 "t2. Upravit dítě",
                 "t3. Uložit / upravit partnera",
+                "t4. Odebrat dítě",
+                "t5. Odebrat partnera",
                 "tn. Návrat zpět"
                 );
 
@@ -91,6 +93,12 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
                         break;
                     case '3':
                         ZamestnanciKonzole.UlozitPartneraZamestnanci(spravceZamestnancu);
+                        break;
+                    case '4':
+                        ZamestnanciKonzole.OdebratDiteZamestnanci(spravceZamestnancu);
+                        break;
+                    case '5':
+                        ZamestnanciKonzole.OdebratPartneraZamestnanci(spravceZamestnancu);
                         break;
                     case 'n':
                         break;
