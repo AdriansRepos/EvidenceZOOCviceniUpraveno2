@@ -1,4 +1,4 @@
-﻿using BarevneVypisyHelper;
+﻿using EvidenceZOOCviceniUpraveno2.Vypisy;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -33,7 +33,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             {
                 // Pokud zápis selže, vrátí paměťový stav zpět do původního stavu
                 rollback.Invoke();                
-                VypisyDoKonzole.VypisVarovani($"Operace '{popisOperace}' se nezdařila a byla vrácena zpět: {ex.Message}");                
+                TransakceVypisy.VypisNeuspesnouTransakci(popisOperace, ex);                
                 return false;
             }
         }
