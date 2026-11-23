@@ -1,12 +1,7 @@
-﻿using BarevneVypisyHelper;
-using EvidenceZOOCviceniUpraveno2.Data;
+﻿using EvidenceZOOCviceniUpraveno2.Data;
+using EvidenceZOOCviceniUpraveno2.DTO.ZamestnanciDTO;
 using EvidenceZOOCviceniUpraveno2.Entity;
 using EvidenceZOOCviceniUpraveno2.Enumy;
-using EvidenceZOOCviceniUpraveno2.Vypisy.Zamestnanci;
-using InputHelper;
-using PohybHelper;
-using SelectHelper;
-using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
@@ -24,330 +19,335 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         }
 
         /// <summary>
-        /// Zadá nového zaměstnance včetně jeho rodinných příslušníků (děti, partner) a vytvoří mu osobní složku.
+        /// Zadá nového zaměstnance a vytvoří mu osobní složku.
         /// </summary>
-        public void Pridat()
+        public void Pridat(ZamestnanecVytvoreniDto dto)
         {
-            Console.WriteLine("ZADÁNÍ NOVÉHO ZAMĚSTNANCE");
-
-            // Vygenerování nového osobního čísla dle konfigurace číselníku
             string osobniCislo = zoo.Zamestnanci.CisloKonfigurace.DalsiCislo();
             zoo.Zamestnanci.UlozCisloKonfiguraci();
-
-            // Načtení osobních a kontaktních údajů z konzole
-            string jmeno = UpravaVstupu.ZeptejSeAUprav("", "jméno", v => v, s => s, jeNove: true);
-            string prijmeni = UpravaVstupu.ZeptejSeAUprav("", "příjmení", v => v, s => s, jeNove: true);
-            string pracovniPozice = UpravaVstupu.ZeptejSeAUprav("", "pracovní pozice", v => v, s => s, jeNove: true);
-
-            DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
-                DateOnly.MinValue, "datum narození", v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
-
-            string rodneCislo = UpravaVstupu.ZeptejSeAUprav(
-                "", "rodné číslo (např. 900101/1234)", v => v, s => s, jeNove: true);
-
-            int mzda = UpravaVstupu.ZeptejSeAUprav(
-                0, "mzda", v => v.ToString(), s => int.Parse(s), jeNove: true);
-
-            string mesto = UpravaVstupu.ZeptejSeAUprav("", "město", v => v, s => s, jeNove: true);
-            string ulice = UpravaVstupu.ZeptejSeAUprav("", "ulice a číslo popisné", v => v, s => s, jeNove: true);
-            string psc = UpravaVstupu.ZeptejSeAUprav("", "PSČ", v => v, s => s, jeNove: true);
-            string telefon = UpravaVstupu.ZeptejSeAUprav("", "telefonní číslo", v => v, s => s, jeNove: true);
-
-            // Načtení e-mailu s ověřením platného formátu
-            string email = UpravaVstupu.ZeptejSeAUprav(
-                "", "e-mail", v => v,
-                s =>
-                {
-                    if (!Zamestnanec.JePlatnyEmail(s))
-                        throw new FormatException("E-mail nemá platný formát (očekává se např. jmeno@domena.cz).");
-                    return s;
-                },
-                jeNove: true);
-
-            Console.WriteLine("Rodinný stav:");
-            RodinnyStav rodinnyStav = VyberEnum<RodinnyStav>();
-
-            Console.WriteLine("Zdravotní stav:");
-            ZdravotniStav zdravotniStav = VyberEnum<ZdravotniStav>();
-
-            string typDokladu = UpravaVstupu.ZeptejSeAUprav("", "typ dokladu (OP, pas...)", v => v, s => s, jeNove: true);
-            string cisloDokladu = UpravaVstupu.ZeptejSeAUprav("", "číslo dokladu", v => v, s => s, jeNove: true);
-
-            // Zadaní vedlejších entit (děti, partner) pro daňové účely
-            List<Dite> deti = ZadatDeti();
-            Partner? partner = ZadatPartnera();
-
-            Zamestnanec novy = new(osobniCislo, jmeno, prijmeni, datumNarozeni, rodneCislo, mzda, pracovniPozice,
-                mesto, ulice, psc, telefon, email, rodinnyStav, zdravotniStav, typDokladu, cisloDokladu, deti, partner);
-
-            // Transakční uložení záznamu
+        
+            Zamestnanec novy = new(
+                osobniCislo,
+                dto.Jmeno,
+                dto.Prijmeni,
+                dto.DatumNarozeni,
+                dto.RodneCislo,
+                dto.Mzda,
+                dto.PracovniPozice,
+                dto.Mesto,
+                dto.Ulice,
+                dto.PSC,
+                dto.Telefon,
+                dto.Email,
+                dto.RodinnyStav,
+                dto.ZdravotniStav,
+                dto.TypDokladu,
+                dto.CisloDokladu,
+                deti: [],
+                partner: null);
+        
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Zamestnanci.Add(novy),
                 rollback: () => zoo.Zamestnanci.Zamestnanci.Remove(novy),
                 ulozeni: zoo.Zamestnanci.Uloz,
                 popisOperace: "přidání zaměstnance");
-
+        
             if (uspech)
             {
-                // Vytvoření podřízené fyzické složky na disku pro dokumenty zaměstnance
                 zoo.Zamestnanci.VytvorSlozkuZamestnance(novy);
-
+        
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
-                    "Zaměstnanci", TypAkce.Pridano, $"{jmeno} {prijmeni} ({osobniCislo})",
-                    novaHodnota: $"mzda {mzda} Kč"));
-
-                VypisyDoKonzole.VypisUspech("Zaměstnanec byl úspěšně přidán.");
+                    "Zaměstnanci", TypAkce.Pridano, $"{novy.Jmeno} {novy.Prijmeni} ({novy.OsobniCislo})",
+                    novaHodnota: $"mzda {novy.Mzda} Kč"));
             }
         }
 
         /// <summary>
-        /// Generická pomocná metoda pro výběr hodnoty výčtového typu ze seznamu v konzoli.
+        /// Metody pro práci s dítětem tak, aby se nenačítali hned, pokud není dítě zadáno.
         /// </summary>
-        private static TEnum VyberEnum<TEnum>() where TEnum : struct, Enum
+        public bool PridatDite(DiteVytvoreniDto dto)
         {
-            var hodnoty = Enum.GetValues<TEnum>();
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCisloZamestnance);
+        
+            if (zam == null)
+                return false;
+        
+            Dite noveDite = new(
+                dto.Jmeno,
+                dto.Prijmeni,
+                dto.DatumNarozeni,
+                dto.RodneCislo,
+                dto.JeDrzitelZtpP,
+                dto.UplatnenBonus);
+        
+            zam.Deti.Add(noveDite);
+            zoo.Zamestnanci.Uloz();
+        
+            return true;
+        }
 
-            for (int i = 0; i < hodnoty.Length; i++)
-                Console.WriteLine($"\t{i + 1}. {PopiskyHelper.ZiskejPopisek(hodnoty[i])}");
+        public bool UpravitDite(DiteUpravaDto dto)
+        {
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCisloZamestnance);
+        
+            if (zam == null)
+                return false;
+        
+            var dite = zam.Deti
+                .FirstOrDefault(d => d.RodneCislo == dto.PuvodniRodneCislo);
+        
+            if (dite == null)
+                return false;
+        
+            dite.Jmeno = dto.Jmeno;
+            dite.Prijmeni = dto.Prijmeni;
+            dite.DatumNarozeni = dto.DatumNarozeni;
+            dite.RodneCislo = dto.RodneCislo;
+            dite.JeDrzitelZtpP = dto.JeDrzitelZtpP;
+            dite.UplatnenBonus = dto.UplatnenBonus;
+        
+            zoo.Zamestnanci.Uloz();
+        
+            return true;
+        }
 
-            while (true)
-            {
-                Console.Write("Vyber možnost: ");
-                if (int.TryParse(Console.ReadLine(), out int volba) && volba >= 1 && volba <= hodnoty.Length)
-                    return hodnoty[volba - 1];
-
-                VypisyDoKonzole.VypisInformaci("Neplatná volba, zkus to znovu.");
-            }
+        public bool OdebratDite(string osobniCisloZamestnance, string rodneCisloDitete)
+        {
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == osobniCisloZamestnance);
+        
+            if (zam == null)
+                return false;
+        
+            var dite = zam.Deti
+                .FirstOrDefault(d => d.RodneCislo == rodneCisloDitete);
+        
+            if (dite == null)
+                return false;
+        
+            zam.Deti.Remove(dite);
+            zoo.Zamestnanci.Uloz();
+        
+            return true;
         }
 
         /// <summary>
-        /// Pomocný dialog pro zadání seznamu dětí daného zaměstnance.
+        /// Metody pro práci s údaji o partnerovi a daňových slevách.
         /// </summary>
-        private static List<Dite> ZadatDeti()
+        public bool UlozitPartnera(PartnerUlozeniDto dto)
         {
-            List<Dite> deti = [];
-
-            Console.Write("Počet dětí: ");
-            int pocetDeti = int.TryParse(Console.ReadLine(), out int p) ? p : 0;
-
-            for (int i = 0; i < pocetDeti; i++)
-            {
-                Console.WriteLine($"--- Dítě {i + 1} ---");
-                string jmenoDite = UpravaVstupu.ZeptejSeAUprav("", "jméno dítěte", v => v, s => s, jeNove: true);
-                string prijmeniDite = UpravaVstupu.ZeptejSeAUprav("", "příjmení dítěte", v => v, s => s, jeNove: true);
-
-                DateOnly datumNarozeniDite = UpravaVstupu.ZeptejSeAUprav(
-                    DateOnly.MinValue, "datum narození dítěte", v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
-
-                string rodneCisloDite = UpravaVstupu.ZeptejSeAUprav(
-                    "", "rodné číslo dítěte (např. 1101011234)", v => v, s => s, jeNove: true);
-
-                bool jeDrzitelZtpP = UpravaVstupu.ZeptejSeAUprav(
-                    false, "držitel průkazu ZTP/P (ano/ne)", v => v ? "ano" : "ne",
-                    s => s.Trim().Equals("ano", StringComparison.OrdinalIgnoreCase), jeNove: true);
-
-                bool uplatnenBonus = UpravaVstupu.ZeptejSeAUprav(
-                    false, "uplatnit daňový bonus na dítě (ano/ne)", v => v ? "ano" : "ne",
-                    s => s.Trim().Equals("ano", StringComparison.OrdinalIgnoreCase), jeNove: true);
-
-                deti.Add(new Dite(jmenoDite, prijmeniDite, datumNarozeniDite, rodneCisloDite, jeDrzitelZtpP, uplatnenBonus));
-            }
-            return deti;
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCisloZamestnance);
+        
+            if (zam == null)
+                return false;
+        
+            zam.Partner = new Partner(
+                dto.Jmeno,
+                dto.Prijmeni,
+                dto.RodneCislo,
+                dto.JeDrzitelZtpP,
+                dto.PecujeODiteDo3Let,
+                dto.PrijemDo68Tisic,
+                dto.UplatnitSlevu);
+        
+            zoo.Zamestnanci.Uloz();
+            return true;
         }
-
-        /// <summary>
-        /// Pomocný dialog pro zadání údajů o partnerovi a daňových slevách.
-        /// </summary>
-        private static Partner? ZadatPartnera()
+        
+        public bool OdebratPartnera(string osobniCisloZamestnance)
         {
-            Console.WriteLine("Má zaměstnanec partnera/manžela/manželku pro uplatnění slevy? A/N");
-            if (!Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
-                return null;
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == osobniCisloZamestnance);
         
-            string jmeno = UpravaVstupu.ZeptejSeAUprav("", "jméno partnera", v => v, s => s, jeNove: true);
-            string prijmeni = UpravaVstupu.ZeptejSeAUprav("", "příjmení partnera", v => v, s => s, jeNove: true);
-            string rc = UpravaVstupu.ZeptejSeAUprav("", "rodné číslo partnera", v => v, s => InputHelper.RodneCislo.Zkontroluj(s), jeNove: true);
-            
-            Console.WriteLine("Je partner držitelem průkazu ZTP/P? A/N");
-            bool ztp = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
+            if (zam == null || zam.Partner == null)
+                return false;
         
-            Console.WriteLine("Pečuje partner o společné dítě do 3 let? A/N");
-            bool diteDo3 = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
-        
-            Console.WriteLine("Jsou vlastní příjmy partnera do 68 000 Kč / rok? A/N");
-            bool prijemDo68 = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
-        
-            Console.WriteLine("Uplatnit slevu na partnera v ročním zúčtování? A/N");
-            bool uplatnit = Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase);
-        
-            return new Partner(jmeno, prijmeni, rc, ztp, diteDo3, prijemDo68, uplatnit);
+            zam.Partner = null;
+            zoo.Zamestnanci.Uloz();
+            return true;
         }
-
-        /// <summary>
-        /// Vypíše seznam všech zaměstnanců včetně kontaktních údajů.
-        /// </summary>
-        public void Vypis()
-        {
-            ZamestnanciVypisy.VypisHlavicku();
-
-            foreach (var zam in zoo.Zamestnanci.Zamestnanci)
-            {
-                ZamestnanciVypisy.VypisZamestnance(zam);
-                ZamestnanciVypisy.VypisKontaktniUdaje(zam);
-                Console.WriteLine();
-            }
-        }
-
+                
         /// <summary>
         /// Umožňuje modifikaci libovolných osobních a mzdových údajů vybraného zaměstnance.
         /// </summary>
-        public void Upravit()
+        public bool Upravit(ZamestnanecUpravaDto dto)
         {
-            Console.WriteLine("ÚPRAVA ZAMĚSTNANCE");
-            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci.Zamestnanci, z => z.Prijmeni, "zaměstnance");
-            if (zam == null) 
-                return;
-
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCislo);
+        
+            if (zam == null)
+                return false;
+        
             int puvodniMzda = zam.Mzda;
             string puvodniPrijmeni = zam.Prijmeni;
-
-            // Úprava vlastností
-            zam.Jmeno = UpravaVstupu.ZeptejSeAUprav(zam.Jmeno, "jméno", v => v, s => s);
-            zam.Prijmeni = UpravaVstupu.ZeptejSeAUprav(zam.Prijmeni, "příjmení", v => v, s => s);
-            zam.PracovniPozice = UpravaVstupu.ZeptejSeAUprav(zam.PracovniPozice, "pracovní pozice", v => v, s => s);
-
-            zam.DatumNarozeni = UpravaVstupu.ZeptejSeAUprav(
-                zam.DatumNarozeni, "datum narození", v => v.ToString(), s => DateOnly.Parse(s));
-
-            zam.RodneCislo = UpravaVstupu.ZeptejSeAUprav(
-                zam.RodneCislo, "rodné číslo (např. 900101/1234)", v => v, s => RodneCislo.Zkontroluj(s));
-
-            zam.Mzda = UpravaVstupu.ZeptejSeAUprav(zam.Mzda, "mzda", v => v.ToString(), s => int.Parse(s));
-
-            zam.Mesto = UpravaVstupu.ZeptejSeAUprav(zam.Mesto, "město", v => v, s => s);
-            zam.Ulice = UpravaVstupu.ZeptejSeAUprav(zam.Ulice, "ulice a číslo popisné", v => v, s => s);
-            zam.PSC = UpravaVstupu.ZeptejSeAUprav(zam.PSC, "PSČ", v => v, s => s);
-            zam.Telefon = UpravaVstupu.ZeptejSeAUprav(zam.Telefon, "telefonní číslo", v => v, s => s);
-
-            zam.Email = UpravaVstupu.ZeptejSeAUprav(
-                zam.Email, "e-mail", v => v,
-                s =>
-                {
-                    if (!Zamestnanec.JePlatnyEmail(s))
-                        throw new FormatException("E-mail nemá platný formát (očekává se např. jmeno@domena.cz).");
-                    return s;
-                });
-
-            Console.WriteLine("Upravit rodinný stav? A/N");
-            if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
-                zam.RodinnyStav = VyberEnum<RodinnyStav>();
-
-            Console.WriteLine("Upravit zdravotní stav? A/N");
-            if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
-                zam.ZdravotniStav = VyberEnum<ZdravotniStav>();
-
-            zam.TypDokladu = UpravaVstupu.ZeptejSeAUprav(zam.TypDokladu, "typ dokladu", v => v, s => s);
-            zam.CisloDokladu = UpravaVstupu.ZeptejSeAUprav(zam.CisloDokladu, "číslo dokladu", v => v, s => s);
-
-            Console.WriteLine("Upravit údaje o dětech (kompletně přepsat seznam)? A/N");
-            if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
-                zam.Deti = ZadatDeti();
-
-            Console.WriteLine("Upravit údaje o partnerovi/manželovi? A/N");
-            if (Console.ReadLine()!.Equals("A", StringComparison.OrdinalIgnoreCase))
-                zam.Partner = ZadatPartnera();
-
+        
+            zam.Jmeno = dto.Jmeno;
+            zam.Prijmeni = dto.Prijmeni;
+            zam.PracovniPozice = dto.PracovniPozice;
+            zam.DatumNarozeni = dto.DatumNarozeni;
+            zam.RodneCislo = dto.RodneCislo;
+            zam.Mzda = dto.Mzda;
+            zam.Mesto = dto.Mesto;
+            zam.Ulice = dto.Ulice;
+            zam.PSC = dto.PSC;
+            zam.Telefon = dto.Telefon;
+            zam.Email = dto.Email;
+            zam.RodinnyStav = dto.RodinnyStav;
+            zam.ZdravotniStav = dto.ZdravotniStav;
+            zam.TypDokladu = dto.TypDokladu;
+            zam.CisloDokladu = dto.CisloDokladu;
+        
             zoo.Zamestnanci.Uloz();
-
-            // Při změně příjmení přejmenuje i jeho fyzickou složku na disku
+        
             if (zam.Prijmeni != puvodniPrijmeni)
                 zoo.Zamestnanci.PrejmenovatSlozkuZamestnance(zam, puvodniPrijmeni);
-
-            // Auditování změn platu
+        
             if (zam.Mzda != puvodniMzda)
             {
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Upraveno, $"{zam.Jmeno} {zam.Prijmeni} – mzda",
                     puvodniMzda.ToString(), zam.Mzda.ToString()));
             }
+        
+            return true;
+        }
 
-            VypisyDoKonzole.VypisUspech("Úprava dokončena.");
+        private static ZamestnanecPrehledDto MapujNaPrehledDto(Zamestnanec zam)
+        {
+            return new ZamestnanecPrehledDto
+            {
+                OsobniCislo = zam.OsobniCislo,
+                Jmeno = zam.Jmeno,
+                Prijmeni = zam.Prijmeni,
+                DatumNarozeni = zam.DatumNarozeni,
+                RodneCislo = zam.RodneCislo,
+                Mzda = zam.Mzda,
+                PracovniPozice = zam.PracovniPozice,
+                Mesto = zam.Mesto,
+                Ulice = zam.Ulice,
+                PSC = zam.PSC,
+                Telefon = zam.Telefon,
+                Email = zam.Email,
+                RodinnyStav = zam.RodinnyStav,
+                ZdravotniStav = zam.ZdravotniStav,
+                TypDokladu = zam.TypDokladu,
+                CisloDokladu = zam.CisloDokladu,
+                Deti = [.. zam.Deti.Select(d => new DitePrehledDto
+                {
+                    Jmeno = d.Jmeno,
+                    Prijmeni = d.Prijmeni,
+                    DatumNarozeni = d.DatumNarozeni,
+                    RodneCislo = d.RodneCislo,
+                    JeDrzitelZtpP = d.JeDrzitelZtpP,
+                    UplatnenBonus = d.UplatnenBonus
+                })],
+                Partner = zam.Partner == null
+                    ? null
+                    : new PartnerPrehledDto
+                    {
+                        Jmeno = zam.Partner.Jmeno,
+                        Prijmeni = zam.Partner.Prijmeni,
+                        RodneCislo = zam.Partner.RodneCislo,
+                        JeDrzitelZtpP = zam.Partner.JeDrzitelZtpP,
+                        PecujeODiteDo3Let = zam.Partner.PecujeODiteDo3Let,
+                        PrijemDo68Tisic = zam.Partner.PrijemDo68Tisic,
+                        UplatnitSlevu = zam.Partner.UplatnitSlevu
+                    }
+            };
         }
 
         /// <summary>
-        /// Odstraní zaměstnance z evidence v paměti i z disku.
+        /// Vrátí přehled všech evidovaných zaměstnanců.
         /// </summary>
-        public void Smazat()
+        public List<ZamestnanecPrehledDto> VratPrehled()
         {
-            Console.WriteLine("SMAZÁNÍ ZAMĚSTNANCE");
-            var zam = SelectHelp.VybratPolozku(zoo.Zamestnanci.Zamestnanci, z => z.Prijmeni, "zaměstnance");
-            if (zam == null) 
-                return;
-
+            return [.. zoo.Zamestnanci.Zamestnanci.Select(MapujNaPrehledDto)];
+        }
+        
+        /// <summary>
+        /// Vyhledá zaměstnance podle shody v příjmení bez ohledu na velikost písmen.
+        /// </summary>
+        public List<ZamestnanecPrehledDto> Vyhledat(string hledanePrijmeni)
+        {
+            if (string.IsNullOrWhiteSpace(hledanePrijmeni))
+                return [];
+        
+            string hledany = hledanePrijmeni.Trim();
+        
+            return [.. zoo.Zamestnanci.Zamestnanci
+                .Where(z => z.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
+                .Select(MapujNaPrehledDto)];
+        }
+        
+        /// <summary>
+        /// Odstraní zaměstnance podle osobního čísla z evidence v paměti i z disku.
+        /// </summary>
+        public bool Smazat(string osobniCislo)
+        {
+            var zam = zoo.Zamestnanci.Zamestnanci
+                .FirstOrDefault(z => z.OsobniCislo == osobniCislo);
+        
+            if (zam == null)
+                return false;
+        
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Zamestnanci.Remove(zam),
                 rollback: () => zoo.Zamestnanci.Zamestnanci.Add(zam),
                 ulozeni: zoo.Zamestnanci.Uloz,
                 popisOperace: "smazání zaměstnance");
-
+        
             if (uspech)
             {
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Smazano, $"{zam.Jmeno} {zam.Prijmeni}",
                     puvodniHodnota: $"mzda {zam.Mzda} Kč"));
-
-                VypisyDoKonzole.VypisInformaci($"Zaměstnanec {zam.Prijmeni} byl smazán.");
             }
+        
+            return uspech;
         }
 
         /// <summary>
-        /// Vyhledává zaměstnance podle shody v příjmení bez ohledu na velikost písmen.
+        /// Vrátí aktuální nastavení číslování zaměstnanců.
         /// </summary>
-        public void Vyhledat()
+        public NastaveniCislovaniZamestnancuDto VratNastaveniCislovani()
         {
-            Console.Write("Zadejte hledané příjmení: ");
-            string hledany = Console.ReadLine()!.Trim().ToLower();
-
-            bool nalezeno = false;
-
-            foreach (var zam in zoo.Zamestnanci.Zamestnanci)
-            {
-                if (zam.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
-                {
-                    ZamestnanciVypisy.VypisZamestnance(zam);
-                    nalezeno = true;
-                }
-            }
-            if (!nalezeno)
-            {
-                VypisyDoKonzole.VypisVarovani("Zaměstnanec nenalezen.");
-            }
-        }
-
-        /// <summary>
-        /// Umožňuje nastavit formát osobního čísla (prefix, počáteční číslo, počet číslic).
-        /// </summary>
-        public void NastaveniCislovaniZamestnancu()
-        {
-            Console.WriteLine("NASTAVENÍ ČÍSLOVÁNÍ ZAMĚSTNANCŮ");
-
             var konfigurace = zoo.Zamestnanci.CisloKonfigurace;
 
-            Console.WriteLine($"Aktuální ukázka dalšího čísla: {konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}");
+            return new NastaveniCislovaniZamestnancuDto
+            {
+                Prefix = konfigurace.Prefix,
+                PocetCislic = konfigurace.PocetCislic,
+                PosledniCislo = konfigurace.PosledniCislo
+            };
+        }
 
-            konfigurace.Prefix = UpravaVstupu.ZeptejSeAUprav(
-                konfigurace.Prefix, "prefix (může být prázdný)", v => v, s => s);
+        /// <summary>
+        /// Uloží nový formát osobního čísla a vrátí ukázku dalšího vydaného čísla.
+        /// </summary>
+        public string UlozNastaveniCislovani(NastaveniCislovaniZamestnancuDto dto)
+        {
+            if (dto.PocetCislic is < 1 or > 20)
+                throw new ArgumentOutOfRangeException(nameof(dto), "Počet číslic musí být v rozsahu 1 až 20.");
 
-            konfigurace.PocetCislic = UpravaVstupu.ZeptejSeAUprav(
-                konfigurace.PocetCislic, "počet číslic", v => v.ToString(), s => int.Parse(s));
+            if (dto.PosledniCislo < 0)
+                throw new ArgumentOutOfRangeException(nameof(dto), "Poslední vydané číslo nemůže být záporné.");
 
-            konfigurace.PosledniCislo = UpravaVstupu.ZeptejSeAUprav(
-                konfigurace.PosledniCislo, "poslední vydané číslo (další zaměstnanec dostane o 1 vyšší)",
-                v => v.ToString(), s => long.Parse(s));
+            var konfigurace = zoo.Zamestnanci.CisloKonfigurace;
+            konfigurace.Prefix = dto.Prefix ?? string.Empty;
+            konfigurace.PocetCislic = dto.PocetCislic;
+            konfigurace.PosledniCislo = dto.PosledniCislo;
 
             zoo.Zamestnanci.UlozCisloKonfiguraci();
 
-            VypisyDoKonzole.VypisUspech($"Nastavení uloženo. Další vydané číslo bude: {konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}");
+            return FormatujDalsiCislo(konfigurace);
+        }
+
+        private static string FormatujDalsiCislo(CisloZamestnanceKonfigurace konfigurace)
+        {
+            return $"{konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}";
         }
     }
-}
+}    
