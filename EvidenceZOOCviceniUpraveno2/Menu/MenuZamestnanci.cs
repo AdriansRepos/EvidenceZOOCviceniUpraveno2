@@ -48,7 +48,7 @@ namespace EvidenceZOOCviceniUpraveno2.Menu
                         ZamestnanciKonzole.VyhledatZamestnance(spravceZamestnancu);
                         break;
                     case '6':
-                        spravceZamestnancu.NastaveniCislovaniZamestnancu();
+                        ZamestnanciKonzole.NastavitCislovaniZamestnancu(spravceZamestnancu);
                         break;
                     case '7':
                         ZobrazPodmenuRodina();
