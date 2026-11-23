@@ -645,4 +645,70 @@ internal static class ZamestnanciKonzole
     
         throw new ArgumentException("Zadejte A nebo N.");
     }
+
+    public static void OdebratDiteZamestnanci(SpravceZamestnancu spravce)
+        {
+            var prehled = spravce.VratPrehled();
+            if (prehled.Count == 0)
+            {
+                VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
+                return;
+            }
+
+            var vybranyZam = SelectHelp.VybratPolozku(
+                prehled,
+                z => $"{z.OsobniCislo} - {z.Jmeno} {z.Prijmeni}",
+                "zaměstnance");
+
+            if (vybranyZam == null)
+                return;
+
+            if (vybranyZam.Deti.Count == 0)
+            {
+                VypisyDoKonzole.VypisInformaci("Zaměstnanec nemá evidované žádné děti.");
+                return;
+            }
+
+            var vybraneDite = SelectHelp.VybratPolozku(
+                vybranyZam.Deti,
+                d => $"{d.Jmeno} {d.Prijmeni} (RČ: {d.RodneCislo})",
+                "dítě");
+
+            if (vybraneDite == null)
+                return;
+
+            if (spravce.OdebratDite(vybranyZam.OsobniCislo, vybraneDite.RodneCislo))
+                VypisyDoKonzole.VypisUspech("Dítě bylo odebráno.");
+            else
+                VypisyDoKonzole.VypisVarovani("Dítě se nepodařilo odebrat.");
+    }
+
+    public static void OdebratPartneraZamestnanci(SpravceZamestnancu spravce)
+    {
+        var prehled = spravce.VratPrehled();
+        if (prehled.Count == 0)
+        {
+            VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
+            return;
+        }
+
+        var vybranyZam = SelectHelp.VybratPolozku(
+            prehled,
+            z => $"{z.OsobniCislo} - {z.Jmeno} {z.Prijmeni}",
+            "zaměstnance");
+
+        if (vybranyZam == null)
+            return;
+
+        if (vybranyZam.Partner == null)
+        {
+            VypisyDoKonzole.VypisInformaci("Zaměstnanec nemá evidovaného žádného partnera.");
+            return;
+        }
+
+        if (spravce.OdebratPartnera(vybranyZam.OsobniCislo))
+            VypisyDoKonzole.VypisUspech("Partner byl odebrán.");
+        else
+            VypisyDoKonzole.VypisVarovani("Partnera se nepodařilo odebrat.");
+    }
 }
