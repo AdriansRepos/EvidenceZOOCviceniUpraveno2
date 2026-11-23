@@ -711,4 +711,48 @@ internal static class ZamestnanciKonzole
         else
             VypisyDoKonzole.VypisVarovani("Partnera se nepodařilo odebrat.");
     }
+
+    public static void NastavitCislovaniZamestnancu(SpravceZamestnancu spravce)
+    {
+        Console.WriteLine("NASTAVENÍ ČÍSLOVÁNÍ ZAMĚSTNANCŮ");
+    
+        var aktualni = spravce.VratNastaveniCislovani();
+        string aktualniUkazka = $"{aktualni.Prefix}{(aktualni.PosledniCislo + 1).ToString().PadLeft(aktualni.PocetCislic, '0')}";
+        Console.WriteLine($"Aktuální ukázka dalšího čísla: {aktualniUkazka}");
+    
+        try
+        {
+            string prefix = UpravaVstupu.ZeptejSeAUprav(
+                aktualni.Prefix,
+                "prefix (může být prázdný)",
+                v => v,
+                s => s); 
+    
+            int pocetCislic = UpravaVstupu.ZeptejSeAUprav(
+                aktualni.PocetCislic,
+                "počet číslic",
+                v => v.ToString(),
+                s => int.Parse(s));
+    
+            long posledniCislo = UpravaVstupu.ZeptejSeAUprav(
+                aktualni.PosledniCislo,
+                "poslední vydané číslo (další zaměstnanec dostane o 1 vyšší)",
+                v => v.ToString(),
+                s => long.Parse(s));
+    
+            NastaveniCislovaniZamestnancuDto dto = new()
+            {
+                Prefix = prefix,
+                PocetCislic = pocetCislic,
+                PosledniCislo = posledniCislo
+            };
+    
+            string dalsiCislo = spravce.UlozNastaveniCislovani(dto);
+            VypisyDoKonzole.VypisUspech($"Nastavení uloženo. Další vydané číslo bude: {dalsiCislo}");
+        }
+        catch (Exception ex)
+        {
+            VypisyDoKonzole.VypisVarovani($"Chyba při ukládání nastavení číslování: {ex.Message}");
+        }
+    }
 }
