@@ -1,58 +1,56 @@
 ﻿using BarevneVypisyHelper;
-using EvidenceZOOCviceniUpraveno2.Logika;
-    
-namespace EvidenceZOOCviceniUpraveno2.Menu
-{
-    class MenuZvirata(SpravceZvirat spravceZvirat)
-    {
-        private readonly SpravceZvirat spravceZvirat = spravceZvirat;
+using EvidenceZOOCviceniUpraveno2.Konzole;
 
-        public void Zobraz()
+namespace EvidenceZOOCviceniUpraveno2.Menu;
+
+class MenuZvirata(ZvirataKonzole zvirataKonzole)
+{
+    private readonly ZvirataKonzole zvirataKonzole = zvirataKonzole;
+
+    public void Zobraz()
+    {
+        char volba;
+        do
         {
-            char volba;
-            do
-            {
-                
-                VypisyDoKonzole.VypisHlavickuMenu("MENU ZVÍŘATA");
-                VypisyDoKonzole.VypisTeloMenu(
+            VypisyDoKonzole.VypisHlavickuMenu("MENU ZVÍŘATA");
+            VypisyDoKonzole.VypisTeloMenu(
                 "1. Přidat zvíře",
                 "2. Vypsat zvířata",
                 "3. Smazat zvíře",
                 "4. Upravit zvíře",
                 "5. Vyhledat zvíře",
                 "n. Návrat do hlavního menu"
-                );
-                
-                VypisyDoKonzole.VypisVyzvuKZadani();
+            );
 
-                volba = char.ToLower(Console.ReadKey().KeyChar);
-                Console.WriteLine();
+            VypisyDoKonzole.VypisVyzvuKZadani();
 
-                switch (volba)
-                {
-                    case '1': 
-                        spravceZvirat.Pridat(); 
-                        break;
-                    case '2': 
-                        spravceZvirat.Vypis(); 
-                        break;
-                    case '3': 
-                        spravceZvirat.Smazat(); 
-                        break;
-                    case '4': 
-                        spravceZvirat.Upravit(); 
-                        break;
-                    case '5': 
-                        spravceZvirat.Vyhledat(); 
-                        break;
-                    case 'n': 
-                        break;
-                    default:                        
-                        VypisyDoKonzole.VypisInformaci("Neplatná volba, opakujte zadání: ");                        
-                        break;
-                }
+            volba = char.ToLower(Console.ReadKey().KeyChar);
+            Console.WriteLine();
 
-            } while (volba != 'n');
-        }
+            switch (volba)
+            {
+                case '1':
+                    zvirataKonzole.Pridat();
+                    break;
+                case '2':
+                    zvirataKonzole.Vypis();
+                    break;
+                case '3':
+                    zvirataKonzole.Smazat();
+                    break;
+                case '4':
+                    zvirataKonzole.Upravit();
+                    break;
+                case '5':
+                    zvirataKonzole.Vyhledat();
+                    break;
+                case 'n':
+                    break;
+                default:
+                    VypisyDoKonzole.VypisInformaci("Neplatná volba, opakujte zadání: ");
+                    break;
+            }
+
+        } while (volba != 'n');
     }
 }
