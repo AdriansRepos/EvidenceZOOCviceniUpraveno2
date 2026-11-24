@@ -7,78 +7,130 @@ using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.KonzoleVstupy;
 
-internal sealed class ZvirataKonzole(SpravceZvirat spravceZvirat)
+internal static class ZvirataKonzole
 {
-    private readonly SpravceZvirat spravceZvirat = spravceZvirat;
-
-    public void Pridat()
+    public static void Pridat(SpravceZvirat spravceZvirat)
     {
-        VypisyDoKonzole.VypisInformaci("ZADÁNÍ NOVÉHO ZVÍŘETE");
-
-        string nazev = UpravaVstupu.ZeptejSeAUprav(
-            "", "název", v => v, s => s, jeNove: true);
-
-        DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
-            DateOnly.MinValue, "datum narození",
-            v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
-
-        double vaha = UpravaVstupu.ZeptejSeAUprav(
-            0.0, "váha", v => v.ToString(), s => double.Parse(s), jeNove: true);
-
-        Console.Write("Bylo zvíře přijato z jiné zoo? (Enter = ne, narozeno zde) Datum přijetí: ");
-        string vstupDatumPrijeti = Console.ReadLine()!.Trim();
-        DateOnly? datumPrijetiZJineZoo = string.IsNullOrWhiteSpace(vstupDatumPrijeti)
-            ? null
-            : DateOnly.Parse(vstupDatumPrijeti);
-
-        NoveZvireDto dto = new()
+        try
         {
-            Nazev = nazev,
-            DatumNarozeni = datumNarozeni,
-            Vaha = vaha,
-            DatumPrijetiZJineZoo = datumPrijetiZJineZoo
-        };
+            VypisyDoKonzole.VypisInformaci("ZADÁNÍ NOVÉHO ZVÍŘETE");
 
-        spravceZvirat.Pridat(dto);
+            string nazev = UpravaVstupu.ZeptejSeAUprav(
+                string.Empty,
+                "název",
+                v => v,
+                s => PovinnyText(s, "název"),
+                jeNove: true);
 
-        VypisyDoKonzole.VypisUspech("Zvíře bylo úspěšně přidáno.");
-    }
+            DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
+                default,
+                "datum narození (DD.MM.RRRR)",
+                v => v.ToString("dd.MM.yyyy"),
+                s => DateOnly.Parse(s),
+                jeNove: true);
 
-    public void Vypis()
-    {
-        ZvirataVypisy.VypisHlavicku();
+            double vaha = UpravaVstupu.ZeptejSeAUprav(
+                0.0,
+                "váha",
+                v => v.ToString(),
+                s => double.Parse(s),
+                jeNove: true);
 
-        foreach (var zvire in spravceZvirat.ZiskejPrehled())
-            ZvirataVypisy.VypisZvire(zvire);
-    }
+            Console.Write("Bylo zvíře přijato z jiné zoo? (Enter = ne, narozeno zde) Datum přijetí: ");
+            string vstupDatumPrijeti = (Console.ReadLine() ?? string.Empty).Trim();
+            DateOnly? datumPrijetiZJineZoo = string.IsNullOrWhiteSpace(vstupDatumPrijeti)
+                ? null
+                : DateOnly.Parse(vstupDatumPrijeti);
 
-    public void Smazat()
-    {
-        VypisyDoKonzole.VypisInformaci("SMAZÁNÍ ZVÍŘETE");
+            NoveZvireDto dto = new()
+            {
+                Nazev = nazev,
+                DatumNarozeni = datumNarozeni,
+                Vaha = vaha,
+                DatumPrijetiZJineZoo = datumPrijetiZJineZoo
+            };
 
-        var zvire = SelectHelp.VybratPolozku(spravceZvirat.ZiskejZvirata(), z => z.Nazev, "zvířete");
-        if (zvire != null && spravceZvirat.Smazat(zvire))
+            spravceZvirat.Pridat(dto);
+            VypisyDoKonzole.VypisUspech("Zvíře bylo úspěšně přidáno.");
+        }
+        catch (Exception ex)
         {
-            VypisyDoKonzole.VypisInformaci($"Zvíře {zvire.Nazev} bylo smazáno.");
+            VypisyDoKonzole.VypisVarovani($"Chyba při přidávání zvířete: {ex.Message}");
         }
     }
 
-    public void Upravit()
+    public static void Vypis(SpravceZvirat spravceZvirat)
     {
+        var prehled = spravceZvirat.ZiskejPrehled().ToList();
+        if (prehled.Count == 0)
+        {
+            VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádná zvířata.");
+            return;
+        }
+
+        ZvirataVypisy.VypisHlavicku();
+
+        foreach (var zvire in prehled)
+        {
+            ZvirataVypisy.VypisZvire(zvire);
+        }
+    }
+
+    public static void Smazat(SpravceZvirat spravceZvirat)
+    {
+        var zvirata = spravceZvirat.ZiskejZvirata().ToList();
+        if (zvirata.Count == 0)
+        {
+            VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádná zvířata.");
+            return;
+        }
+
+        VypisyDoKonzole.VypisInformaci("SMAZÁNÍ ZVÍŘETE");
+
+        var zvire = SelectHelp.VybratPolozku(zvirata, z => z.Nazev, "zvířete");
+        if (zvire == null)
+            return;
+
+        if (spravceZvirat.Smazat(zvire))
+            VypisyDoKonzole.VypisUspech($"Zvíře {zvire.Nazev} bylo smazáno.");
+        else
+            VypisyDoKonzole.VypisVarovani("Zvíře se nepodařilo smazat.");
+    }
+
+    public static void Upravit(SpravceZvirat spravceZvirat)
+    {
+        var zvirata = spravceZvirat.ZiskejZvirata().ToList();
+        if (zvirata.Count == 0)
+        {
+            VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádná zvířata.");
+            return;
+        }
+
         VypisyDoKonzole.VypisInformaci("ÚPRAVA ZVÍŘETE");
 
-        var zvire = SelectHelp.VybratPolozku(spravceZvirat.ZiskejZvirata(), z => z.Nazev, "zvířete");
-        if (zvire != null)
+        var zvire = SelectHelp.VybratPolozku(zvirata, z => z.Nazev, "zvířete");
+        if (zvire == null)
+            return;
+
+        try
         {
             string nazev = UpravaVstupu.ZeptejSeAUprav(
-                zvire.Nazev, "název", v => v, s => s);
+                zvire.Nazev,
+                "název",
+                v => v,
+                s => PovinnyText(s, "název"));
 
             DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
-                zvire.DatumNarozeni, "datum narození",
-                v => v.ToString(), s => DateOnly.Parse(s));
+                zvire.DatumNarozeni,
+                "datum narození (DD.MM.RRRR)",
+                v => v.ToString("dd.MM.yyyy"),
+                s => DateOnly.Parse(s));
 
             double vaha = UpravaVstupu.ZeptejSeAUprav(
-                zvire.Vaha, "váha", v => v.ToString(), s => double.Parse(s));
+                zvire.Vaha,
+                "váha",
+                v => v.ToString(),
+                s => double.Parse(s));
 
             UpravaZvireteDto dto = new()
             {
@@ -88,16 +140,20 @@ internal sealed class ZvirataKonzole(SpravceZvirat spravceZvirat)
             };
 
             if (spravceZvirat.Upravit(zvire, dto))
-            {
                 VypisyDoKonzole.VypisUspech("Úprava dokončena.");
-            }
+            else
+                VypisyDoKonzole.VypisVarovani("Zvíře se nepodařilo upravit.");
+        }
+        catch (Exception ex)
+        {
+            VypisyDoKonzole.VypisVarovani($"Chyba při úpravě zvířete: {ex.Message}");
         }
     }
 
-    public void Vyhledat()
+    public static void Vyhledat(SpravceZvirat spravceZvirat)
     {
         Console.Write("Zadejte hledaný výraz: ");
-        string hledany = Console.ReadLine()!.Trim();
+        string hledany = (Console.ReadLine() ?? string.Empty).Trim();
 
         var nalezena = spravceZvirat.Vyhledat(hledany);
 
@@ -111,5 +167,13 @@ internal sealed class ZvirataKonzole(SpravceZvirat spravceZvirat)
         {
             ZvirataVypisy.VypisVyhledaneZvire(zvire);
         }
+    }
+
+    private static string PovinnyText(string vstup, string nazevPole)
+    {
+        if (string.IsNullOrWhiteSpace(vstup))
+            throw new ArgumentException($"Zadejte platné pole: {nazevPole}.");
+
+        return vstup.Trim();
     }
 }
