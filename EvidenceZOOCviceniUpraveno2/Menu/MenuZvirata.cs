@@ -1,11 +1,12 @@
 ﻿using BarevneVypisyHelper;
 using EvidenceZOOCviceniUpraveno2.KonzoleVstupy;
+using EvidenceZOOCviceniUpraveno2.Logika;
 
 namespace EvidenceZOOCviceniUpraveno2.Menu;
 
-class MenuZvirata(ZvirataKonzole zvirataKonzole)
+class MenuZvirata(SpravceZvirat spravceZvirat)
 {
-    private readonly ZvirataKonzole zvirataKonzole = zvirataKonzole;
+    private readonly SpravceZvirat spravceZvirat = spravceZvirat;
 
     public void Zobraz()
     {
@@ -30,19 +31,19 @@ class MenuZvirata(ZvirataKonzole zvirataKonzole)
             switch (volba)
             {
                 case '1':
-                    zvirataKonzole.Pridat();
+                    ZvirataKonzole.Pridat(spravceZvirat);
                     break;
                 case '2':
-                    zvirataKonzole.Vypis();
+                    ZvirataKonzole.Vypis(spravceZvirat);
                     break;
                 case '3':
-                    zvirataKonzole.Smazat();
+                    ZvirataKonzole.Smazat(spravceZvirat);
                     break;
                 case '4':
-                    zvirataKonzole.Upravit();
+                    ZvirataKonzole.Upravit(spravceZvirat);
                     break;
                 case '5':
-                    zvirataKonzole.Vyhledat();
+                    ZvirataKonzole.Vyhledat(spravceZvirat);
                     break;
                 case 'n':
                     break;
