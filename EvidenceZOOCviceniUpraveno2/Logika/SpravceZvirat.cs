@@ -1,14 +1,11 @@
-﻿using BarevneVypisyHelper;
+﻿using EvidenceZOOCviceniUpraveno2.DTO.ZvirataDTO;
 using EvidenceZOOCviceniUpraveno2.Entity;
-using EvidenceZOOCviceniUpraveno2.Vypisy.Zvirata;
-using SelectHelper;
-using TextHelper;
 
 namespace EvidenceZOOCviceniUpraveno2.Logika
 {
     /// <summary>
     /// Třída zodpovědná za správu zvířat – přidávání, mazání, úpravy,
-    /// výpisy a vyhledávání. Pracuje s daty uloženými v instanci <see cref="Zoo"/>.
+    /// čtení a vyhledávání. Pracuje s daty uloženými v instanci <see cref="Zoo"/>.
     /// </summary>
     class SpravceZvirat
     {
@@ -21,123 +18,120 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         }
 
         /// <summary>
-        /// Zadá nové zvíře, vytvoří pro něj ID a uloží samostatný soubor zvířete.
+        /// Vrátí kolekci všech zvířat v evidenci.
         /// </summary>
-        public void Pridat()
+        public IReadOnlyList<Zvire> ZiskejZvirata()
         {
-            Console.WriteLine("ZADÁNÍ NOVÉHO ZVÍŘETE");
+            return zoo.Zvirata.Zvirata;
+        }
 
+        /// <summary>
+        /// Vrátí přehled všech zvířat pro výpis.
+        /// </summary>
+        public List<ZvirePrehledDto> ZiskejPrehled()
+        {
+            return [.. zoo.Zvirata.Zvirata
+                .Select(z => new ZvirePrehledDto
+                {
+                    Nazev = z.Nazev,
+                    Vek = z.Vek,
+                    Vaha = z.Vaha
+                })];
+        }
+
+        /// <summary>
+        /// Přidá nové zvíře, vygeneruje pro něj ID a uloží samostatný soubor zvířete v rámci transakce.
+        /// </summary>
+        public bool Pridat(NoveZvireDto dto)
+        {
             // Vygenerování nového ID zvířete podle konfigurace
             string id = zoo.Zvirata.CisloKonfigurace.DalsiId();
             zoo.Zvirata.UlozCisloKonfiguraci();
 
-            string nazev = UpravaVstupu.ZeptejSeAUprav(
-                "", "název", v => v, s => s, jeNove: true);
-
-            DateOnly datumNarozeni = UpravaVstupu.ZeptejSeAUprav(
-                DateOnly.MinValue, "datum narození",
-                v => v.ToString(), s => DateOnly.Parse(s), jeNove: true);
-
-            double vaha = UpravaVstupu.ZeptejSeAUprav(
-                0.0, "váha", v => v.ToString(), s => double.Parse(s), jeNove: true);
-
-            Console.Write("Bylo zvíře přijato z jiné zoo? (Enter = ne, narozeno zde) Datum přijetí: ");
-            string vstupDatumPrijeti = Console.ReadLine()!.Trim();
-            DateOnly? datumPrijetiZJineZoo = string.IsNullOrWhiteSpace(vstupDatumPrijeti)
-                ? null
-                : DateOnly.Parse(vstupDatumPrijeti);
-
             List<ZdravotniZaznam> zdravotniZaznamy = [];
+            Zvire nove = new(
+                dto.Nazev,
+                dto.DatumNarozeni,
+                dto.Vaha,
+                dto.DatumPrijetiZJineZoo,
+                zdravotniZaznamy,
+                id);
 
-            Zvire nove = new(nazev, datumNarozeni, vaha, datumPrijetiZJineZoo, zdravotniZaznamy, id);
-
-            // Uložení objektu v paměti a vytvoření dedikovaného souboru
-            zoo.Zvirata.Zvirata.Add(nove);
-            zoo.Zvirata.UlozZvire(nove);
-
-            VypisyDoKonzole.VypisUspech("Zvíře bylo úspěšně přidáno.");
+            return Transakce.ProvedSUlozenim(
+                akce: () => zoo.Zvirata.Zvirata.Add(nove),
+                rollback: () => zoo.Zvirata.Zvirata.Remove(nove),
+                ulozeni: () => zoo.Zvirata.UlozZvire(nove),
+                popisOperace: $"přidání zvířete '{nove.Nazev}'"
+            );
         }
 
         /// <summary>
-        /// Zobrazí tabulkový výpis všech zvířat.
+        /// Odstraní zvíře z evidence a smaže jeho soubor na disku v rámci transakce.
         /// </summary>
-        public void Vypis()
+        public bool Smazat(Zvire? zvire)
         {
-            ZvirataVypisy.VypisHlavicku();
+            if (zvire == null)
+                return false;
 
-            foreach (var zvire in zoo.Zvirata.Zvirata)
-                ZvirataVypisy.VypisZvire(zvire);
+            int index = zoo.Zvirata.Zvirata.IndexOf(zvire);
+            if (index < 0)
+                return false;
+
+            return Transakce.ProvedSUlozenim(
+                akce: () => zoo.Zvirata.Zvirata.RemoveAt(index),
+                rollback: () => zoo.Zvirata.Zvirata.Insert(index, zvire),
+                ulozeni: () => zoo.Zvirata.SmazatZvireSoubor(zvire),
+                popisOperace: $"smazání zvířete '{zvire.Nazev}'"
+            );
         }
 
         /// <summary>
-        /// Odstraní zvíře z evidence a smaže jeho soubor na disku.
+        /// Upraví základní údaje o zvířeti (název, narození, váha) a uloží změny v rámci transakce.
         /// </summary>
-        public void Smazat()
+        public bool Upravit(Zvire? zvire, UpravaZvireteDto dto)
         {
-            Console.WriteLine("SMAZÁNÍ ZVÍŘETE");
+            if (zvire == null)
+                return false;
 
-            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata.Zvirata, z => z.Nazev, "zvířete");
-            if (zvire != null)
-            {
-                zoo.Zvirata.Zvirata.Remove(zvire);
-                zoo.Zvirata.SmazatZvireSoubor(zvire);
+            // Uložení původních hodnot a názvu souboru pro případný rollback i přejmenování
+            string puvodniSoubor = zoo.Zvirata.SouborZvirete(zvire);
+            string puvodniNazev = zvire.Nazev;
+            DateOnly puvodniDatumNarozeni = zvire.DatumNarozeni;
+            double puvodniVaha = zvire.Vaha;
 
-                VypisyDoKonzole.VypisInformaci($"Zvíře {zvire.Nazev} bylo smazáno.");
-            }
-        }
-
-        /// <summary>
-        /// Umožňuje úpravu základních údajů o zvířeti (název, narození, váha).
-        /// </summary>
-        public void Upravit()
-        {
-            Console.WriteLine("ÚPRAVA ZVÍŘETE");
-            var zvire = SelectHelp.VybratPolozku(zoo.Zvirata.Zvirata, z => z.Nazev, "zvířete");
-            if (zvire != null)
-            {
-                // Uložení starého názvu souboru pro případ, že dojde k přejmenování zvířete
-                string puvodniSoubor = zoo.Zvirata.SouborZvirete(zvire);
-
-                zvire.Nazev = UpravaVstupu.ZeptejSeAUprav(
-                    zvire.Nazev, "název", v => v, s => s);
-
-                zvire.DatumNarozeni = UpravaVstupu.ZeptejSeAUprav(
-                    zvire.DatumNarozeni, "datum narození",
-                    v => v.ToString(), s => DateOnly.Parse(s));
-
-                zvire.Vaha = UpravaVstupu.ZeptejSeAUprav(
-                    zvire.Vaha, "váha", v => v.ToString(), s => double.Parse(s));
-
-                // Aktualizace souboru s případným přejmenováním
-                zoo.Zvirata.UlozZvire(zvire, puvodniSoubor);
-
-                VypisyDoKonzole.VypisUspech("Úprava dokončena.");
-            }
-        }
-
-        /// <summary>
-        /// Vyhledává zvíře dle zadání textového řetězce v názvu.
-        /// </summary>
-        public void Vyhledat()
-        {
-            Console.Write("Zadejte hledaný výraz: ");
-            string hledany = Console.ReadLine()!.Trim().ToLower();
-
-            bool nalezeno = false;
-
-            foreach (var zvire in zoo.Zvirata.Zvirata)
-            {
-                if (zvire.Nazev.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
+            return Transakce.ProvedSUlozenim(
+                akce: () =>
                 {
-                    ZvirataVypisy.VypisVyhledaneZvire(zvire);
-                    nalezeno = true;
-                }
-            }
+                    zvire.Nazev = dto.Nazev;
+                    zvire.DatumNarozeni = dto.DatumNarozeni;
+                    zvire.Vaha = dto.Vaha;
+                },
+                rollback: () =>
+                {
+                    zvire.Nazev = puvodniNazev;
+                    zvire.DatumNarozeni = puvodniDatumNarozeni;
+                    zvire.Vaha = puvodniVaha;
+                },
+                ulozeni: () => zoo.Zvirata.UlozZvire(zvire, puvodniSoubor),
+                popisOperace: $"úprava zvířete '{puvodniNazev}'"
+            );
+        }
 
-            if (!nalezeno)
-            {
-                VypisyDoKonzole.VypisVarovani("Zvíře nenalezeno.");
-            }
+        /// <summary>
+        /// Vyhledá zvířata dle zadání textového řetězce v názvu.
+        /// </summary>
+        public List<ZvirePrehledDto> Vyhledat(string hledanyVyraz)
+        {
+            string hledany = hledanyVyraz.Trim().ToLower();
+
+            return [.. zoo.Zvirata.Zvirata
+                .Where(z => z.Nazev.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
+                .Select(z => new ZvirePrehledDto
+                {
+                    Nazev = z.Nazev,
+                    Vek = z.Vek,
+                    Vaha = z.Vaha
+                })];
         }
     }
 }
