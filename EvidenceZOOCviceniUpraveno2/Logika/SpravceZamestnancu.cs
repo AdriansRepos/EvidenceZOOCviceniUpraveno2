@@ -25,7 +25,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             string osobniCislo = zoo.Zamestnanci.CisloKonfigurace.DalsiCislo();
             zoo.Zamestnanci.UlozCisloKonfiguraci();
-        
+
             Zamestnanec novy = new(
                 osobniCislo,
                 dto.Jmeno,
@@ -45,17 +45,17 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 dto.CisloDokladu,
                 deti: [],
                 partner: null);
-        
+
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Zamestnanci.Add(novy),
                 rollback: () => zoo.Zamestnanci.Zamestnanci.Remove(novy),
                 ulozeni: zoo.Zamestnanci.Uloz,
                 popisOperace: "přidání zaměstnance");
-        
+
             if (uspech)
             {
                 zoo.Zamestnanci.VytvorSlozkuZamestnance(novy);
-        
+
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Pridano, $"{novy.Jmeno} {novy.Prijmeni} ({novy.OsobniCislo})",
                     novaHodnota: $"mzda {novy.Mzda} Kč"));
@@ -69,10 +69,10 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCisloZamestnance);
-        
+
             if (zam == null)
                 return false;
-        
+
             Dite noveDite = new(
                 dto.Jmeno,
                 dto.Prijmeni,
@@ -80,57 +80,77 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 dto.RodneCislo,
                 dto.JeDrzitelZtpP,
                 dto.UplatnenBonus);
-        
-            zam.Deti.Add(noveDite);
-            zoo.Zamestnanci.Uloz();
-        
-            return true;
+
+            return Transakce.ProvedSUlozenim(
+                akce: () => zam.Deti.Add(noveDite),
+                rollback: () => zam.Deti.Remove(noveDite),
+                ulozeni: zoo.Zamestnanci.Uloz,
+                popisOperace: "přidání dítěte");
         }
 
         public bool UpravitDite(DiteUpravaDto dto)
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCisloZamestnance);
-        
+
             if (zam == null)
                 return false;
-        
+
             var dite = zam.Deti
                 .FirstOrDefault(d => d.RodneCislo == dto.PuvodniRodneCislo);
-        
+
             if (dite == null)
                 return false;
-        
-            dite.Jmeno = dto.Jmeno;
-            dite.Prijmeni = dto.Prijmeni;
-            dite.DatumNarozeni = dto.DatumNarozeni;
-            dite.RodneCislo = dto.RodneCislo;
-            dite.JeDrzitelZtpP = dto.JeDrzitelZtpP;
-            dite.UplatnenBonus = dto.UplatnenBonus;
-        
-            zoo.Zamestnanci.Uloz();
-        
-            return true;
+
+            string puvodniJmeno = dite.Jmeno;
+            string puvodniPrijmeni = dite.Prijmeni;
+            DateOnly puvodniDatumNarozeni = dite.DatumNarozeni;
+            string puvodniRodneCislo = dite.RodneCislo;
+            bool puvodniJeDrzitelZtpP = dite.JeDrzitelZtpP;
+            bool puvodniUplatnenBonus = dite.UplatnenBonus;
+
+            return Transakce.ProvedSUlozenim(
+                akce: () =>
+                {
+                    dite.Jmeno = dto.Jmeno;
+                    dite.Prijmeni = dto.Prijmeni;
+                    dite.DatumNarozeni = dto.DatumNarozeni;
+                    dite.RodneCislo = dto.RodneCislo;
+                    dite.JeDrzitelZtpP = dto.JeDrzitelZtpP;
+                    dite.UplatnenBonus = dto.UplatnenBonus;
+                },
+                rollback: () =>
+                {
+                    dite.Jmeno = puvodniJmeno;
+                    dite.Prijmeni = puvodniPrijmeni;
+                    dite.DatumNarozeni = puvodniDatumNarozeni;
+                    dite.RodneCislo = puvodniRodneCislo;
+                    dite.JeDrzitelZtpP = puvodniJeDrzitelZtpP;
+                    dite.UplatnenBonus = puvodniUplatnenBonus;
+                },
+                ulozeni: zoo.Zamestnanci.Uloz,
+                popisOperace: "úprava dítěte");
         }
 
         public bool OdebratDite(string osobniCisloZamestnance, string rodneCisloDitete)
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == osobniCisloZamestnance);
-        
+
             if (zam == null)
                 return false;
-        
-            var dite = zam.Deti
-                .FirstOrDefault(d => d.RodneCislo == rodneCisloDitete);
-        
-            if (dite == null)
+
+            int index = zam.Deti.FindIndex(d => d.RodneCislo == rodneCisloDitete);
+            if (index < 0)
                 return false;
-        
-            zam.Deti.Remove(dite);
-            zoo.Zamestnanci.Uloz();
-        
-            return true;
+
+            var dite = zam.Deti[index];
+
+            return Transakce.ProvedSUlozenim(
+                akce: () => zam.Deti.RemoveAt(index),
+                rollback: () => zam.Deti.Insert(index, dite),
+                ulozeni: zoo.Zamestnanci.Uloz,
+                popisOperace: "odebrání dítěte");
         }
 
         /// <summary>
@@ -140,11 +160,12 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCisloZamestnance);
-        
+
             if (zam == null)
                 return false;
-        
-            zam.Partner = new Partner(
+
+            var puvodniPartner = zam.Partner;
+            var novyPartner = new Partner(
                 dto.Jmeno,
                 dto.Prijmeni,
                 dto.RodneCislo,
@@ -152,24 +173,31 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
                 dto.PecujeODiteDo3Let,
                 dto.PrijemDo68Tisic,
                 dto.UplatnitSlevu);
-        
-            zoo.Zamestnanci.Uloz();
-            return true;
+
+            return Transakce.ProvedSUlozenim(
+                akce: () => zam.Partner = novyPartner,
+                rollback: () => zam.Partner = puvodniPartner,
+                ulozeni: zoo.Zamestnanci.Uloz,
+                popisOperace: "uložení partnera");
         }
-        
+
         public bool OdebratPartnera(string osobniCisloZamestnance)
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == osobniCisloZamestnance);
-        
+
             if (zam == null || zam.Partner == null)
                 return false;
-        
-            zam.Partner = null;
-            zoo.Zamestnanci.Uloz();
-            return true;
+
+            var puvodniPartner = zam.Partner;
+
+            return Transakce.ProvedSUlozenim(
+                akce: () => zam.Partner = null,
+                rollback: () => zam.Partner = puvodniPartner,
+                ulozeni: zoo.Zamestnanci.Uloz,
+                popisOperace: "odebrání partnera");
         }
-                
+
         /// <summary>
         /// Umožňuje modifikaci libovolných osobních a mzdových údajů vybraného zaměstnance.
         /// </summary>
@@ -177,41 +205,79 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == dto.OsobniCislo);
-        
+
             if (zam == null)
                 return false;
-        
-            int puvodniMzda = zam.Mzda;
+
+            string puvodniJmeno = zam.Jmeno;
             string puvodniPrijmeni = zam.Prijmeni;
-        
-            zam.Jmeno = dto.Jmeno;
-            zam.Prijmeni = dto.Prijmeni;
-            zam.PracovniPozice = dto.PracovniPozice;
-            zam.DatumNarozeni = dto.DatumNarozeni;
-            zam.RodneCislo = dto.RodneCislo;
-            zam.Mzda = dto.Mzda;
-            zam.Mesto = dto.Mesto;
-            zam.Ulice = dto.Ulice;
-            zam.PSC = dto.PSC;
-            zam.Telefon = dto.Telefon;
-            zam.Email = dto.Email;
-            zam.RodinnyStav = dto.RodinnyStav;
-            zam.ZdravotniStav = dto.ZdravotniStav;
-            zam.TypDokladu = dto.TypDokladu;
-            zam.CisloDokladu = dto.CisloDokladu;
-        
-            zoo.Zamestnanci.Uloz();
-        
+            string puvodniPracovniPozice = zam.PracovniPozice;
+            DateOnly puvodniDatumNarozeni = zam.DatumNarozeni;
+            string puvodniRodneCislo = zam.RodneCislo;
+            int puvodniMzda = zam.Mzda;
+            string puvodniMesto = zam.Mesto;
+            string puvodniUlice = zam.Ulice;
+            string puvodniPSC = zam.PSC;
+            string puvodniTelefon = zam.Telefon;
+            string puvodniEmail = zam.Email;
+            RodinnyStav puvodniRodinnyStav = zam.RodinnyStav;
+            ZdravotniStav puvodniZdravotniStav = zam.ZdravotniStav;
+            string puvodniTypDokladu = zam.TypDokladu;
+            string puvodniCisloDokladu = zam.CisloDokladu;
+
+            bool uspech = Transakce.ProvedSUlozenim(
+                akce: () =>
+                {
+                    zam.Jmeno = dto.Jmeno;
+                    zam.Prijmeni = dto.Prijmeni;
+                    zam.PracovniPozice = dto.PracovniPozice;
+                    zam.DatumNarozeni = dto.DatumNarozeni;
+                    zam.RodneCislo = dto.RodneCislo;
+                    zam.Mzda = dto.Mzda;
+                    zam.Mesto = dto.Mesto;
+                    zam.Ulice = dto.Ulice;
+                    zam.PSC = dto.PSC;
+                    zam.Telefon = dto.Telefon;
+                    zam.Email = dto.Email;
+                    zam.RodinnyStav = dto.RodinnyStav;
+                    zam.ZdravotniStav = dto.ZdravotniStav;
+                    zam.TypDokladu = dto.TypDokladu;
+                    zam.CisloDokladu = dto.CisloDokladu;
+                },
+                rollback: () =>
+                {
+                    zam.Jmeno = puvodniJmeno;
+                    zam.Prijmeni = puvodniPrijmeni;
+                    zam.PracovniPozice = puvodniPracovniPozice;
+                    zam.DatumNarozeni = puvodniDatumNarozeni;
+                    zam.RodneCislo = puvodniRodneCislo;
+                    zam.Mzda = puvodniMzda;
+                    zam.Mesto = puvodniMesto;
+                    zam.Ulice = puvodniUlice;
+                    zam.PSC = puvodniPSC;
+                    zam.Telefon = puvodniTelefon;
+                    zam.Email = puvodniEmail;
+                    zam.RodinnyStav = puvodniRodinnyStav;
+                    zam.ZdravotniStav = puvodniZdravotniStav;
+                    zam.TypDokladu = puvodniTypDokladu;
+                    zam.CisloDokladu = puvodniCisloDokladu;
+                },
+                ulozeni: zoo.Zamestnanci.Uloz,
+                popisOperace: "úprava zaměstnance");
+
+            if (!uspech)
+                return false;
+
             if (zam.Prijmeni != puvodniPrijmeni)
                 zoo.Zamestnanci.PrejmenovatSlozkuZamestnance(zam, puvodniPrijmeni);
-        
+
             if (zam.Mzda != puvodniMzda)
             {
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Upraveno, $"{zam.Jmeno} {zam.Prijmeni} – mzda",
                     puvodniMzda.ToString(), zam.Mzda.ToString()));
             }
-        
+
             return true;
         }
 
@@ -266,7 +332,7 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             return [.. zoo.Zamestnanci.Zamestnanci.Select(MapujNaPrehledDto)];
         }
-        
+
         /// <summary>
         /// Vyhledá zaměstnance podle shody v příjmení bez ohledu na velikost písmen.
         /// </summary>
@@ -274,14 +340,14 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             if (string.IsNullOrWhiteSpace(hledanePrijmeni))
                 return [];
-        
+
             string hledany = hledanePrijmeni.Trim();
-        
+
             return [.. zoo.Zamestnanci.Zamestnanci
                 .Where(z => z.Prijmeni.Contains(hledany, StringComparison.CurrentCultureIgnoreCase))
                 .Select(MapujNaPrehledDto)];
         }
-        
+
         /// <summary>
         /// Odstraní zaměstnance podle osobního čísla z evidence v paměti i z disku.
         /// </summary>
@@ -289,23 +355,23 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
         {
             var zam = zoo.Zamestnanci.Zamestnanci
                 .FirstOrDefault(z => z.OsobniCislo == osobniCislo);
-        
+
             if (zam == null)
                 return false;
-        
+
             bool uspech = Transakce.ProvedSUlozenim(
                 akce: () => zoo.Zamestnanci.Zamestnanci.Remove(zam),
                 rollback: () => zoo.Zamestnanci.Zamestnanci.Add(zam),
                 ulozeni: zoo.Zamestnanci.Uloz,
                 popisOperace: "smazání zaměstnance");
-        
+
             if (uspech)
             {
                 zoo.Logy.ZapisAudit(AuditZaznam.Vytvor(
                     "Zaměstnanci", TypAkce.Smazano, $"{zam.Jmeno} {zam.Prijmeni}",
                     puvodniHodnota: $"mzda {zam.Mzda} Kč"));
             }
-        
+
             return uspech;
         }
 
@@ -350,4 +416,4 @@ namespace EvidenceZOOCviceniUpraveno2.Logika
             return $"{konfigurace.Prefix}{(konfigurace.PosledniCislo + 1).ToString().PadLeft(konfigurace.PocetCislic, '0')}";
         }
     }
-}    
+}
