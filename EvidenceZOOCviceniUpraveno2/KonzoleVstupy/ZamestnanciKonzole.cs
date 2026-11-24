@@ -12,7 +12,7 @@ namespace EvidenceZOOCviceniUpraveno2.KonzoleVstupy;
 
 internal static class ZamestnanciKonzole
 {
-    public static void PridatZamestnance(SpravceZamestnancu spravce)
+    public static void PridatZamestnance(SpravceZamestnancu spravceZamestnancu)
     {
         try
         {
@@ -122,7 +122,7 @@ internal static class ZamestnanciKonzole
                 CisloDokladu = cisloDokladu
             };
 
-            spravce.Pridat(dto);
+            spravceZamestnancu.Pridat(dto);
             VypisyDoKonzole.VypisUspech("Zaměstnanec byl přidán.");
         }
         catch (Exception ex)
@@ -149,9 +149,9 @@ internal static class ZamestnanciKonzole
         }
     }
 
-    public static void SmazatZamestnance(SpravceZamestnancu spravce)
+    public static void SmazatZamestnance(SpravceZamestnancu spravceZamestnancu)
     {
-        var prehled = spravce.VratPrehled();
+        var prehled = spravceZamestnancu.VratPrehled();
         if (prehled.Count == 0)
         {
             VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -167,16 +167,16 @@ internal static class ZamestnanciKonzole
         if (vybrany == null)
             return;
 
-        bool smazano = spravce.Smazat(vybrany.OsobniCislo);
+        bool smazano = spravceZamestnancu.Smazat(vybrany.OsobniCislo);
         if (smazano)
             VypisyDoKonzole.VypisUspech($"Zaměstnanec {vybrany.Prijmeni} byl smazán.");
         else
             VypisyDoKonzole.VypisVarovani("Zaměstnance se nepodařilo smazat.");
     }
 
-    public static void UpravitZamestnance(SpravceZamestnancu spravce)
+    public static void UpravitZamestnance(SpravceZamestnancu spravceZamestnancu)
     {
-        var prehled = spravce.VratPrehled();
+        var prehled = spravceZamestnancu.VratPrehled();
         if (prehled.Count == 0)
         {
             VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -298,7 +298,7 @@ internal static class ZamestnanciKonzole
                 CisloDokladu = cisloDokladu
             };
 
-            bool upraveno = spravce.Upravit(dto);
+            bool upraveno = spravceZamestnancu.Upravit(dto);
             if (upraveno)
                 VypisyDoKonzole.VypisUspech("Údaje zaměstnance byly upraveny.");
             else
@@ -310,12 +310,12 @@ internal static class ZamestnanciKonzole
         }
     }
 
-    public static void VyhledatZamestnance(SpravceZamestnancu spravce)
+    public static void VyhledatZamestnance(SpravceZamestnancu spravceZamestnancu)
     {
         Console.Write("Zadejte hledané příjmení: ");
         string hledany = Console.ReadLine() ?? string.Empty;
 
-        var nalezeni = spravce.Vyhledat(hledany);
+        var nalezeni = spravceZamestnancu.Vyhledat(hledany);
 
         if (nalezeni.Count == 0)
         {
@@ -359,9 +359,9 @@ internal static class ZamestnanciKonzole
         }
     }
 
-    public static void PridatDiteZamestnanci(SpravceZamestnancu spravce)
+    public static void PridatDiteZamestnanci(SpravceZamestnancu spravceZamestnancu)
     {
-        var prehled = spravce.VratPrehled();
+        var prehled = spravceZamestnancu.VratPrehled();
         if (prehled.Count == 0)
         {
             VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -420,7 +420,7 @@ internal static class ZamestnanciKonzole
                 UplatnenBonus = uplatnenBonus
             };
     
-            if (spravce.PridatDite(dto))
+            if (spravceZamestnancu.PridatDite(dto))
                 VypisyDoKonzole.VypisUspech("Dítě bylo přidáno.");
             else
                 VypisyDoKonzole.VypisVarovani("Dítě se nepodařilo přidat.");
@@ -431,9 +431,9 @@ internal static class ZamestnanciKonzole
         }
     }
     
-    public static void UpravitDiteZamestnanci(SpravceZamestnancu spravce)
+    public static void UpravitDiteZamestnanci(SpravceZamestnancu spravceZamestnancu)
     {
-        var prehled = spravce.VratPrehled();
+        var prehled = spravceZamestnancu.VratPrehled();
         if (prehled.Count == 0)
         {
             VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -512,7 +512,7 @@ internal static class ZamestnanciKonzole
                 UplatnenBonus = uplatnenBonus
             };
     
-            if (spravce.UpravitDite(dto))
+            if (spravceZamestnancu.UpravitDite(dto))
                 VypisyDoKonzole.VypisUspech("Údaje dítěte byly upraveny.");
             else
                 VypisyDoKonzole.VypisVarovani("Údaje dítěte se nepodařilo upravit.");
@@ -523,9 +523,9 @@ internal static class ZamestnanciKonzole
         }
     }
     
-    public static void UlozitPartneraZamestnanci(SpravceZamestnancu spravce)
+    public static void UlozitPartneraZamestnanci(SpravceZamestnancu spravceZamestnancu)
     {
-        var prehled = spravce.VratPrehled();
+        var prehled = spravceZamestnancu.VratPrehled();
         if (prehled.Count == 0)
         {
             VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -610,7 +610,7 @@ internal static class ZamestnanciKonzole
                 UplatnitSlevu = uplatnitSlevu
             };
     
-            if (spravce.UlozitPartnera(dto))
+            if (spravceZamestnancu.UlozitPartnera(dto))
                 VypisyDoKonzole.VypisUspech("Údaje partnera byly uloženy.");
             else
                 VypisyDoKonzole.VypisVarovani("Údaje partnera se nepodařilo uložit.");
@@ -646,9 +646,9 @@ internal static class ZamestnanciKonzole
         throw new ArgumentException("Zadejte A nebo N.");
     }
 
-    public static void OdebratDiteZamestnanci(SpravceZamestnancu spravce)
+    public static void OdebratDiteZamestnanci(SpravceZamestnancu spravceZamestnancu)
         {
-            var prehled = spravce.VratPrehled();
+            var prehled = spravceZamestnancu.VratPrehled();
             if (prehled.Count == 0)
             {
                 VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -677,15 +677,15 @@ internal static class ZamestnanciKonzole
             if (vybraneDite == null)
                 return;
 
-            if (spravce.OdebratDite(vybranyZam.OsobniCislo, vybraneDite.RodneCislo))
+            if (spravceZamestnancu.OdebratDite(vybranyZam.OsobniCislo, vybraneDite.RodneCislo))
                 VypisyDoKonzole.VypisUspech("Dítě bylo odebráno.");
             else
                 VypisyDoKonzole.VypisVarovani("Dítě se nepodařilo odebrat.");
     }
 
-    public static void OdebratPartneraZamestnanci(SpravceZamestnancu spravce)
+    public static void OdebratPartneraZamestnanci(SpravceZamestnancu spravceZamestnancu)
     {
-        var prehled = spravce.VratPrehled();
+        var prehled = spravceZamestnancu.VratPrehled();
         if (prehled.Count == 0)
         {
             VypisyDoKonzole.VypisInformaci("V evidenci nejsou žádní zaměstnanci.");
@@ -706,17 +706,17 @@ internal static class ZamestnanciKonzole
             return;
         }
 
-        if (spravce.OdebratPartnera(vybranyZam.OsobniCislo))
+        if (spravceZamestnancu.OdebratPartnera(vybranyZam.OsobniCislo))
             VypisyDoKonzole.VypisUspech("Partner byl odebrán.");
         else
             VypisyDoKonzole.VypisVarovani("Partnera se nepodařilo odebrat.");
     }
 
-    public static void NastavitCislovaniZamestnancu(SpravceZamestnancu spravce)
+    public static void NastavitCislovaniZamestnancu(SpravceZamestnancu spravceZamestnancu)
     {
         Console.WriteLine("NASTAVENÍ ČÍSLOVÁNÍ ZAMĚSTNANCŮ");
     
-        var aktualni = spravce.VratNastaveniCislovani();
+        var aktualni = spravceZamestnancu.VratNastaveniCislovani();
         string aktualniUkazka = $"{aktualni.Prefix}{(aktualni.PosledniCislo + 1).ToString().PadLeft(aktualni.PocetCislic, '0')}";
         Console.WriteLine($"Aktuální ukázka dalšího čísla: {aktualniUkazka}");
     
@@ -747,7 +747,7 @@ internal static class ZamestnanciKonzole
                 PosledniCislo = posledniCislo
             };
     
-            string dalsiCislo = spravce.UlozNastaveniCislovani(dto);
+            string dalsiCislo = spravceZamestnancu.UlozNastaveniCislovani(dto);
             VypisyDoKonzole.VypisUspech($"Nastavení uloženo. Další vydané číslo bude: {dalsiCislo}");
         }
         catch (Exception ex)
