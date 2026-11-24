@@ -1,5 +1,5 @@
 ﻿using BarevneVypisyHelper;
-using EvidenceZOOCviceniUpraveno2.Konzole;
+using EvidenceZOOCviceniUpraveno2.KonzoleVstupy;
 
 namespace EvidenceZOOCviceniUpraveno2.Menu;
 
